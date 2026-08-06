@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}工作台 - 支付宝收款码系统{% endblock %}
+{% block body %}
+<div class="app-shell">
+  {% include "_sidebar.html" %}
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title">工作台</div>
+      <div class="user">
+        <div class="avatar" style="background:{{ merchant.avatar_color }}">{{ merchant.merchant_name|initial }}</div>
+        <span class="uname">{{ merchant.merchant_name }}</span>
+        <a class="logout" href="{{ url_for('logout') }}">退出</a>
+      </div>
+    </div>
+    <div class="content">
+      <!-- 统计卡片 -->
+      <div class="stat-grid">
+        <div class="stat blue">
+          <div class="icon">¥</div>
+          <div class="label">今日收款</div>
+          <div class="value">{{ today_total|money }}</div>
+          <div class="sub">{{ today_count }} 笔交易</div>
+        </div>
+        <div class="stat green">
+          <div class="icon">∑</div>
+          <div class="label">累计收款</div>
+          <div class="value">{{ total_total|money }}</div>
+          <div class="sub">{{ total_count }} 笔交易</div>
+        </div>
+        <div class="stat orange">
+          <div class="icon">◳</div>
+          <div class="label">活跃收款码</div>
+          <div class="value">{{ active_codes }}</div>
+          <div class="sub">个收款码可用</div>
+        </div>
+        <div class="stat purple">
+          <div class="icon">↗</div>
+          <div class="label">日均收款</div>
+          <div class="value">
+            {% if total_count > 0 %}
+              {{ (total_total / 7)|money }}
+            {% else %}
+              ¥0.00
+            {% endif %}
+          </div>
+          <div class="sub">近 7 天平均</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:16px;">
+        <!-- 趋势 -->
+        <div class="card" style="margin-top:0">
+          <div class="card-title">近 7 天收款趋势</div>
+          {% if trend %}
+            <div class="trend">
+              {% set max_val = (trend | map(attribute='total') | max) or 1 %}
+              {% for t in trend %}
+                <div class="bar-col">
+                  <div class="bar" style="height:{{ (t.total / max_val * 100)|int }}%"
+                       data-val="{{ t.total|money }} / {{ t.cnt }}笔"></div>
+                  <div class="bar-date">{{ t.d[5:] }}</div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty"><div class="ico">📊</div>暂无收款数据</div>
+          {% endif %}
+        </div>
+
+        <!-- 快捷操作 -->
+        <div class="card" style="margin-top:0">
+          <div class="card-title">快捷操作</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <a class="btn btn-primary btn-block" href="{{ url_for('codes') }}">＋ 生成收款码</a>
+            <a class="btn btn-block" href="{{ url_for('records') }}">查看收款记录</a>
+            <a class="btn btn-block" href="{{ url_for('profile') }}">商户资料设置</a>
+          </div>
+          <div style="margin-top:18px; padding:14px; background:var(--blue-light); border-radius:10px; font-size:13px; color:var(--blue-dark);">
+            扫码即可收款：生成的二维码可下载打印，买家扫码后在支付页输入金额（自由金额码）或直接确认（固定金额码）完成支付。
+          </div>
+        </div>
+      </div>
+
+      <!-- 最近收款 -->
+      <div class="card">
+        <div class="card-title">
+          <span>最近收款</span>
+          <a href="{{ url_for('records') }}" class="btn btn-sm">查看全部</a>
+        </div>
+        {% if recent %}
+        <table>
+          <thead>
+            <tr><th>买家</th><th>金额</th><th>备注</th><th>时间</th></tr>
+          </thead>
+          <tbody>
+            {% for r in recent %}
+            <tr>
+              <td>{{ r.buyer }}</td>
+              <td class="amount-pos">{{ r.amount|money }}</td>
+              <td class="text-sub">{{ r.note or '—' }}</td>
+              <td class="text-mute">{{ r.paid_at }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <div class="empty"><div class="ico">💸</div>暂无收款记录，生成收款码开始收款吧</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

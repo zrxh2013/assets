@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}向 {{ merchant.merchant_name if merchant else '商户' }} 付款{% endblock %}
+{% block body %}
+<div class="pay-page">
+  <div class="pay-card">
+    {% if error %}
+      <div class="pay-error">
+        <div class="x">✕</div>
+        <h3 style="font-size:18px; margin-bottom:8px;">无法收款</h3>
+        <p class="tip">{{ error }}</p>
+      </div>
+    {% elif code and merchant %}
+      <!-- 商户头部 -->
+      <div class="mer-head">
+        <div class="av" style="background:{{ merchant.avatar_color }}">{{ merchant.merchant_name|initial }}</div>
+        <div>
+          <div class="name">{{ merchant.merchant_name }}</div>
+          <div class="acc">支付宝账号：{{ merchant.alipay_account }}</div>
+        </div>
+      </div>
+
+      <!-- 支付表单 -->
+      <div id="payFormWrap">
+        <div class="pay-amount-display">
+          {% if code.amount %}
+            <span class="cur">¥</span><span class="num">{{ '%.2f'|format(code.amount) }}</span>
+          {% else %}
+            <span class="cur">¥</span><span class="num" id="amountShow" style="color:#bbb;">0.00</span>
+          {% endif %}
+        </div>
+
+        <div class="field-line">
+          <span class="k">收款备注</span>
+          <span class="v">{{ code.note or '—' }}</span>
+        </div>
+
+        {% if code.amount is none %}
+        <div class="form-group" style="margin-top:18px;">
+          <label>付款金额</label>
+          <div class="input-group">
+            <span class="addon">¥</span>
+            <input class="form-control" type="number" step="0.01" min="0.01" id="amountInput"
+                   placeholder="请输入付款金额">
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label>留言（可选）</label>
+          <input class="form-control" type="text" id="noteInput" maxlength="40" placeholder="给商户留言">
+        </div>
+
+        <div class="form-group">
+          <label>付款人</label>
+          <input class="form-control" type="text" id="buyerInput" placeholder="匿名用户" value="匿名用户">
+        </div>
+
+        <button class="alipay-btn" id="payBtn">
+          {% if code.amount %}确认支付 {{ '%.2f'|format(code.amount) }} 元{% else %}确认支付{% endif %}
+        </button>
+      </div>
+
+      <!-- 支付成功 -->
+      <div id="paySuccess" style="display:none;">
+        <div class="pay-success">
+          <div class="check">✓</div>
+          <div class="amt" id="successAmt">¥0.00</div>
+          <p class="tip">支付成功</p>
+          <p class="tip" style="margin-top:8px;">已向 {{ merchant.merchant_name }} 完成付款</p>
+          <p class="tip" id="successTime" style="margin-top:14px;"></p>
+        </div>
+      </div>
+    {% else %}
+      <div class="pay-error">
+        <div class="x">✕</div>
+        <h3 style="font-size:18px; margin-bottom:8px;">收款码无效</h3>
+        <p class="tip">该二维码已失效或不存在</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<script>
+const token = "{{ code.token if code else '' }}";
+const fixedAmount = {{ code.amount if code and code.amount else 'null' }};
+
+const amountInput = document.getElementById('amountInput');
+const amountShow = document.getElementById('amountShow');
+if (amountInput) {
+  amountInput.addEventListener('input', () => {
+    const v = parseFloat(amountInput.value) || 0;
+    amountShow.textContent = v.toFixed(2);
+    amountShow.style.color = v > 0 ? '#1a1a1a' : '#bbb';
+  });
+}
+
+document.getElementById('payBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('payBtn');
+  const amount = fixedAmount !== null ? fixedAmount : parseFloat(amountInput.value);
+  if (fixedAmount === null && (!amount || amount <= 0)) {
+    alert('请输入有效金额'); return;
+  }
+  btn.disabled = true;
+  btn.textContent = '处理中...';
+  const fd = new FormData();
+  if (fixedAmount === null) fd.append('amount', amount);
+  fd.append('note', document.getElementById('noteInput').value);
+  fd.append('buyer', document.getElementById('buyerInput').value);
+  try {
+    const res = await fetch('/pay/' + token + '/submit', { method:'POST', body: fd });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('payFormWrap').style.display = 'none';
+      document.getElementById('paySuccess').style.display = 'block';
+      document.getElementById('successAmt').textContent = '¥' + parseFloat(data.amount).toFixed(2);
+      const now = new Date();
+      document.getElementById('successTime').textContent =
+        now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' +
+        String(now.getDate()).padStart(2,'0') + ' ' +
+        String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' +
+        String(now.getSeconds()).padStart(2,'0');
+    } else {
+      alert(data.msg || '支付失败');
+      btn.disabled = false;
+      btn.textContent = '确认支付';
+    }
+  } catch (e) {
+    alert('网络错误，请重试');
+    btn.disabled = false;
+    btn.textContent = '确认支付';
+  }
+});
+</script>
+{% endblock %}

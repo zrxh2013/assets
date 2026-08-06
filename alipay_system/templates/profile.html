@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}商户资料 - 支付宝收款码系统{% endblock %}
+{% block body %}
+<div class="app-shell">
+  {% include "_sidebar.html" %}
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title">商户资料</div>
+      <div class="user">
+        <div class="avatar" style="background:{{ merchant.avatar_color }}">{{ merchant.merchant_name|initial }}</div>
+        <span class="uname">{{ merchant.merchant_name }}</span>
+        <a class="logout" href="{{ url_for('logout') }}">退出</a>
+      </div>
+    </div>
+    <div class="content">
+      <div class="card" style="max-width:560px;">
+        <div class="card-title">基本资料</div>
+        {% if error %}<div class="error" style="background:#fff2f0;color:var(--red);border:1px solid #ffccc7;padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:16px;">{{ error }}</div>{% endif %}
+        <form method="post">
+          <div class="form-group">
+            <label>用户名（不可修改）</label>
+            <input class="form-control" type="text" value="{{ merchant.username }}" disabled>
+          </div>
+          <div class="form-group">
+            <label>商户名称</label>
+            <input class="form-control" type="text" name="merchant_name" required value="{{ merchant.merchant_name }}">
+          </div>
+          <div class="form-group">
+            <label>支付宝账号</label>
+            <input class="form-control" type="text" name="alipay_account" required value="{{ merchant.alipay_account }}">
+          </div>
+          <div class="form-group">
+            <label>头像颜色</label>
+            <div class="color-swatches">
+              {% set colors = ['#1677FF','#00b96b','#fa8c16','#7c3aed','#eb2f96','#13c2c2','#fa541c','#1a1a1a'] %}
+              {% for c in colors %}
+                <div class="color-swatch {{ 'active' if merchant.avatar_color == c else '' }}"
+                     style="background:{{ c }}" data-color="{{ c }}"></div>
+              {% endfor %}
+            </div>
+            <input type="hidden" name="avatar_color" id="avatarColor" value="{{ merchant.avatar_color }}">
+          </div>
+          <div class="form-group">
+            <label>新密码（留空则不修改）</label>
+            <input class="form-control" type="password" name="password" placeholder="至少 6 位">
+          </div>
+          <button class="btn btn-primary" type="submit">保存修改</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.color-swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+    sw.classList.add('active');
+    document.getElementById('avatarColor').value = sw.dataset.color;
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{# 共享侧边栏 #}
+<aside class="sidebar">
+  <div class="brand">
+    <div class="logo">¥</div>
+    <span>收款码系统</span>
+  </div>
+  <nav>
+    <a href="{{ url_for('dashboard') }}"
+       class="{{ 'active' if request.endpoint == 'dashboard' else '' }}">
+      <span class="ico">▤</span><span>工作台</span>
+    </a>
+    <a href="{{ url_for('codes') }}"
+       class="{{ 'active' if request.endpoint == 'codes' else '' }}">
+      <span class="ico">◳</span><span>收款码</span>
+    </a>
+    <a href="{{ url_for('records') }}"
+       class="{{ 'active' if request.endpoint == 'records' else '' }}">
+      <span class="ico">≣</span><span>收款记录</span>
+    </a>
+    <a href="{{ url_for('profile') }}"
+       class="{{ 'active' if request.endpoint == 'profile' else '' }}">
+      <span class="ico">⚙</span><span>商户资料</span>
+    </a>
+  </nav>
+  <div class="footer">© 2026 收款码系统 v1.0</div>
+</aside>

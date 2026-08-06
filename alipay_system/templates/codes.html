@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}收款码 - 支付宝收款码系统{% endblock %}
+{% block body %}
+<div class="app-shell">
+  {% include "_sidebar.html" %}
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title">收款码管理</div>
+      <div class="user">
+        <div class="avatar" style="background:{{ merchant.avatar_color }}">{{ merchant.merchant_name|initial }}</div>
+        <span class="uname">{{ merchant.merchant_name }}</span>
+        <a class="logout" href="{{ url_for('logout') }}">退出</a>
+      </div>
+    </div>
+    <div class="content">
+      <!-- 生成收款码 -->
+      <div class="card">
+        <div class="card-title">生成新收款码</div>
+        <form id="createForm" style="display:grid; grid-template-columns:1fr 1fr auto; gap:12px; align-items:end;">
+          <div class="form-group" style="margin:0">
+            <label>金额（留空=自由金额）</label>
+            <div class="input-group">
+              <span class="addon">¥</span>
+              <input class="form-control" type="number" step="0.01" min="0.01"
+                     name="amount" id="amount" placeholder="如 9.90">
+            </div>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>备注（可选）</label>
+            <input class="form-control" type="text" name="note" id="note"
+                   maxlength="40" placeholder="如 奶茶店-中杯">
+          </div>
+          <button class="btn btn-primary" type="submit">生成收款码</button>
+        </form>
+      </div>
+
+      <!-- 收款码列表 -->
+      <div class="card">
+        <div class="card-title">
+          <span>我的收款码（{{ codes|length }}）</span>
+        </div>
+        {% if codes %}
+        <table>
+          <thead>
+            <tr>
+              <th>金额</th><th>备注</th><th>状态</th>
+              <th>收款笔数</th><th>累计金额</th><th>创建时间</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in codes %}
+            <tr data-cid="{{ c.id }}" data-token="{{ c.token }}"
+                data-amount="{{ c.amount if c.amount else '' }}"
+                data-note="{{ c.note }}" data-status="{{ c.status }}">
+              <td>
+                {% if c.amount %}<strong>{{ c.amount|money }}</strong>
+                {% else %}<span class="badge blue">自由金额</span>{% endif %}
+              </td>
+              <td class="text-sub">{{ c.note or '—' }}</td>
+              <td>
+                {% if c.status == 'active' %}
+                  <span class="badge green">启用</span>
+                {% else %}
+                  <span class="badge gray">停用</span>
+                {% endif %}
+              </td>
+              <td>{{ c.pay_cnt }}</td>
+              <td class="amount-pos">{{ c.pay_sum|money }}</td>
+              <td class="text-mute">{{ c.created_at }}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-sm view-qr">查看</button>
+                  <a class="btn btn-sm" href="{{ url_for('codes_qr', cid=c.id) }}" download>下载</a>
+                  <button class="btn btn-sm toggle-btn">
+                    {% if c.status == 'active' %}停用{% else %}启用{% endif %}
+                  </button>
+                  <button class="btn btn-sm btn-danger del-btn">删除</button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <div class="empty"><div class="ico">◳</div>还没有收款码，使用上方表单生成第一个吧</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 二维码弹窗 -->
+<div class="modal-mask" id="qrModal">
+  <div class="modal">
+    <h3>收款二维码</h3>
+    <div class="qr-note" id="qrNote">展示给买家扫码即可收款</div>
+    <div class="qr-box"><img id="qrImg" src="" alt="QR"></div>
+    <div class="pay-amount" id="qrAmount"></div>
+    <div class="pay-to" id="qrMerchant">{{ merchant.merchant_name }}</div>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <a class="btn btn-primary" id="qrDownload" download>下载二维码</a>
+      <a class="btn" id="qrPayLink" target="_blank">打开支付页</a>
+      <button class="btn" onclick="document.getElementById('qrModal').classList.remove('show')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const form = document.getElementById('createForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(form);
+  const res = await fetch('{{ url_for("codes_create") }}', { method:'POST', body: fd });
+  const data = await res.json();
+  if (!data.ok) { alert(data.msg || '生成失败'); return; }
+  form.reset();
+  // 刷新列表
+  location.reload();
+});
+
+document.querySelectorAll('.view-qr').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tr = btn.closest('tr');
+    const cid = tr.dataset.cid;
+    const amount = tr.dataset.amount;
+    const note = tr.dataset.note;
+    document.getElementById('qrImg').src = '{{ url_for("codes") }}' + '/' + cid + '/qr.png?t=' + Date.now();
+    document.getElementById('qrAmount').textContent = amount ? '¥' + parseFloat(amount).toFixed(2) : '自由金额';
+    document.getElementById('qrNote').textContent = note ? ('备注：' + note) : '展示给买家扫码即可收款';
+    document.getElementById('qrDownload').href = document.getElementById('qrImg').src;
+    document.getElementById('qrPayLink').href = '/pay/' + tr.dataset.token;
+    document.getElementById('qrModal').classList.add('show');
+  });
+});
+
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const tr = btn.closest('tr');
+    const cid = tr.dataset.cid;
+    const res = await fetch('/codes/' + cid + '/toggle', { method:'POST' });
+    const data = await res.json();
+    if (data.ok) location.reload();
+  });
+});
+
+document.querySelectorAll('.del-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    if (!confirm('确认删除该收款码？相关收款记录也会被删除。')) return;
+    const tr = btn.closest('tr');
+    const cid = tr.dataset.cid;
+    const res = await fetch('/codes/' + cid + '/delete', { method:'POST' });
+    const data = await res.json();
+    if (data.ok) location.reload();
+  });
+});
+
+document.getElementById('qrModal').addEventListener('click', (e) => {
+  if (e.target.id === 'qrModal') e.target.classList.remove('show');
+});
+</script>
+{% endblock %}
