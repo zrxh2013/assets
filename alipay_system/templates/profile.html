@@ -53,6 +53,19 @@
                 <div style="font-size:12px; color:var(--text-mute); margin-top:6px;">
                   当前脱敏显示：{{ merchant.id_card | mask_id }}
                 </div>
+                {% if merchant.id_card_source == 'sample' %}
+                <div style="margin-top:8px; padding:8px 10px; background:#fffbe6; border:1px solid #ffe58f; border-radius:6px; font-size:12px; color:#d48806; line-height:1.5;">
+                  ⚠ 示例数据，待法人本人实名认证。该身份证号为系统生成的测试号（仅通过校验位算法），非法人真实身份证。请由法人本人登录后通过实名认证更新。
+                </div>
+                {% elif merchant.id_card_source == 'official' %}
+                <div style="margin-top:8px; padding:8px 10px; background:#f6ffed; border:1px solid #b7eb8f; border-radius:6px; font-size:12px; color:#389e0d;">
+                  ✓ 已通过官方实名认证接口核验
+                </div>
+                {% else %}
+                <div style="margin-top:8px; padding:8px 10px; background:#e6f4ff; border:1px solid #91caff; border-radius:6px; font-size:12px; color:#0958d9;">
+                  ℹ 已由商户本人填写认证
+                </div>
+                {% endif %}
               {% endif %}
             </div>
           </div>

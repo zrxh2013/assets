@@ -74,7 +74,8 @@ def init_db():
             contact_phone TEXT NOT NULL DEFAULT '',            -- 联系电话
             website       TEXT NOT NULL DEFAULT '',            -- 官网
             org_type      TEXT NOT NULL DEFAULT '',            -- 机构类型（事业单位等）
-            established_date TEXT NOT NULL DEFAULT ''          -- 成立日期
+            established_date TEXT NOT NULL DEFAULT '',         -- 成立日期
+            id_card_source TEXT NOT NULL DEFAULT 'self_certified'  -- 身份证来源：self_certified本人认证 / sample示例数据 / official官方接口
         );
 
         CREATE TABLE IF NOT EXISTS codes (
@@ -121,6 +122,7 @@ def init_db():
     _ensure_column(db, "merchants", "website", "TEXT NOT NULL DEFAULT ''")
     _ensure_column(db, "merchants", "org_type", "TEXT NOT NULL DEFAULT ''")
     _ensure_column(db, "merchants", "established_date", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "id_card_source", "TEXT NOT NULL DEFAULT 'self_certified'")
     db.commit()
     db.close()
 
