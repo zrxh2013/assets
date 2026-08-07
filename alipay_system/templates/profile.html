@@ -93,6 +93,55 @@
             </div>
           </div>
 
+          <!-- 工商信息区块（企查查同步，只读展示） -->
+          {% if merchant.uscc or merchant.legal_person %}
+          <div style="margin: 22px 0 8px; padding: 14px 16px; background: #f0f7ff; border-radius: 10px; border: 1px solid #d6e8ff;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px;">
+              <span style="font-weight:600; font-size:14px; color: var(--blue-dark);">工商信息（企查查同步）</span>
+              <span class="badge blue" style="font-size:11px;">数据来源：企查查</span>
+            </div>
+            <table style="width:100%; font-size:13px;">
+              <tr>
+                <td style="padding:6px 0; color:var(--text-sub); width:32%;">统一社会信用代码</td>
+                <td style="padding:6px 0; font-weight:500;">{{ merchant.uscc or '—' }}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0; color:var(--text-sub);">法定代表人</td>
+                <td style="padding:6px 0; font-weight:500;">{{ merchant.legal_person or '—' }}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0; color:var(--text-sub);">注册资本</td>
+                <td style="padding:6px 0; font-weight:500;">{{ merchant.reg_capital or '—' }}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0; color:var(--text-sub);">成立日期</td>
+                <td style="padding:6px 0; font-weight:500;">{{ merchant.established_date or '—' }}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0; color:var(--text-sub);">机构类型</td>
+                <td style="padding:6px 0; font-weight:500;">{{ merchant.org_type or '—' }}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0; color:var(--text-sub);">注册地址</td>
+                <td style="padding:6px 0; font-weight:500;">{{ merchant.reg_address or '—' }}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0; color:var(--text-sub);">联系电话</td>
+                <td style="padding:6px 0; font-weight:500;">{{ merchant.contact_phone or '—' }}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0; color:var(--text-sub);">官方网站</td>
+                <td style="padding:6px 0; font-weight:500;">
+                  {% if merchant.website %}<a href="{{ merchant.website }}" target="_blank">{{ merchant.website }}</a>{% else %}—{% endif %}
+                </td>
+              </tr>
+            </table>
+            <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #d6e8ff; font-size:11px; color:var(--text-mute);">
+              以上信息由企查查公开数据同步，如有变更请以国家企业信用信息公示系统为准。
+            </div>
+          </div>
+          {% endif %}
+
           <div class="form-group">
             <label>头像颜色</label>
             <div class="color-swatches">

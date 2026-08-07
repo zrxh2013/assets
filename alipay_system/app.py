@@ -66,7 +66,15 @@ def init_db():
             id_verified   INTEGER NOT NULL DEFAULT 0,
             merchant_type TEXT NOT NULL DEFAULT 'individual',  -- individual个人 / notary_org公证处法人 / enterprise企业
             merchant_level TEXT NOT NULL DEFAULT 'basic',      -- basic普通用户 / merchant商户 / vip高级商户
-            org_license   TEXT NOT NULL DEFAULT ''             -- 机构许可证号（公证处法人/企业用）
+            org_license   TEXT NOT NULL DEFAULT '',            -- 机构许可证号（公证处法人/企业用）
+            uscc          TEXT NOT NULL DEFAULT '',            -- 统一社会信用代码
+            legal_person  TEXT NOT NULL DEFAULT '',            -- 法定代表人
+            reg_address   TEXT NOT NULL DEFAULT '',            -- 注册地址
+            reg_capital   TEXT NOT NULL DEFAULT '',            -- 注册资本
+            contact_phone TEXT NOT NULL DEFAULT '',            -- 联系电话
+            website       TEXT NOT NULL DEFAULT '',            -- 官网
+            org_type      TEXT NOT NULL DEFAULT '',            -- 机构类型（事业单位等）
+            established_date TEXT NOT NULL DEFAULT ''          -- 成立日期
         );
 
         CREATE TABLE IF NOT EXISTS codes (
@@ -105,6 +113,14 @@ def init_db():
     _ensure_column(db, "merchants", "merchant_type", "TEXT NOT NULL DEFAULT 'individual'")
     _ensure_column(db, "merchants", "merchant_level", "TEXT NOT NULL DEFAULT 'basic'")
     _ensure_column(db, "merchants", "org_license", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "uscc", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "legal_person", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "reg_address", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "reg_capital", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "contact_phone", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "website", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "org_type", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "established_date", "TEXT NOT NULL DEFAULT ''")
     db.commit()
     db.close()
 
