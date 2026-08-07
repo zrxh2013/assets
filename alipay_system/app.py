@@ -60,7 +60,10 @@ def init_db():
             merchant_name TEXT NOT NULL,
             alipay_account TEXT NOT NULL,
             avatar_color  TEXT NOT NULL DEFAULT '#1677FF',
-            created_at    TEXT NOT NULL
+            created_at    TEXT NOT NULL,
+            real_name     TEXT NOT NULL DEFAULT '',
+            id_card       TEXT NOT NULL DEFAULT '',
+            id_verified   INTEGER NOT NULL DEFAULT 0
         );
 
         CREATE TABLE IF NOT EXISTS codes (
@@ -92,8 +95,38 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_codes_merchant ON codes(merchant_id);
         """
     )
+    # 兼容旧表：补充新增的身份证字段（CREATE TABLE IF NOT EXISTS 不会更新已有表结构）
+    _ensure_column(db, "merchants", "real_name", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "id_card", "TEXT NOT NULL DEFAULT ''")
+    _ensure_column(db, "merchants", "id_verified", "INTEGER NOT NULL DEFAULT 0")
     db.commit()
     db.close()
+
+
+def _ensure_column(db, table, column, definition):
+    """若某列不存在则添加（SQLite 轻量迁移）。"""
+    cols = {row[1] for row in db.execute(f"PRAGMA table_info({table})")}
+    if column not in cols:
+        db.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+
+
+def mask_id_card(id_card: str) -> str:
+    """身份证脱敏：前6位 + 8个星号 + 后4位。"""
+    if not id_card or len(id_card) < 10:
+        return id_card or ""
+    return id_card[:6] + "*" * 8 + id_card[-4:]
+
+
+def is_valid_id_card(id_card: str) -> bool:
+    """简易 18 位身份证校验（含校验位验证）。"""
+    if not id_card or len(id_card) != 18:
+        return False
+    if not id_card[:17].isdigit():
+        return False
+    weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
+    check_map = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2']
+    total = sum(int(id_card[i]) * weights[i] for i in range(17))
+    return id_card[17].upper() == check_map[total % 11]
 
 
 # --------------------------------------------------------------- helpers
@@ -175,20 +208,29 @@ def register():
         password = request.form.get("password") or ""
         merchant_name = (request.form.get("merchant_name") or "").strip()
         alipay_account = (request.form.get("alipay_account") or "").strip()
+        real_name = (request.form.get("real_name") or "").strip()
+        id_card = (request.form.get("id_card") or "").strip().upper()
 
         if not (username and password and merchant_name and alipay_account):
             return render_template("register.html", error="请完整填写所有字段"), 400
         if len(password) < 6:
             return render_template("register.html", error="密码至少 6 位"), 400
+        # 身份证为选填，但若填写则必须校验通过
+        if id_card:
+            if not real_name:
+                return render_template("register.html", error="填写身份证时需同时提供真实姓名"), 400
+            if not is_valid_id_card(id_card):
+                return render_template("register.html", error="身份证号格式或校验位不正确"), 400
 
         db = get_db()
         if db.execute("SELECT id FROM merchants WHERE username = ?", (username,)).fetchone():
             return render_template("register.html", error="用户名已被占用"), 400
 
         cur = db.execute(
-            "INSERT INTO merchants (username, password_hash, merchant_name, alipay_account, created_at) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (username, hash_password(password), merchant_name, alipay_account, now()),
+            "INSERT INTO merchants (username, password_hash, merchant_name, alipay_account, created_at, "
+            "real_name, id_card, id_verified) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (username, hash_password(password), merchant_name, alipay_account, now(),
+             real_name, id_card, 1 if id_card else 0),
         )
         db.commit()
         session["merchant_id"] = cur.lastrowid
@@ -470,24 +512,45 @@ def profile():
         alipay_account = (request.form.get("alipay_account") or "").strip()
         avatar_color = (request.form.get("avatar_color") or "#1677FF").strip()
         new_password = (request.form.get("password") or "").strip()
+        real_name = (request.form.get("real_name") or "").strip()
+        id_card = (request.form.get("id_card") or "").strip().upper()
 
         if not (merchant_name and alipay_account):
             return render_template("profile.html", merchant=m,
                                    error="商户名和支付宝账号不能为空"), 400
+
+        # 处理实名身份证：若提交了身份证则校验；留空则保留原值（不强制要求）
+        id_verified = m["id_verified"] if "id_verified" in m.keys() else 0
+        if id_card:
+            if not real_name:
+                return render_template("profile.html", merchant=m,
+                                       error="填写身份证时需同时提供真实姓名"), 400
+            if not is_valid_id_card(id_card):
+                return render_template("profile.html", merchant=m,
+                                       error="身份证号格式或校验位不正确"), 400
+            id_verified = 1
+        elif not real_name:
+            # 两者都留空：清空之前的身份证信息
+            id_card = ""
+            id_verified = 0
 
         if new_password:
             if len(new_password) < 6:
                 return render_template("profile.html", merchant=m,
                                        error="新密码至少 6 位"), 400
             db.execute(
-                "UPDATE merchants SET merchant_name=?, alipay_account=?, avatar_color=?, password_hash=? WHERE id=?",
+                "UPDATE merchants SET merchant_name=?, alipay_account=?, avatar_color=?, "
+                "real_name=?, id_card=?, id_verified=?, password_hash=? WHERE id=?",
                 (merchant_name, alipay_account, avatar_color,
+                 real_name, id_card, id_verified,
                  hash_password(new_password), m["id"]),
             )
         else:
             db.execute(
-                "UPDATE merchants SET merchant_name=?, alipay_account=?, avatar_color=? WHERE id=?",
-                (merchant_name, alipay_account, avatar_color, m["id"]),
+                "UPDATE merchants SET merchant_name=?, alipay_account=?, avatar_color=?, "
+                "real_name=?, id_card=?, id_verified=? WHERE id=?",
+                (merchant_name, alipay_account, avatar_color,
+                 real_name, id_card, id_verified, m["id"]),
             )
         db.commit()
         return redirect(url_for("profile"))
@@ -516,6 +579,11 @@ def _money(v):
 @app.template_filter("initial")
 def _initial(name):
     return (name[:1].upper() if name else "M")
+
+
+@app.template_filter("mask_id")
+def _mask_id(id_card):
+    return mask_id_card(id_card)
 
 
 # --------------------------------------------------------------- entrypoint

@@ -27,6 +27,16 @@
         <input class="form-control" type="text" name="alipay_account" required
                value="{{ request.form.alipay_account }}" placeholder="邮箱或手机号">
       </div>
+      <div class="form-group">
+        <label>真实姓名（实名认证，选填）</label>
+        <input class="form-control" type="text" name="real_name"
+               value="{{ request.form.real_name }}" placeholder="如 王小明">
+      </div>
+      <div class="form-group">
+        <label>身份证号（选填，18 位）</label>
+        <input class="form-control" type="text" name="id_card" maxlength="18"
+               value="{{ request.form.id_card }}" placeholder="如 110101199001010012">
+      </div>
       <button class="btn btn-primary btn-block" type="submit">注 册</button>
     </form>
     <div class="switch">已有账号？ <a href="{{ url_for('login') }}">去登录</a></div>
