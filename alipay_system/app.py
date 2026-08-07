@@ -63,7 +63,10 @@ def init_db():
             created_at    TEXT NOT NULL,
             real_name     TEXT NOT NULL DEFAULT '',
             id_card       TEXT NOT NULL DEFAULT '',
-            id_verified   INTEGER NOT NULL DEFAULT 0
+            id_verified   INTEGER NOT NULL DEFAULT 0,
+            merchant_type TEXT NOT NULL DEFAULT 'individual',  -- individual个人 / notary_org公证处法人 / enterprise企业
+            merchant_level TEXT NOT NULL DEFAULT 'basic',      -- basic普通用户 / merchant商户 / vip高级商户
+            org_license   TEXT NOT NULL DEFAULT ''             -- 机构许可证号（公证处法人/企业用）
         );
 
         CREATE TABLE IF NOT EXISTS codes (
@@ -95,10 +98,13 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_codes_merchant ON codes(merchant_id);
         """
     )
-    # 兼容旧表：补充新增的身份证字段（CREATE TABLE IF NOT EXISTS 不会更新已有表结构）
+    # 兼容旧表：补充新增字段（CREATE TABLE IF NOT EXISTS 不会更新已有表结构）
     _ensure_column(db, "merchants", "real_name", "TEXT NOT NULL DEFAULT ''")
     _ensure_column(db, "merchants", "id_card", "TEXT NOT NULL DEFAULT ''")
     _ensure_column(db, "merchants", "id_verified", "INTEGER NOT NULL DEFAULT 0")
+    _ensure_column(db, "merchants", "merchant_type", "TEXT NOT NULL DEFAULT 'individual'")
+    _ensure_column(db, "merchants", "merchant_level", "TEXT NOT NULL DEFAULT 'basic'")
+    _ensure_column(db, "merchants", "org_license", "TEXT NOT NULL DEFAULT ''")
     db.commit()
     db.close()
 
@@ -127,6 +133,21 @@ def is_valid_id_card(id_card: str) -> bool:
     check_map = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2']
     total = sum(int(id_card[i]) * weights[i] for i in range(17))
     return id_card[17].upper() == check_map[total % 11]
+
+
+# 商户类型 / 等级枚举（集中管理，前后端共用）
+MERCHANT_TYPES = {
+    "individual": "个人",
+    "notary_org": "公证处法人",
+    "enterprise": "企业",
+}
+MERCHANT_LEVELS = {
+    "basic": "普通用户",
+    "merchant": "商户",
+    "vip": "高级商户",
+}
+VALID_TYPES = set(MERCHANT_TYPES)
+VALID_LEVELS = set(MERCHANT_LEVELS)
 
 
 # --------------------------------------------------------------- helpers
@@ -210,11 +231,19 @@ def register():
         alipay_account = (request.form.get("alipay_account") or "").strip()
         real_name = (request.form.get("real_name") or "").strip()
         id_card = (request.form.get("id_card") or "").strip().upper()
+        merchant_type = (request.form.get("merchant_type") or "individual").strip()
+        org_license = (request.form.get("org_license") or "").strip()
 
         if not (username and password and merchant_name and alipay_account):
             return render_template("register.html", error="请完整填写所有字段"), 400
         if len(password) < 6:
             return render_template("register.html", error="密码至少 6 位"), 400
+        if merchant_type not in VALID_TYPES:
+            return render_template("register.html", error="商户类型不合法"), 400
+        # 公证处法人 / 企业 必须提供机构许可证号
+        if merchant_type in ("notary_org", "enterprise") and not org_license:
+            return render_template("register.html",
+                                   error="该商户类型需提供机构许可证号"), 400
         # 身份证为选填，但若填写则必须校验通过
         if id_card:
             if not real_name:
@@ -226,11 +255,16 @@ def register():
         if db.execute("SELECT id FROM merchants WHERE username = ?", (username,)).fetchone():
             return render_template("register.html", error="用户名已被占用"), 400
 
+        # 新注册默认为普通用户等级；已完成实名或机构类型可直接为商户等级
+        level = "merchant" if (id_card or merchant_type != "individual") else "basic"
+
         cur = db.execute(
             "INSERT INTO merchants (username, password_hash, merchant_name, alipay_account, created_at, "
-            "real_name, id_card, id_verified) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "real_name, id_card, id_verified, merchant_type, merchant_level, org_license) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (username, hash_password(password), merchant_name, alipay_account, now(),
-             real_name, id_card, 1 if id_card else 0),
+             real_name, id_card, 1 if id_card else 0,
+             merchant_type, level, org_license),
         )
         db.commit()
         session["merchant_id"] = cur.lastrowid
@@ -514,10 +548,23 @@ def profile():
         new_password = (request.form.get("password") or "").strip()
         real_name = (request.form.get("real_name") or "").strip()
         id_card = (request.form.get("id_card") or "").strip().upper()
+        merchant_type = (request.form.get("merchant_type") or "individual").strip()
+        merchant_level = (request.form.get("merchant_level") or m["merchant_level"]).strip()
+        org_license = (request.form.get("org_license") or "").strip()
 
         if not (merchant_name and alipay_account):
             return render_template("profile.html", merchant=m,
                                    error="商户名和支付宝账号不能为空"), 400
+        if merchant_type not in VALID_TYPES:
+            return render_template("profile.html", merchant=m,
+                                   error="商户类型不合法"), 400
+        if merchant_level not in VALID_LEVELS:
+            return render_template("profile.html", merchant=m,
+                                   error="商户等级不合法"), 400
+        # 公证处法人 / 企业 必须提供机构许可证号
+        if merchant_type in ("notary_org", "enterprise") and not org_license:
+            return render_template("profile.html", merchant=m,
+                                   error="该商户类型需提供机构许可证号"), 400
 
         # 处理实名身份证：若提交了身份证则校验；留空则保留原值（不强制要求）
         id_verified = m["id_verified"] if "id_verified" in m.keys() else 0
@@ -530,7 +577,6 @@ def profile():
                                        error="身份证号格式或校验位不正确"), 400
             id_verified = 1
         elif not real_name:
-            # 两者都留空：清空之前的身份证信息
             id_card = ""
             id_verified = 0
 
@@ -540,21 +586,27 @@ def profile():
                                        error="新密码至少 6 位"), 400
             db.execute(
                 "UPDATE merchants SET merchant_name=?, alipay_account=?, avatar_color=?, "
-                "real_name=?, id_card=?, id_verified=?, password_hash=? WHERE id=?",
+                "real_name=?, id_card=?, id_verified=?, merchant_type=?, merchant_level=?, "
+                "org_license=?, password_hash=? WHERE id=?",
                 (merchant_name, alipay_account, avatar_color,
                  real_name, id_card, id_verified,
+                 merchant_type, merchant_level, org_license,
                  hash_password(new_password), m["id"]),
             )
         else:
             db.execute(
                 "UPDATE merchants SET merchant_name=?, alipay_account=?, avatar_color=?, "
-                "real_name=?, id_card=?, id_verified=? WHERE id=?",
+                "real_name=?, id_card=?, id_verified=?, merchant_type=?, merchant_level=?, "
+                "org_license=? WHERE id=?",
                 (merchant_name, alipay_account, avatar_color,
-                 real_name, id_card, id_verified, m["id"]),
+                 real_name, id_card, id_verified,
+                 merchant_type, merchant_level, org_license, m["id"]),
             )
         db.commit()
         return redirect(url_for("profile"))
-    return render_template("profile.html", merchant=m)
+    return render_template("profile.html", merchant=m,
+                           merchant_types=MERCHANT_TYPES,
+                           merchant_levels=MERCHANT_LEVELS)
 
 
 # --------------------------------------------------------------- error handlers

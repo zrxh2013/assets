@@ -56,6 +56,43 @@
               {% endif %}
             </div>
           </div>
+
+          <!-- 商户资质区块（类型 + 等级 + 许可证） -->
+          <div style="margin: 22px 0 8px; padding: 14px 16px; background: #f6f8fb; border-radius: 10px; border: 1px solid #eef0f3;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px;">
+              <span style="font-weight:600; font-size:14px;">商户资质</span>
+              {% if merchant.merchant_level == 'vip' %}
+                <span class="badge green">高级商户</span>
+              {% elif merchant.merchant_level == 'merchant' %}
+                <span class="badge blue">商户</span>
+              {% else %}
+                <span class="badge gray">普通用户</span>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label>商户类型</label>
+              <select class="form-control" name="merchant_type" id="merchantType">
+                {% for key, label in merchant_types.items() %}
+                  <option value="{{ key }}" {{ 'selected' if merchant.merchant_type == key else '' }}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>商户等级</label>
+              <select class="form-control" name="merchant_level" id="merchantLevel">
+                {% for key, label in merchant_levels.items() %}
+                  <option value="{{ key }}" {{ 'selected' if merchant.merchant_level == key else '' }}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group" id="orgLicenseGroup"
+                 style="margin-bottom:0; {{ '' if merchant.merchant_type in ('notary_org','enterprise') else 'display:none;' }}">
+              <label>机构许可证号</label>
+              <input class="form-control" type="text" name="org_license"
+                     value="{{ merchant.org_license or '' }}" placeholder="公证处执业证号 / 营业执照号">
+            </div>
+          </div>
+
           <div class="form-group">
             <label>头像颜色</label>
             <div class="color-swatches">
@@ -85,5 +122,14 @@ document.querySelectorAll('.color-swatch').forEach(sw => {
     document.getElementById('avatarColor').value = sw.dataset.color;
   });
 });
+
+// 公证处法人 / 企业 时显示机构许可证号字段
+const typeSelect = document.getElementById('merchantType');
+const licenseGroup = document.getElementById('orgLicenseGroup');
+function toggleLicense() {
+  licenseGroup.style.display = (typeSelect.value === 'notary_org' || typeSelect.value === 'enterprise') ? '' : 'none';
+}
+typeSelect.addEventListener('change', toggleLicense);
+toggleLicense();
 </script>
 {% endblock %}

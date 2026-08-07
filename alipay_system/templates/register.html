@@ -28,6 +28,19 @@
                value="{{ request.form.alipay_account }}" placeholder="邮箱或手机号">
       </div>
       <div class="form-group">
+        <label>商户类型</label>
+        <select class="form-control" name="merchant_type" id="merchantType">
+          <option value="individual" {{ 'selected' if (request.form.merchant_type or 'individual') == 'individual' else '' }}>个人</option>
+          <option value="notary_org" {{ 'selected' if request.form.merchant_type == 'notary_org' else '' }}>公证处法人</option>
+          <option value="enterprise" {{ 'selected' if request.form.merchant_type == 'enterprise' else '' }}>企业</option>
+        </select>
+      </div>
+      <div class="form-group" id="orgLicenseGroup" style="display:none;">
+        <label>机构许可证号</label>
+        <input class="form-control" type="text" name="org_license"
+               value="{{ request.form.org_license }}" placeholder="公证处执业证号 / 营业执照号">
+      </div>
+      <div class="form-group">
         <label>真实姓名（实名认证，选填）</label>
         <input class="form-control" type="text" name="real_name"
                value="{{ request.form.real_name }}" placeholder="如 王小明">
@@ -42,4 +55,14 @@
     <div class="switch">已有账号？ <a href="{{ url_for('login') }}">去登录</a></div>
   </div>
 </div>
+<script>
+// 公证处法人 / 企业 时显示机构许可证号字段
+const typeSelect = document.getElementById('merchantType');
+const licenseGroup = document.getElementById('orgLicenseGroup');
+function toggleLicense() {
+  licenseGroup.style.display = (typeSelect.value === 'notary_org' || typeSelect.value === 'enterprise') ? '' : 'none';
+}
+typeSelect.addEventListener('change', toggleLicense);
+toggleLicense();
+</script>
 {% endblock %}
