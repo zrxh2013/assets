@@ -116,6 +116,8 @@ tbody tr:hover { background: #fafbfc; }
 .badge.green { background: #e6fffb; color: var(--green); }
 .badge.gray { background: #f0f1f3; color: var(--text-mute); }
 .badge.blue { background: var(--blue-light); color: var(--blue); }
+.badge.orange { background: #fff7e6; color: var(--orange); }
+.badge.red { background: #fff1f0; color: var(--red); }
 
 /* ---------- buttons ---------- */
 .btn {

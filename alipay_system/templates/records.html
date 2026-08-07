@@ -34,30 +34,48 @@
 
       <div class="card">
         <div class="card-title">
-          <span>收款明细（共 {{ rows|length }} 笔，合计 {{ total|money }}）</span>
-          <a class="btn btn-sm" href="{{ url_for('records') }}">重置</a>
+          <span>收款明细（共 {{ rows|length }} 笔，已支付合计 {{ total|money }}）</span>
+          <div style="display:flex; gap:8px;">
+            <a class="btn btn-sm" href="{{ url_for('records') }}">重置</a>
+            <a class="btn btn-sm btn-primary" href="{{ url_for('export_csv', q=q, from=date_from, to=date_to) }}">导出对账单</a>
+          </div>
         </div>
         {% if rows %}
         <table>
           <thead>
             <tr>
-              <th>时间</th><th>买家</th><th>金额</th>
-              <th>收款备注</th><th>码备注</th><th>状态</th>
+              <th>交易单号</th><th>下单时间</th><th>支付时间</th><th>买家</th>
+              <th>金额</th><th>支付方式</th><th>收款备注</th><th>状态</th><th>操作</th>
             </tr>
           </thead>
           <tbody>
             {% for r in rows %}
             <tr>
-              <td class="text-mute">{{ r.paid_at }}</td>
+              <td class="text-mute" style="font-size:11px; font-family:monospace;">{{ r.trade_no }}</td>
+              <td class="text-mute">{{ r.created_at }}</td>
+              <td class="text-mute">{{ r.paid_at or '—' }}</td>
               <td>{{ r.buyer }}</td>
               <td class="amount-pos">{{ r.amount|money }}</td>
+              <td class="text-sub">{{ pay_methods.get(r.pay_method, '—') if r.pay_method else '—' }}</td>
               <td class="text-sub">{{ r.note or '—' }}</td>
-              <td class="text-sub">{{ r.code_note or '—' }}</td>
               <td>
-                {% if r.status == 'success' %}
-                  <span class="badge green">成功</span>
+                {% if r.status == 'paid' %}
+                  <span class="badge green">已支付</span>
+                {% elif r.status == 'pending' %}
+                  <span class="badge orange">待支付</span>
+                {% elif r.status == 'refunded' %}
+                  <span class="badge gray">已退款</span>
                 {% else %}
-                  <span class="badge gray">{{ r.status }}</span>
+                  <span class="badge red">{{ order_status.get(r.status, r.status) }}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if r.status == 'paid' %}
+                  <button class="btn btn-sm btn-danger refund-btn" data-trade-no="{{ r.trade_no }}">退款</button>
+                {% elif r.status == 'refunded' %}
+                  <span class="text-mute" style="font-size:11px;">{{ r.refund_at }}</span>
+                {% else %}
+                  —
                 {% endif %}
               </td>
             </tr>
@@ -71,4 +89,30 @@
     </div>
   </div>
 </div>
+<script>
+document.querySelectorAll('.refund-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const tradeNo = btn.dataset.tradeNo;
+    if (!confirm('确认对该订单发起退款？\n交易单号：' + tradeNo)) return;
+    const reason = prompt('退款原因（可留空）：', '商户主动退款') || '商户主动退款';
+    btn.disabled = true; btn.textContent = '处理中...';
+    try {
+      const fd = new FormData();
+      fd.append('reason', reason);
+      const res = await fetch('/merchant/order/' + tradeNo + '/refund', { method:'POST', body: fd });
+      const data = await res.json();
+      if (data.ok) {
+        alert('退款成功，金额 ¥' + parseFloat(data.refund_amount).toFixed(2));
+        location.reload();
+      } else {
+        alert(data.msg || '退款失败');
+        btn.disabled = false; btn.textContent = '退款';
+      }
+    } catch (e) {
+      alert('网络错误');
+      btn.disabled = false; btn.textContent = '退款';
+    }
+  });
+});
+</script>
 {% endblock %}

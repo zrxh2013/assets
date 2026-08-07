@@ -19,7 +19,7 @@
         </div>
       </div>
 
-      <!-- 支付表单 -->
+      <!-- 步骤1：填写付款信息 -->
       <div id="payFormWrap">
         <div class="pay-amount-display">
           {% if code.amount %}
@@ -55,19 +55,83 @@
           <input class="form-control" type="text" id="buyerInput" placeholder="匿名用户" value="匿名用户">
         </div>
 
-        <button class="alipay-btn" id="payBtn">
-          {% if code.amount %}确认支付 {{ '%.2f'|format(code.amount) }} 元{% else %}确认支付{% endif %}
+        <div class="form-group">
+          <label>联系电话（可选）</label>
+          <input class="form-control" type="text" id="buyerContactInput" maxlength="20" placeholder="便于商户联系">
+        </div>
+
+        <button class="alipay-btn" id="toCashierBtn">
+          {% if code.amount %}去支付 {{ '%.2f'|format(code.amount) }} 元{% else %}去支付{% endif %}
         </button>
       </div>
 
-      <!-- 支付成功 -->
+      <!-- 步骤2：模拟支付宝收银台 -->
+      <div id="cashierWrap" style="display:none;">
+        <div style="text-align:center; padding:8px 0 4px;">
+          <div style="font-size:12px; color:var(--text-mute);">付款给</div>
+          <div style="font-size:16px; font-weight:600; margin-top:2px;">{{ merchant.merchant_name }}</div>
+        </div>
+        <div class="pay-amount-display" style="margin:16px 0 20px;">
+          <span class="cur">¥</span><span class="num" id="cashierAmt">0.00</span>
+        </div>
+
+        <div style="font-size:13px; color:var(--text-sub); margin-bottom:10px; font-weight:500;">选择支付方式</div>
+        <div id="methodList">
+          <label class="pay-method-item" data-method="balance">
+            <input type="radio" name="payMethod" value="balance" checked style="display:none;">
+            <span class="method-icon" style="background:#1677FF;">¥</span>
+            <span class="method-name">支付宝余额</span>
+            <span class="method-bal">¥ 9,830.00</span>
+            <span class="method-check">✓</span>
+          </label>
+          <label class="pay-method-item" data-method="bank_card">
+            <input type="radio" name="payMethod" value="bank_card" style="display:none;">
+            <span class="method-icon" style="background:#722ED1;">卡</span>
+            <span class="method-name">银行卡</span>
+            <span class="method-bal">招商银行(****1234)</span>
+            <span class="method-check">✓</span>
+          </label>
+          <label class="pay-method-item" data-method="huabei">
+            <input type="radio" name="payMethod" value="huabei" style="display:none;">
+            <span class="method-icon" style="background:#FA541C;">花</span>
+            <span class="method-name">花呗</span>
+            <span class="method-bal">可用额度 ¥5,000</span>
+            <span class="method-check">✓</span>
+          </label>
+        </div>
+
+        <!-- 交易单号展示 -->
+        <div style="margin-top:16px; padding:10px 12px; background:#fafafa; border-radius:8px; font-size:11px; color:var(--text-mute); line-height:1.6;">
+          <div>交易单号：<span id="tradeNoDisplay">—</span></div>
+          <div>创建时间：<span id="orderTimeDisplay">—</span></div>
+        </div>
+
+        <button class="alipay-btn" id="confirmPayBtn">确认支付</button>
+        <button class="alipay-btn alipay-btn-ghost" id="backToFormBtn" style="margin-top:8px;">返回修改</button>
+      </div>
+
+      <!-- 步骤3：支付中（模拟网关处理） -->
+      <div id="payingWrap" style="display:none;">
+        <div style="text-align:center; padding:30px 0;">
+          <div class="pay-spinner"></div>
+          <div style="margin-top:18px; font-size:14px; color:var(--text-sub);">正在通过支付宝安全支付...</div>
+          <div style="margin-top:6px; font-size:12px; color:var(--text-mute);" id="payingAmt">¥0.00</div>
+        </div>
+      </div>
+
+      <!-- 步骤4：支付成功 -->
       <div id="paySuccess" style="display:none;">
         <div class="pay-success">
           <div class="check">✓</div>
           <div class="amt" id="successAmt">¥0.00</div>
           <p class="tip">支付成功</p>
           <p class="tip" style="margin-top:8px;">已向 {{ merchant.merchant_name }} 完成付款</p>
-          <p class="tip" id="successTime" style="margin-top:14px;"></p>
+          <div style="margin-top:14px; padding:10px 12px; background:#fafafa; border-radius:8px; font-size:11px; color:var(--text-mute); line-height:1.7; text-align:left;">
+            <div>交易单号：<span id="successTradeNo">—</span></div>
+            <div>支付宝交易号：<span id="successAlipayNo">—</span></div>
+            <div>支付方式：<span id="successMethod">—</span></div>
+            <div>支付时间：<span id="successTime">—</span></div>
+          </div>
         </div>
       </div>
     {% else %}
@@ -79,9 +143,38 @@
     {% endif %}
   </div>
 </div>
+<style>
+.pay-method-item{
+  display:flex; align-items:center; padding:12px; border:1px solid #e8e8e8; border-radius:10px;
+  margin-bottom:8px; cursor:pointer; transition:all .15s; position:relative;
+}
+.pay-method-item:hover{ border-color:#1677FF; background:#f0f7ff; }
+.pay-method-item.active{ border-color:#1677FF; background:#e6f4ff; }
+.pay-method-item .method-icon{
+  width:32px; height:32px; border-radius:50%; color:#fff; font-size:13px; font-weight:600;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.pay-method-item .method-name{ font-size:14px; font-weight:500; margin-left:10px; }
+.pay-method-item .method-bal{ margin-left:auto; font-size:12px; color:var(--text-mute); }
+.pay-method-item .method-check{ color:#1677FF; font-size:16px; margin-left:10px; opacity:0; }
+.pay-method-item.active .method-check{ opacity:1; }
+.alipay-btn-ghost{
+  background:transparent; color:var(--text-sub); border:1px solid #d9d9d9;
+}
+.alipay-btn-ghost:hover{ background:#fafafa; }
+.pay-spinner{
+  width:36px; height:36px; border:3px solid #e8e8e8; border-top-color:#1677FF;
+  border-radius:50%; margin:0 auto; animation:spin 0.8s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+</style>
 <script>
 const token = "{{ code.token if code else '' }}";
 const fixedAmount = {{ code.amount if code and code.amount else 'null' }};
+const PAY_METHOD_NAMES = {balance:'支付宝余额', bank_card:'银行卡', huabei:'花呗'};
+
+let currentTradeNo = null;
+let currentAmount = null;
 
 const amountInput = document.getElementById('amountInput');
 const amountShow = document.getElementById('amountShow');
@@ -93,41 +186,100 @@ if (amountInput) {
   });
 }
 
-document.getElementById('payBtn').addEventListener('click', async () => {
-  const btn = document.getElementById('payBtn');
+// 支付方式选择
+document.querySelectorAll('.pay-method-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.pay-method-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    item.querySelector('input[type=radio]').checked = true;
+  });
+});
+// 默认选中余额
+const defaultMethod = document.querySelector('.pay-method-item[data-method="balance"]');
+if (defaultMethod) defaultMethod.classList.add('active');
+
+// 步骤1 → 步骤2：下单
+document.getElementById('toCashierBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('toCashierBtn');
   const amount = fixedAmount !== null ? fixedAmount : parseFloat(amountInput.value);
   if (fixedAmount === null && (!amount || amount <= 0)) {
     alert('请输入有效金额'); return;
   }
-  btn.disabled = true;
-  btn.textContent = '处理中...';
+  btn.disabled = true; btn.textContent = '下单中...';
   const fd = new FormData();
   if (fixedAmount === null) fd.append('amount', amount);
   fd.append('note', document.getElementById('noteInput').value);
   fd.append('buyer', document.getElementById('buyerInput').value);
+  fd.append('buyer_contact', document.getElementById('buyerContactInput').value);
   try {
-    const res = await fetch('/pay/' + token + '/submit', { method:'POST', body: fd });
+    const res = await fetch('/pay/' + token + '/order', { method:'POST', body: fd });
     const data = await res.json();
     if (data.ok) {
-      document.getElementById('payFormWrap').style.display = 'none';
-      document.getElementById('paySuccess').style.display = 'block';
-      document.getElementById('successAmt').textContent = '¥' + parseFloat(data.amount).toFixed(2);
+      currentTradeNo = data.trade_no;
+      currentAmount = data.amount;
+      document.getElementById('cashierAmt').textContent = parseFloat(data.amount).toFixed(2);
+      document.getElementById('tradeNoDisplay').textContent = data.trade_no;
       const now = new Date();
-      document.getElementById('successTime').textContent =
-        now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' +
-        String(now.getDate()).padStart(2,'0') + ' ' +
-        String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' +
-        String(now.getSeconds()).padStart(2,'0');
+      document.getElementById('orderTimeDisplay').textContent =
+        now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+
+        String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+      // 切换到收银台
+      document.getElementById('payFormWrap').style.display = 'none';
+      document.getElementById('cashierWrap').style.display = 'block';
     } else {
-      alert(data.msg || '支付失败');
-      btn.disabled = false;
-      btn.textContent = '确认支付';
+      alert(data.msg || '下单失败');
     }
   } catch (e) {
     alert('网络错误，请重试');
-    btn.disabled = false;
-    btn.textContent = '确认支付';
   }
+  btn.disabled = false;
+  btn.textContent = fixedAmount !== null ? '去支付 ' + parseFloat(fixedAmount).toFixed(2) + ' 元' : '去支付';
+});
+
+// 返回修改
+document.getElementById('backToFormBtn').addEventListener('click', () => {
+  document.getElementById('cashierWrap').style.display = 'none';
+  document.getElementById('payFormWrap').style.display = 'block';
+});
+
+// 步骤2 → 步骤3：确认支付（模拟网关扣款）
+document.getElementById('confirmPayBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('confirmPayBtn');
+  const payMethod = document.querySelector('input[name=payMethod]:checked').value;
+  btn.disabled = true; btn.textContent = '处理中...';
+  document.getElementById('cashierWrap').style.display = 'none';
+  document.getElementById('payingWrap').style.display = 'block';
+  document.getElementById('payingAmt').textContent = '¥' + parseFloat(currentAmount).toFixed(2);
+
+  // 模拟网关处理延时（真实场景由支付宝异步回调）
+  await new Promise(r => setTimeout(r, 1500));
+
+  try {
+    const fd = new FormData();
+    fd.append('trade_no', currentTradeNo);
+    fd.append('pay_method', payMethod);
+    const res = await fetch('/pay/' + token + '/pay', { method:'POST', body: fd });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('payingWrap').style.display = 'none';
+      document.getElementById('paySuccess').style.display = 'block';
+      document.getElementById('successAmt').textContent = '¥' + parseFloat(data.amount).toFixed(2);
+      document.getElementById('successTradeNo').textContent = data.trade_no;
+      document.getElementById('successAlipayNo').textContent = data.alipay_trade_no;
+      document.getElementById('successMethod').textContent = PAY_METHOD_NAMES[payMethod] || payMethod;
+      document.getElementById('successTime').textContent = data.paid_at;
+    } else {
+      alert(data.msg || '支付失败');
+      document.getElementById('payingWrap').style.display = 'none';
+      document.getElementById('cashierWrap').style.display = 'block';
+    }
+  } catch (e) {
+    alert('网络错误，请查询订单状态');
+    document.getElementById('payingWrap').style.display = 'none';
+    document.getElementById('cashierWrap').style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.textContent = '确认支付';
 });
 </script>
 {% endblock %}
