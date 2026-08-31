@@ -1,0 +1,18 @@
+{
+  "name": "private-chain",
+  "version": "1.0.0",
+  "description": "Private Hardhat chain with USDT",
+  "scripts": {
+    "node": "hardhat node --hostname 0.0.0.0 --port 8545",
+    "deploy": "hardhat run scripts/deploy-official.js --network localhost",
+    "tron": "node scripts/tron-address.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "hardhat": "^2.17.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.0",
+    "ethers": "^6.7.0"
+  }
+}
