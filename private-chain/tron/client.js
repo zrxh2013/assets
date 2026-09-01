@@ -1,6 +1,7 @@
 // tron/client.js
 // 波场链主网连接客户端 + 链上查询 API
 
+const crypto = require("crypto");
 const TronWebLib = require("tronweb");
 const TronWeb = TronWebLib.TronWeb;
 const config = require("./config");
@@ -8,14 +9,17 @@ const config = require("./config");
 /**
  * 创建 TronWeb 客户端
  * @param {"mainnet"|"nile"} network - 网络类型
- * @param {string} [privateKey] - 可选，用于签名交易的私钥
+ * @param {string} [privateKey] - 可选，用于签名交易的私钥；不传则自动生成临时私钥（仅用于只读合约调用）
  */
 function createClient(network = "mainnet", privateKey = null) {
   const cfg = config[network];
   if (!cfg) throw new Error(`未知网络: ${network}`);
+  // TronWeb v6 的合约只读调用（如 balanceOf）也需要 owner_address，
+  // 无私钥时生成临时私钥以保证只读调用正常工作（该私钥无余额，无法签名广播）
+  const key = privateKey || crypto.randomBytes(32).toString("hex");
   return new TronWeb({
     fullHost: cfg.fullNode,
-    privateKey,
+    privateKey: key,
   });
 }
 
