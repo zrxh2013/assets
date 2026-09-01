@@ -99,57 +99,71 @@ async function fetchNileTx(txID) {
 }
 
 // ──────────────────────────────────────────────
-// 2. 构造锚定 memo 并广播到主网
+// 2. 构造锚定 memo 并广播到目标网络（默认主网，可切到 Nile 用于演示闭环）
 // ──────────────────────────────────────────────
 async function anchorNileTx({
   privateKey,
   nileTxID,
+  targetNetwork = "mainnet",     // "mainnet" | "nile"
+  sourceNetwork = "nile",        // 源网络（目前只支持 nile，留扩展位）
   comment = "",
   includeMemo = true,
   amount = 0, // 可选：给接收方转 TRX；默认 0（只写 memo）
 }) {
-  if (!privateKey) throw new Error("必须提供主网私钥 TRON_PRIVATE_KEY");
+  if (!privateKey) throw new Error("必须提供 TRON_PRIVATE_KEY");
+  if (!config[targetNetwork]) throw new Error("未知目标网络: " + targetNetwork);
 
-  const twMain = new TronWeb({
-    fullHost: config.mainnet.fullNode,
+  const twTgt = new TronWeb({
+    fullHost: config[targetNetwork].fullNode,
     privateKey,
   });
-  const fromAddr = twMain.defaultAddress.base58;
+  const fromAddr = twTgt.defaultAddress.base58;
 
-  // 1. 抓取 Nile 交易
-  const nile = await fetchNileTx(nileTxID);
+  // 1. 抓取源交易
+  const src = sourceNetwork === "nile" ? await fetchNileTx(nileTxID) : null;
+  if (!src) throw new Error("源交易抓取失败");
 
   // 2. 构造锚定 memo（JSON → hex，注意不能太长）
   const payload = {
     a: "nile-anchor",
     v: 1,
+    src: sourceNetwork,
+    tgt: targetNetwork,
     n: {
       tx: nileTxID,
-      bn: nile.blockNumber,
-      ts: nile.timestamp,
-      st: nile.status,
-      fr: nile.from,
-      to: nile.to,
-      tp: nile.contractType,
-      am: nile.amount,
+      bn: src.blockNumber,
+      ts: src.timestamp,
+      st: src.status,
+      fr: src.from,
+      to: src.to,
+      tp: src.contractType,
+      am: src.amount,
     },
   };
   if (comment) payload.c = comment;
-  if (includeMemo && nile.memoDecoded) {
-    // 截断过长的 memo，避免超过 200 字节
-    const md = nile.memoDecoded;
+  if (includeMemo && src.memoDecoded) {
+    const md = src.memoDecoded;
     const max = 120;
     payload.n.da = md.length > max ? md.slice(0, max) + "…" : md;
-    if (nile.memoIsJson && nile.memoJson && nile.memoJson.t) {
-      payload.n.h = nile.memoJson.h;
+    if (src.memoIsJson && src.memoJson && src.memoJson.h) {
+      payload.n.h = src.memoJson.h;
     }
   }
 
   let memoStr;
   try {
     memoStr = JSON.stringify(payload);
-    if (Buffer.from(memoStr, "utf8").length > 200) {
-      // 再去掉 da（内容原文）
+    // Tron raw_data.data 支持 ~1KB，这里用 900 作为安全上限，
+    // 超过才截断 memo 内容（先缩短 da，再删 da）。
+    const HARD = 900, SOFT = 600;
+    const len = () => Buffer.from(memoStr, "utf8").length;
+    if (len() > SOFT && payload.n && payload.n.da) {
+      const half = Math.floor(Math.max(40, SOFT - (len() - payload.n.da.length))) ;
+      payload.n.da = payload.n.da.length > half
+        ? payload.n.da.slice(0, half) + "…" : payload.n.da;
+      memoStr = JSON.stringify(payload);
+    }
+    if (len() > HARD && payload.n && payload.n.da) {
       delete payload.n.da;
       memoStr = JSON.stringify(payload);
     }
@@ -157,82 +171,94 @@ async function anchorNileTx({
     throw new Error("锚定 JSON 序列化失败: " + e.message);
   }
 
-  // 3. 广播（TRX 转账，默认 amount=0，使用 memo 模式）
-  const toAddr = fromAddr; // 自转账，零金额避免亏损
-  const amountSUN = amount * 1e6; // 可选转额
-  const unSignedTx = await twMain.transactionBuilder.sendTrx(
-    toAddr,
-    amountSUN,
-    fromAddr
+  // 3. 广播：给「Tron 官方 Burn 地址」转 1 SUN（0.000001 TRX），
+  //    memo 存锚定数据。
+  //    ⚠️ 必须在 sendTrx 后修改 raw_data.data 并通过 utils.transaction
+  //       重新序列化（txJsonToPb → 重算 txID + raw_data_hex），否则
+  //       raw_data_hex 未包含 data 字段，导致签名不匹配 / "Invalid transaction"。
+  const toAddr = "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb"; // Tron 官方 burn 地址
+  const amountSUN = Math.max(1, amount * 1e6); // 默认 1 SUN
+
+  const unSignedTx = await twTgt.transactionBuilder.sendTrx(
+    toAddr, amountSUN, fromAddr
   );
-  // 添加 memo
+  // 注入 memo（raw_data.data 必须是 hex 编码的 UTF-8 字符串）
   unSignedTx.raw_data.data = Buffer.from(memoStr, "utf8").toString("hex");
-  // 重新计算 txID
-  const signed = await twMain.trx.sign(unSignedTx);
-  const result = await twMain.trx.sendRawTransaction(signed);
+  // 重新序列化：保证 txID、raw_data_hex 与修改后的 raw_data 一致
+  const txUtil = twTgt.utils.transaction;
+  const pb = txUtil.txJsonToPb(unSignedTx);
+  unSignedTx.txID = txUtil.txPbToTxID(pb).replace(/^0x/, "");
+  unSignedTx.raw_data_hex = txUtil.txPbToRawDataHex(pb).toLowerCase();
+  // 签名 + 广播
+  const signed = await twTgt.trx.sign(unSignedTx);
+  const result = await twTgt.trx.sendRawTransaction(signed);
 
   if (!result.result) {
-    throw new Error("主网广播失败: " + JSON.stringify(result));
+    throw new Error(`${targetNetwork} 广播失败: ` + JSON.stringify(result));
   }
+
+  const explorerBase = targetNetwork === "nile"
+    ? "https://nile.tronscan.org/#/transaction/"
+    : "https://tronscan.org/#/transaction/";
 
   return {
     ok: true,
-    nile,
+    src,
     anchor: {
-      network: "mainnet",
+      network: targetNetwork,
       txID: signed.txID,
       from: fromAddr,
       to: toAddr,
       memo: payload,
       memoStr,
-      fee: "≈ 1.0~1.4 TRX (memo fee 1 TRX + bandwidth)",
-      explorer: "https://tronscan.org/#/transaction/" + signed.txID,
+      fee: (targetNetwork === "nile" ? "≈ 1.0~1.4 TRX (Nile testnet, memo fee)" : "≈ 1.0~1.4 TRX (memo fee 1 TRX + bandwidth)"),
+      explorer: explorerBase + signed.txID,
       nileExplorer: "https://nile.tronscan.org/#/transaction/" + nileTxID,
     },
   };
 }
 
 // ──────────────────────────────────────────────
-// 3. 解码主网锚定交易
+// 3. 解码锚定交易（自动：主网 → Nile 兜底，任何一个找到都返回）
 // ──────────────────────────────────────────────
 async function decodeAnchorTx(txID) {
   const twMain = createClient("mainnet");
-  let tx;
-  try {
-    tx = await twMain.trx.getTransaction(txID);
-  } catch (e) {
-    // 如果主网查不到，可能是 Nile 的，让 caller 处理
-    return { ok: false, reason: "tx_not_found_on_mainnet", message: e.message };
-  }
-  if (!tx || !tx.raw_data) return { ok: false, reason: "tx_not_found" };
+  const twNile = createClient("nile");
 
-  const data = tx.raw_data.data;
-  let memoUtf8 = "";
-  if (data) {
+  // 并行查 2 个网络
+  let found = null; // { network, tx, info }
+  for (const [net, tw] of [["mainnet", twMain], ["nile", twNile]]) {
     try {
-      memoUtf8 = Buffer.from(data, "hex").toString("utf8");
-    } catch (_) {}
-  }
-
-  // 检查是否锚定
-  let anchorData = null;
-  if (memoUtf8) {
-    try {
-      const obj = JSON.parse(memoUtf8);
-      if (obj && obj.a === "nile-anchor") {
-        anchorData = obj;
+      const tx = await tw.trx.getTransaction(txID);
+      if (tx && tx.raw_data) {
+        let info = null;
+        try { info = await tw.trx.getTransactionInfo(txID); } catch (_) {}
+        found = { network: net, tx, info };
+        break;
       }
     } catch (_) {}
   }
 
-  // 抓 tx info 补齐块高/时间
-  let info = null;
-  try {
-    info = await twMain.trx.getTransactionInfo(txID);
-  } catch (_) {}
+  if (!found) return { ok: false, reason: "tx_not_found_on_both_networks" };
+
+  const { network, tx, info } = found;
+  const data = tx.raw_data.data;
+  let memoUtf8 = "";
+  if (data) {
+    try { memoUtf8 = Buffer.from(data, "hex").toString("utf8"); } catch (_) {}
+  }
+
+  let anchorData = null;
+  if (memoUtf8) {
+    try {
+      const obj = JSON.parse(memoUtf8);
+      if (obj && obj.a === "nile-anchor") anchorData = obj;
+    } catch (_) {}
+  }
 
   return {
     ok: true,
+    network,
     blockNumber: info ? info.blockNumber : null,
     timestamp: info ? info.blockTimeStamp : tx.raw_data.timestamp,
     status: tx.ret && tx.ret[0] ? tx.ret[0].contractRet : "UNKNOWN",
@@ -245,24 +271,19 @@ async function decodeAnchorTx(txID) {
 
 // ──────────────────────────────────────────────
 // 4. 智能查询：输入任意 txID，自动判断来源
-//    优先级：锚定解码(主网) → 主网普通交易 → Nile 交易
+//    优先级：锚定解码(主网→Nile) → Nile 源交易
 // ──────────────────────────────────────────────
 async function resolveAnyTxID(txID) {
-  const twMain = createClient("mainnet");
-  const twNile = createClient("nile");
+  // 1. 解码锚定（自动查主网+Nile）
+  const decoded = await decodeAnchorTx(txID);
+  if (decoded.ok) {
+    return {
+      foundOn: decoded.network,
+      ...decoded,
+    };
+  }
 
-  // 1. 尝试主网（解码锚定）
-  try {
-    const decoded = await decodeAnchorTx(txID);
-    if (decoded.ok) {
-      return {
-        foundOn: "mainnet",
-        ...decoded,
-      };
-    }
-  } catch (_) {}
-
-  // 2. 尝试 Nile
+  // 2. 尝试 Nile（普通交易，非锚定）
   try {
     const nile = await fetchNileTx(txID);
     return { foundOn: "nile", nile };
