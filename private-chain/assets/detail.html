@@ -83,6 +83,8 @@ img{display:block}
   <div class="row"><div class="lbl"><span class="q">?</span>Amount:</div><div class="num">0 TRX</div></div>
   <div class="row"><div class="lbl"><span class="q">?</span>Transaction Hash:</div><div class="val"><span class="hash" id="v-hash" title="68d9bea829d2f5c5f4d48ae460a3b508c7cc2e375265b0611ab609c9015ea3e6">68d9bea829d2f5c5f4d48ae460a3b508c7cc2e375265b0611ab609c9015ea3e6</span><button class="cpy" onclick="navigator.clipboard.writeText('68d9bea829d2f5c5f4d48ae460a3b508c7cc2e375265b0611ab609c9015ea3e6')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
   <div class="row"><div class="lbl"><span class="q">?</span>Block:</div><div class="num" id="v-blk">None</div></div>
+  <div class="row"><div class="lbl"><span class="q">?</span>Anchor Hash:</div><div class="val"><span class="hash" id="v-anchor" title="">loading…</span></div></div>
+  <div class="row"><div class="lbl"><span class="q">?</span>Merkle Root:</div><div class="val"><span class="hash" id="v-merkle" title="">loading…</span></div></div>
   <div class="row"><div class="lbl"><span class="q">?</span>Timestamp:</div><div class="str" id="v-time">2026-09-01 14:52:12</div></div>
 
   <div class="sec">
@@ -11673,6 +11675,8 @@ const ALL = [
       document.getElementById('d-to').textContent = tx.to; document.getElementById('d-to').title = tx.to;
       document.getElementById('v-hash').textContent = tx.txID; document.getElementById('v-hash').title = tx.txID;
       document.getElementById('v-blk').textContent = tx.block || '—';
+      document.getElementById('v-anchor').textContent = (tx.anchor_hash||'').slice(0,16)+'…'; document.getElementById('v-anchor').title = tx.anchor_hash || '';
+      document.getElementById('v-merkle').textContent = (tx.merkle_root||'').slice(0,16)+'…'; document.getElementById('v-merkle').title = tx.merkle_root || '';
       document.getElementById('v-time').textContent = tx.datetime || '—';
       document.getElementById('p-to').textContent = tx.to; document.getElementById('p-to').title = tx.to;
       const raw = Math.round(Number(tx.amount_usdt)*1e6);

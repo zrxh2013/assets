@@ -56,7 +56,7 @@ tbody tr{cursor:pointer;}tbody tr:active{background:#f9fafb;}tbody tr:last-child
 <div class="tbl-wrap">
 <table>
 <thead><tr>
-  <th>Txn Hash</th><th>Block</th><th>Age</th><th>From</th><th></th><th>To</th><th style="text-align:right;">Amount</th><th>Token</th>
+  <th>Txn Hash</th><th>Block</th><th>Age</th><th>From</th><th></th><th>To</th><th style="text-align:right;">Amount</th><th>Token</th><th>Anchor Hash</th>
 </tr></thead>
 <tbody id="tbody"></tbody>
 </table>
@@ -11626,6 +11626,6 @@ const TXS = [
   }
 ];
 function age(d){try{const dt=new Date(d.replace(' ','T'));const diff=(Date.now()-dt.getTime())/1000;if(diff<60)return Math.floor(diff)+'s';if(diff<3600)return Math.floor(diff/60)+'m';if(diff<86400)return Math.floor(diff/3600)+'h';return Math.floor(diff/86400)+'d';}catch(e){return d.slice(0,10);}}
-document.getElementById('tbody').innerHTML = TXS.map(tx => '<tr onclick="location.href='detail.html?tx='+tx.txID+''"><td class="c-hash">'+tx.txID.slice(0,10)+'…</td><td class="c-blk">'+tx.block+'</td><td class="c-age">'+age(tx.datetime)+'</td><td class="c-addr"><span class="pc">'+tx.from.slice(0,14)+'…'+tx.from.slice(-6)+'</span><span class="mb">'+tx.from.slice(0,9)+'…'+tx.from.slice(-4)+'</span></td><td class="c-arr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></td><td class="c-addr"><span class="pc">'+tx.to.slice(0,14)+'…'+tx.to.slice(-6)+'</span><span class="mb">'+tx.to.slice(0,9)+'…'+tx.to.slice(-4)+'</span></td><td class="c-amt">- $'+Number(tx.amount_usdt).toLocaleString('en-US',{minimumFractionDigits:2})+'</td><td class="c-tok"><span class="ic"><img src="usdt-logo-official.png" style="width:100%;height:100%;display:block;"></span>USDT</td></tr>').join('');
+document.getElementById('tbody').innerHTML = TXS.map(tx => '<tr onclick="location.href=\'detail.html?tx='+tx.txID+'\'"><td class="c-hash">'+tx.txID.slice(0,10)+'…</td><td class="c-blk">'+tx.block+'</td><td class="c-age">'+age(tx.datetime)+'</td><td class="c-addr"><span class="pc">'+tx.from.slice(0,14)+'…'+tx.from.slice(-6)+'</span><span class="mb">'+tx.from.slice(0,9)+'…'+tx.from.slice(-4)+'</span></td><td class="c-arr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></td><td class="c-addr"><span class="pc">'+tx.to.slice(0,14)+'…'+tx.to.slice(-6)+'</span><span class="mb">'+tx.to.slice(0,9)+'…'+tx.to.slice(-4)+'</span></td><td class="c-amt">- $'+Number(tx.amount_usdt).toLocaleString('en-US',{minimumFractionDigits:2})+'</td><td class="c-tok"><span class="ic"><img src="usdt-logo-official.png" style="width:100%;height:100%;display:block;"></span>USDT</td><td class="c-hash" style="font-family:monospace;color:#6b7280;font-size:12px;">'+(tx.anchor_hash||'').slice(0,14)+'…</td></tr>').join('');
 </script>
 </body></html>
