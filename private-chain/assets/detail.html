@@ -117,6 +117,10 @@
     <div class="info-value" id="txHash">—</div>
   </div>
   <div class="info-row">
+    <div class="info-label"><span class="q">🔒</span>Anchor Hash:</div>
+    <div class="info-value" id="anchorHash" style="color:#2563eb;">—</div>
+  </div>
+  <div class="info-row">
     <div class="info-label"><span class="q">?</span>Result:</div>
     <div><span class="status-badge status-success">✓ SUCCESSFUL</span></div>
   </div>
@@ -313,6 +317,8 @@ function showSingleTx(t, focusAddr) {
   document.getElementById('usdVal').textContent = '$' + (t.amount_usdt * USDT_TO_USD).toLocaleString(undefined, {minimumFractionDigits: 2});
 
   document.getElementById('txHash').innerHTML = clip(t.txID + ' <button class="copy-btn" data-text="'+t.txID+'">⎘</button>');
+  var ah = t.anchor_hash || 'not-available';
+  document.getElementById('anchorHash').innerHTML = clip(ah + ' <button class="copy-btn" data-text="'+ah+'">⎘</button>');
   document.getElementById('blockVal').textContent = t.block || '—';
   document.getElementById('timeVal').innerHTML = t.datetime + ' | Local';
 
