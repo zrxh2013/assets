@@ -1,5 +1,4 @@
 {
-  "timestamp": "2026-09-02T14:54:20.248Z",
   "mainnetTxID": "ec62c055b6bc51da854c52dc23a2f4cdedccc6ea754167e49b19edfdb9909f12",
   "mainnetUrl": "https://tronscan.org/#/transaction/ec62c055b6bc51da854c52dc23a2f4cdedccc6ea754167e49b19edfdb9909f12",
   "merkleRoot": "0xd474c2d6c717415385a7ca2e91b688758a8b7b78565db5f7345c5462a52732d9",
@@ -10422,41 +10421,15 @@
     }
   ],
   "memoSize": 598,
-  "notary": {
-    "notary": {
-      "file": "assets/stamp-1-notary.svg",
-      "bytes": 2273,
-      "sha256": "0x3b9b67c26a2545832c8784fdcb82d2e166a6700c139cca72c4d896dfd1b4201d",
-      "keccak256": "0x5054114693c124e113892c199d6ffaa59e60dc596dfb28558c0ee2cad1f9d810"
-    },
-    "transfer": {
-      "file": "assets/stamp-2-transmission.svg",
-      "bytes": 2773,
-      "sha256": "0x3088ef239fea26b344e35a20a4493cf7f4bee57ab399d9429c60c6e5adcd8ec0",
-      "keccak256": "0xe7098af38d91faff876db683ff0b9f92fbc16a52dfd181a9c7b328c2db908698"
-    },
-    "sign": {
-      "file": "assets/stamp-3-signature.svg",
-      "bytes": 1913,
-      "sha256": "0x5a73dfba128c955587108b2c839c33dad43b68790d62a16e3b6a10da22c48fa6",
-      "keccak256": "0x0a60cdf74877f566a850ba50a0caf77bde3de84b5f129af24fd159d72f3a487c"
-    },
-    "credential": {
-      "file": "assets/full-notarization-credential.html",
-      "bytes": 18674,
-      "sha256": "0x2fee954f7bde88b8e0006e1eff6ac5113da569a0a6df8fbdd24989f2b00fc59d",
-      "keccak256": "0x292eab1780cf178ab02716b0fbcaeb90fe149c4ae553737b9bc1e64a85645114",
-      "path": "assets/full-notarization-credential.html"
-    },
-    "summary": {
-      "keccak256": "0x7f46ae27165a2abf3df2b27d20a072392c5ea61256a5d9f01c0ab37d84f4ce0a",
-      "notary_name": "邓达明 (Raymond Tang)",
-      "notary_sn": "14413202200495450",
-      "transfer_no": "深办第 2026-0892 号",
-      "issued_date": "2026-09-02",
-      "law_firm": "葉謝鄧律師行 (YIP, TSE & TANG, SOLICITORS)",
-      "merkleRoot": "0x35693cae777bf7115d3f204f69d0fa804396a861dfc389e505d125d906330a87"
-    }
-  },
-  "combinedMerkleRoot": "0x35693cae777bf7115d3f204f69d0fa804396a861dfc389e505d125d906330a87"
+  "seals": {
+    "note": "印章仅做页面可视化展示，不参与链上存证",
+    "files": [
+      "stamp-1-notary.svg",
+      "stamp-3-signature.svg",
+      "stamp-2-transmission.svg",
+      "full-notarization-credential.html"
+    ],
+    "attestedBy": "邓达明（中国委托公证人·香港）",
+    "transmissionNo": "深办第 2026-0892 号"
+  }
 }

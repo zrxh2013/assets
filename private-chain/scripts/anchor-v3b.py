@@ -43,16 +43,16 @@ def main(dry_run=False):
 
     memo_obj = {
         "a": "usdt-1156-anchor",
-        "v": "2.1",
+        "v": "2.2",                # 精简版：印章仅本地展示、不链上存证
         "m": merkle_root,
         "t": len(anchor_map),
         "c": stats.get("nileContract", "TQtjijxvaStWjLXpejaEjZfPkRnkyKyywq"),
         "r": stats.get("totalAmountDisplay", "599999904.27"),
-        "n": anchor.get("notary", {}).get("summary", {}).get("notary_sn", "14413202200495450"),
-        "z": anchor.get("combinedMerkleRoot", "")[:18],
+        "u": stats.get("uniqueFrom", 2),
+        "o": stats.get("uniqueTo", 247),
         "samples": [
-            {"i": 0, "ah": anchor_map[0]["anchor_hash"][2:16]},
-            {"i": 500, "ah": anchor_map[499]["anchor_hash"][2:16]},
+            {"i": 0,    "ah": anchor_map[0]["anchor_hash"][2:16]},
+            {"i": 500,  "ah": anchor_map[499]["anchor_hash"][2:16]},
             {"i": 1155, "ah": anchor_map[-1]["anchor_hash"][2:16]},
         ],
         "ts": int(time.time()),
@@ -192,7 +192,7 @@ const DRY_RUN = process.env.DRY_RUN === '1';
         if not dry_run:
             anchor["mainnetTxID"] = txid
             anchor["mainnetUrl"] = f"https://tronscan.org/#/transaction/{txid}"
-            anchor["anchorTxType"] = "v3b-with-memo"
+            anchor["anchorTxType"] = "v3b-memo-only (seals display-only, not on-chain)"
             anchor["memoSize"] = len(memo_str)
             with open(ANCHOR_FILE, "w") as f:
                 json.dump(anchor, f, indent=2, ensure_ascii=False)
