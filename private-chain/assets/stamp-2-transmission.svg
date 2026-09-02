@@ -1,60 +1,61 @@
-<svg width="400" height="420" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg">
+<svg width="400" height="440" viewBox="0 0 400 440" xmlns="http://www.w3.org/2000/svg">
   <title>转递专用章 · 中国法律服务（香港）有限公司（教学演示模板）</title>
-  <desc>圆形 · 中央五角星 · 上弧司法部委托文字 · 下弧中港法服名称 · 编号+日期</desc>
+  <desc>圆形 · 中央五角星 · 上弧司法部委托文字 · 下弧中港法服名称 · 编号=深办第 年度-流水号 号</desc>
 
-  <!-- 背景 -->
-  <rect x="0" y="0" width="400" height="420" fill="#fff" />
+  <rect x="0" y="0" width="400" height="440" fill="#fff" />
 
-  <!-- 标题 -->
   <text x="200" y="20" text-anchor="middle" fill="#888" font-size="11" font-family="SimSun">
     转递专用章（中国法律服务（香港）有限公司加盖）· 教学演示模板
   </text>
 
   <!-- 外圆 -->
-  <circle cx="200" cy="230" r="180" fill="none" stroke="#c0392b" stroke-width="4" />
-  <circle cx="200" cy="230" r="172" fill="none" stroke="#c0392b" stroke-width="1.2" />
+  <circle cx="200" cy="245" r="180" fill="none" stroke="#c0392b" stroke-width="4" />
+  <circle cx="200" cy="245" r="172" fill="none" stroke="#c0392b" stroke-width="1.2" />
 
-  <!-- 上弧路径：中华人民共和国司法部委托香港律师办理内地使用的公证文书 -->
   <defs>
-    <path id="transTopArc" d="M 28,230 A 172,172 0 0,1 372,230" fill="none" />
-    <path id="transBotArc" d="M 36,234 A 164,164 0 0,0 364,234" fill="none" />
-    <path id="transMidArc" d="M 70,230 A 130,130 0 0,1 330,230" fill="none" />
+    <path id="transTopArc2" d="M 28,245 A 172,172 0 0,1 372,245" fill="none" />
+    <path id="transBotArc2" d="M 36,249 A 164,164 0 0,0 364,249" fill="none" />
   </defs>
 
   <!-- 上弧文字 -->
-  <text fill="#c0392b" font-size="15" font-family="SimSun" font-weight="bold" letter-spacing="2">
-    <textPath href="#transTopArc" startOffset="50%" text-anchor="middle">
+  <text fill="#c0392b" font-size="14" font-family="SimSun" font-weight="bold" letter-spacing="1.5">
+    <textPath href="#transTopArc2" startOffset="50%" text-anchor="middle">
       中华人民共和国司法部委托香港律师办理内地使用的公证文书
     </textPath>
   </text>
 
   <!-- 中央五角星（大） -->
-  <polygon points="200,130 215,178 265,178 225,208 240,256 200,226 160,256 175,208 135,178 185,178"
+  <polygon points="200,145 215,193 265,193 225,223 240,271 200,241 160,271 175,223 135,193 185,193"
            fill="#c0392b" />
 
   <!-- 中间主文字 -->
-  <text x="200" y="300" text-anchor="middle" fill="#c0392b" font-size="26"
+  <text x="200" y="315" text-anchor="middle" fill="#c0392b" font-size="24"
         font-family="SimSun" font-weight="bold" letter-spacing="8">转 递 专 用 章</text>
 
   <!-- 下弧文字：中国法律服务（香港）有限公司 -->
-  <text fill="#c0392b" font-size="13" font-family="SimSun" font-weight="bold" letter-spacing="1.5">
-    <textPath href="#transBotArc" startOffset="50%" text-anchor="middle">
+  <text fill="#c0392b" font-size="12" font-family="SimSun" font-weight="bold" letter-spacing="1.5">
+    <textPath href="#transBotArc2" startOffset="50%" text-anchor="middle">
       中国法律服务（香港）有限公司
     </textPath>
   </text>
 
-  <!-- 编号 -->
-  <text x="200" y="380" text-anchor="middle" fill="#c0392b" font-size="13" font-family="SimSun">
-    深办第 <tspan font-weight="bold">2026-XX</tspan> 号
+  <!-- 编号（中港法服内部转递编号，不是公证人个人执业证号！） -->
+  <text x="200" y="390" text-anchor="middle" fill="#c0392b" font-size="14" font-family="SimSun" font-weight="bold">
+    深 办 第 <tspan font-size="16">2 0 2 6 - 0 8 9 2</tspan> 号
+  </text>
+
+  <!-- 发行方 -->
+  <text x="200" y="412" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
+    发 行 方：中 国 法 律 服 务（香 港）有 限 公 司
   </text>
 
   <!-- 日期 -->
-  <text x="200" y="400" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
-    2026 年 X 月 X 日
+  <text x="200" y="430" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
+    2026 年 9 月 2 日
   </text>
 
   <!-- 水印 -->
-  <text x="200" y="418" text-anchor="middle" fill="#ddd" font-size="9" font-family="SimSun">
+  <text x="200" y="444" text-anchor="middle" fill="#ddd" font-size="9" font-family="SimSun">
     ⚠ 教学演示模板 · 非真实印章
   </text>
 </svg>
