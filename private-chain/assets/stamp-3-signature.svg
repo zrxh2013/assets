@@ -13,25 +13,25 @@
   <!-- 印泥晕染效果（模拟真实盖章的不规则边缘） -->
   <ellipse cx="160" cy="95" rx="140" ry="55" fill="#1a5276" opacity="0.04" />
 
-  <!-- 主签名：实心蓝色楷体手写风（不是空心字！） -->
-  <text x="160" y="90" text-anchor="middle" fill="#1a5276" font-size="52" font-weight="bold"
+  <!-- 主签名：实心蓝色楷体手写风（不是空心字！）—— 字号收紧避免膨胀抢视线 -->
+  <text x="160" y="88" text-anchor="middle" fill="#1a5276" font-size="48" font-weight="bold"
         font-family="KaiTi, STKaiti, 楷体, 华文楷体"
-        style="letter-spacing: 10px; paint-order: stroke fill; stroke: #1a5276; stroke-width: 1;">
+        style="letter-spacing: 8px; paint-order: stroke fill; stroke: #1a5276; stroke-width: 0.8;">
     邓 达 明
   </text>
 
   <!-- 英文手写签名（草书风） -->
-  <text x="160" y="118" text-anchor="middle" fill="#1a5276" font-size="16"
+  <text x="160" y="115" text-anchor="middle" fill="#1a5276" font-size="14"
         font-family="Segoe Script, Brush Script MT, cursive" font-style="italic">
-    Raymond Tang
+    Raymond Tang · CAAO (484)
   </text>
 
   <!-- 底部说明小字（也是实心蓝）→ 加入 CAAO 协会括号编号 484 & 大湾区执业证号后缀 -->
-  <text x="160" y="145" text-anchor="middle" fill="#1a5276" font-size="11" font-family="SimSun">
-    中 国 委 托 公 证 人（香 港） · 公 证 员 签 名 章 · CAAO (484)
+  <text x="160" y="142" text-anchor="middle" fill="#1a5276" font-size="10" font-family="SimSun">
+    中 国 委 托 公 证 人（香 港）· 公 证 员 签 名 章
   </text>
 
-  <text x="160" y="162" text-anchor="middle" fill="#1a5276" font-size="10" font-family="SimSun">
+  <text x="160" y="159" text-anchor="middle" fill="#1a5276" font-size="9" font-family="SimSun">
     邓 达 明 · 2026 年 度 · 执 证 14413202200495450
   </text>
 
