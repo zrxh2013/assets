@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TRON 主网 · Nile USDT 转账存证验证报告</title>
+<style>
+:root {
+  --bg:#0f172a; --card:#1e293b; --border:#334155;
+  --text:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8;
+  --green:#22c55e; --yellow:#eab308; --red:#ef4444; --purple:#a78bfa;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; 
+  background:var(--bg); color:var(--text); line-height:1.6; padding:20px; }
+.container { max-width:1200px; margin:0 auto; }
+
+/* Header */
+.hero { background:linear-gradient(135deg,#1e3a5f,#0f172a); border:1px solid var(--border); 
+  border-radius:16px; padding:40px; margin-bottom:24px; text-align:center; }
+.hero .badge { display:inline-block; background:rgba(56,189,248,.15); border:1px solid var(--accent);
+  color:var(--accent); padding:6px 14px; border-radius:20px; font-size:13px; margin-bottom:16px; }
+.hero h1 { font-size:28px; margin-bottom:8px; }
+.hero .sub { color:var(--muted); font-size:14px; }
+.hero .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:28px; }
+.hero .stat { background:rgba(0,0,0,.3); border-radius:10px; padding:14px; }
+.hero .stat .val { font-size:22px; font-weight:700; color:var(--accent); font-family:monospace; }
+.hero .stat .lbl { font-size:12px; color:var(--muted); margin-top:4px; }
+
+/* Section */
+.section { background:var(--card); border:1px solid var(--border); border-radius:14px; 
+  padding:28px; margin-bottom:20px; }
+.section h2 { font-size:18px; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px; }
+.section h2 .emoji { font-size:22px; }
+
+/* Anchor Card */
+.anchor { background:#0f172a; border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; }
+.anchor .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+.anchor .ver { font-weight:700; font-size:15px; }
+.anchor .status { background:rgba(34,197,94,.15); color:var(--green); border:1px solid var(--green);
+  padding:3px 10px; border-radius:12px; font-size:12px; }
+.anchor .row { display:flex; gap:20px; flex-wrap:wrap; font-size:13px; color:var(--muted); margin-bottom:6px; }
+.anchor .row code { color:var(--accent); font-family:monospace; font-size:12px; word-break:break-all; }
+.anchor .memo-btn { margin-top:10px; background:transparent; border:1px solid var(--border); 
+  color:var(--muted); padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; }
+.anchor .memo-btn:hover { border-color:var(--accent); color:var(--accent); }
+.anchor .memo-box { display:none; margin-top:12px; background:#0a0f1c; border:1px solid var(--border); 
+  border-radius:8px; padding:14px; overflow-x:auto; }
+.anchor .memo-box.show { display:block; }
+.anchor pre { font-family:monospace; font-size:11px; color:#cbd5e1; white-space:pre-wrap; word-break:break-all; }
+
+/* Tables */
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:#0f172a; padding:12px; text-align:left; color:var(--muted); font-weight:500; 
+  font-size:12px; text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--border); }
+td { padding:12px; border-bottom:1px solid #1e293b; }
+tr:hover td { background:rgba(56,189,248,.05); }
+.tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-family:monospace; }
+.tag-green { background:rgba(34,197,94,.15); color:var(--green); }
+.tag-blue { background:rgba(56,189,248,.15); color:var(--accent); }
+.tag-purple { background:rgba(167,139,250,.15); color:var(--purple); }
+
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+/* Raw Memo Block */
+.raw-memo { background:#0a0f1c; border:1px solid var(--border); border-radius:10px; padding:20px; 
+  font-family:monospace; font-size:12px; color:#cbd5e1; overflow-x:auto; }
+
+/* Footer */
+.footer { text-align:center; padding:30px; color:var(--muted); font-size:12px; }
+.footer a { color:var(--accent); }
+
+@media (max-width:768px) {
+  .hero .grid { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HERO -->
+<div class="hero">
+  <span class="badge">🔐 TRON 主网存证 · 链上可查</span>
+  <h1>Nile USDT 转账存证验证报告</h1>
+  <p class="sub">TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx · TRC20 USDT · TQtjijxvaStWjLXpejaEjZfPkRnkyKyywq</p>
+  <p class="sub">生成时间: 2026-09-02 11:06:31 UTC · 主网高度 #85,891,860</p>
+  <div class="grid">
+    <div class="stat"><div class="val">1,819</div><div class="lbl">真实转账笔数</div></div>
+    <div class="stat"><div class="val">4,285</div><div class="lbl">总转入 USDT</div></div>
+    <div class="stat"><div class="val">4,285</div><div class="lbl">总转出 USDT</div></div>
+    <div class="stat"><div class="val">96</div><div class="lbl">最终余额 USDT</div></div>
+  </div>
+</div>
+
+<!-- MAINNET ANCHORS -->
+<div class="section">
+  <h2><span class="emoji">🔗</span> 主网 3 笔存证（不可逆）</h2>
+  
+  <div class="anchor">
+    <div class="top">
+      <span class="ver">主网 V1 · 资产平衡锚定</span>
+      <span class="status">✅ 链上已确认 · 2,899 确认</span>
+    </div>
+    <div class="row">
+      <span>📌 <code>08d917ca162a66f51930bd61ef14e2eb8c467baaa5791e66f3426c74e55fbe77</code></span>
+    </div>
+    <div class="row">
+      <span>🔗 区块 #85,888,961</span>
+      <span>⏰ ?</span>
+      <span>🔥 2.100 TRX</span>
+      <span>📝 Memo 558 字节</span>
+    </div>
+    <div class="row">
+      <a href="https://tronscan.org/#/transaction/08d917ca162a66f51930bd61ef14e2eb8c467baaa5791e66f3426c74e55fbe77" target="_blank">Tronscan 直达 ↗</a>
+    </div>
+    <button class="memo-btn" onclick="this.nextElementSibling.classList.toggle('show')">📋 查看链上 Memo 原始数据</button>
+    <div class="memo-box"><pre>{
+  "a": "nile-addr-balance-anchor",
+  "v": "1.0",
+  "chain": "TRON-MAINNET",
+  "srcChain": "TRON-NILE",
+  "src": {
+    "contract": "TQtjijxvaStWjLXpejaEjZfPkRnkyKyywq",
+    "blockRange": "#70577134~#70585621",
+    "totalTRC20": 1157
+  },
+  "merkle": {
+    "txRoot": "42c2d6fde018032cc20cb71954a03b1e3265d0cc27b3f7d2f209bf4bce28ac4c",
+    "addrRoot": "696dd9d4749480ed007ac2088d6fb1afa4623e715598c922ee84c2430b2436ee"
+  },
+  "stats": {
+    "totalTxs": 1157,
+    "uniqueAddrs": 2,
+    "totalUSDT": "4285054031460"
+  },
+  "addrs": [
+    {
+      "p": "TYSfgUcvAT",
+      "s": "9epx",
+      "b": 4285054031460
+    },
+    {
+      "p": "TFrnsSckPj",
+      "s": "4Ep4",
+      "b": -4285054031460
+    }
+  ],
+  "ts": 1788338485378
+}</pre></div>
+  </div>
+  
+  <div class="anchor">
+    <div class="top">
+      <span class="ver">主网 V2 · Merkle Root 压缩</span>
+      <span class="status">✅ 链上已确认 · 4,661 确认</span>
+    </div>
+    <div class="row">
+      <span>📌 <code>7506790e8dedc4052747b55241e45a9ff89415d81d3f3e1acbaa5784c888f407</code></span>
+    </div>
+    <div class="row">
+      <span>🔗 区块 #85,887,199</span>
+      <span>⏰ ?</span>
+      <span>🔥 1.000 TRX</span>
+      <span>📝 Memo 175 字节</span>
+    </div>
+    <div class="row">
+      <a href="https://tronscan.org/#/transaction/7506790e8dedc4052747b55241e45a9ff89415d81d3f3e1acbaa5784c888f407" target="_blank">Tronscan 直达 ↗</a>
+    </div>
+    <button class="memo-btn" onclick="this.nextElementSibling.classList.toggle('show')">📋 查看链上 Memo 原始数据</button>
+    <div class="memo-box"><pre>{
+  "ty": "BATCH",
+  "v": 3,
+  "s": "nile",
+  "a": "TYSfgUcvATDN",
+  "n": 1157,
+  "root": "42c2d6fde018032cc20cb71954a03b1e3265d0cc27b3f7d2f209bf4bce28ac4c",
+  "prev": "0d201f3c28b1fa9a",
+  "algo": "SHA256"
+}</pre></div>
+  </div>
+  
+  <div class="anchor">
+    <div class="top">
+      <span class="ver">主网 V3 · 批量完整锚定</span>
+      <span class="status">✅ 链上已确认 · 4,884 确认</span>
+    </div>
+    <div class="row">
+      <span>📌 <code>0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc</code></span>
+    </div>
+    <div class="row">
+      <span>🔗 区块 #85,886,976</span>
+      <span>⏰ ?</span>
+      <span>🔥 2.015 TRX</span>
+      <span>📝 Memo 747 字节</span>
+    </div>
+    <div class="row">
+      <a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">Tronscan 直达 ↗</a>
+    </div>
+    <button class="memo-btn" onclick="this.nextElementSibling.classList.toggle('show')">📋 查看链上 Memo 原始数据</button>
+    <div class="memo-box"><pre>{
+  "ty": "BATCH",
+  "v": 2,
+  "s": "nile",
+  "a": "TYSfgUcv",
+  "sum": {
+    "n": 1852,
+    "r": 1819,
+    "bk": [
+      70577134,
+      70585621
+    ],
+    "tok": {
+      "TQtjijxv": [
+        "U",
+        1819,
+        1,
+        4285054031,
+        4285054030,
+        300000000,
+        96
+      ]
+    },
+    "top": [
+      [
+        "TFrnsSck",
+        4022053915
+      ],
+      [
+        "TDKBnuJ8",
+        100978638
+      ],
+      [
+        "TXUSTBCr",
+        48420401
+      ],
+      [
+        "TKiJ2phg",
+        16577004
+      ],
+      [
+        "TP8okPX7",
+        14430066
+      ],
+      [
+        "THahWHiW",
+        9620898
+      ],
+      [
+        "TC1WNyN1",
+        5460211
+      ],
+      [
+        "TQgPqDUN",
+        5378782
+      ],
+      [
+        "TXgcr2ui",
+        4899763
+      ],
+      [
+        "TF8vw2MS",
+        3892001
+      ]
+    ]
+  },
+  "sp": [
+    {
+      "b": 8461,
+      "t": "C1WNyN1",
+      "a": 390015,
+      "k": "U"
+    },
+    {
+      "b": 8439,
+      "t": "P8okPX7",
+      "a": 901879,
+      "k": "U"
+    },
+    {
+      "b": 8420,
+      "t": "XUSTBCr",
+      "a": 3458600,
+      "k": "U"
+    },
+    {
+      "b": 8416,
+      "t": "DKBnuJ8",
+      "a": 9179876,
+      "k": "U"
+    },
+    {
+      "b": 8413,
+      "t": "FrnsSck",
+      "a": 167585580,
+      "k": "U"
+    },
+    {
+      "b": 8129,
+      "t": "HahWHiW",
+      "a": 962090,
+      "k": "U"
+    },
+    {
+      "b": 8110,
+      "t": "KiJ2phg",
+      "a": 1507000,
+      "k": "U"
+    },
+    {
+      "b": 0,
+      "t": "YSfgUcv",
+      "a": 1,
+      "k": "U"
+    }
+  ]
+}</pre></div>
+  </div>
+  
+</div>
+
+<!-- V3 RAW MEMO -->
+<div class="section">
+  <h2><span class="emoji">📄</span> V3 存证链上原始 Memo（完整 JSON）</h2>
+  <div class="raw-memo">{
+  "ty": "BATCH",
+  "v": 2,
+  "s": "nile",
+  "a": "TYSfgUcv",
+  "sum": {
+    "n": 1852,
+    "r": 1819,
+    "bk": [
+      70577134,
+      70585621
+    ],
+    "tok": {
+      "TQtjijxv": [
+        "U",
+        1819,
+        1,
+        4285054031,
+        4285054030,
+        300000000,
+        96
+      ]
+    },
+    "top": [
+      [
+        "TFrnsSck",
+        4022053915
+      ],
+      [
+        "TDKBnuJ8",
+        100978638
+      ],
+      [
+        "TXUSTBCr",
+        48420401
+      ],
+      [
+        "TKiJ2phg",
+        16577004
+      ],
+      [
+        "TP8okPX7",
+        14430066
+      ],
+      [
+        "THahWHiW",
+        9620898
+      ],
+      [
+        "TC1WNyN1",
+        5460211
+      ],
+      [
+        "TQgPqDUN",
+        5378782
+      ],
+      [
+        "TXgcr2ui",
+        4899763
+      ],
+      [
+        "TF8vw2MS",
+        3892001
+      ]
+    ]
+  },
+  "sp": [
+    {
+      "b": 8461,
+      "t": "C1WNyN1",
+      "a": 390015,
+      "k": "U"
+    },
+    {
+      "b": 8439,
+      "t": "P8okPX7",
+      "a": 901879,
+      "k": "U"
+    },
+    {
+      "b": 8420,
+      "t": "XUSTBCr",
+      "a": 3458600,
+      "k": "U"
+    },
+    {
+      "b": 8416,
+      "t": "DKBnuJ8",
+      "a": 9179876,
+      "k": "U"
+    },
+    {
+      "b": 8413,
+      "t": "FrnsSck",
+      "a": 167585580,
+      "k": "U"
+    },
+    {
+      "b": 8129,
+      "t": "HahWHiW",
+      "a": 962090,
+      "k": "U"
+    },
+    {
+      "b": 8110,
+      "t": "KiJ2phg",
+      "a": 1507000,
+      "k": "U"
+    },
+    {
+      "b": 0,
+      "t": "YSfgUcv",
+      "a": 1,
+      "k": "U"
+    }
+  ]
+}</div>
+</div>
+
+<!-- SUMMARY STATS -->
+<div class="section">
+  <h2><span class="emoji">📊</span> 链上存证汇总统计</h2>
+  <table>
+    <thead><tr><th>指标</th><th>链上值</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>区块范围</td><td><code>#70577134 ~ #70585621</code></td><td>Nile 测试网</td></tr>
+      <tr><td>合约地址</td><td><code>TQtjijxvaStWjLXpejaEjZfPkRnkyKyywq</code></td><td>Nile USDT TRC20</td></tr>
+      <tr><td>总交易数</td><td>1,852 笔</td><td>包含非真实转账</td></tr>
+      <tr><td>真实转账数</td><td>1,819 笔</td><td>TRC20 非零金额</td></tr>
+      <tr><td>Token 笔数</td><td>1,819 笔</td><td>USDT 转账</td></tr>
+      <tr><td>总转入</td><td>4,285 USDT</td><td>原始精度 × 1e6</td></tr>
+      <tr><td>总转出</td><td>4,285 USDT</td><td>原始精度 × 1e6</td></tr>
+      <tr><td>净流入</td><td>300 USDT</td><td></td></tr>
+      <tr><td>最终余额</td><td>96 USDT</td><td>目标地址剩余</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- TOP 10 RECEIVERS -->
+<div class="section">
+  <h2><span class="emoji">💰</span> Top 10 接收方（链上存证的完整汇总）</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>#</th><th>存证前缀</th><th>Nile 完整地址</th><th>累计 USDT</th><th>占比</th></tr></thead>
+    <tbody>
+      
+      <tr>
+        <td>1</td>
+        <td><code>TTFrnsSck</code></td>
+        <td><code style="font-size:11px">TFrnsSckPje2PKxhzP1F5CV3M69xTj4Ep4</code></td>
+        <td><b>4,022</b></td>
+        <td>93.9%</td>
+      </tr>
+      
+      <tr>
+        <td>2</td>
+        <td><code>TTDKBnuJ8</code></td>
+        <td><code style="font-size:11px">TDKBnuJ8sZtpRcjvxzEe5S8C1YhMNekNBJ</code></td>
+        <td><b>101</b></td>
+        <td>2.4%</td>
+      </tr>
+      
+      <tr>
+        <td>3</td>
+        <td><code>TTXUSTBCr</code></td>
+        <td><code style="font-size:11px">TXUSTBCrT7veZp813Gcd4QWZuvyH9YRBm3</code></td>
+        <td><b>48</b></td>
+        <td>1.1%</td>
+      </tr>
+      
+      <tr>
+        <td>4</td>
+        <td><code>TTKiJ2phg</code></td>
+        <td><code style="font-size:11px">TKiJ2phgaLv7S5V9YSC4AeXJt4372dDNR3</code></td>
+        <td><b>17</b></td>
+        <td>0.4%</td>
+      </tr>
+      
+      <tr>
+        <td>5</td>
+        <td><code>TTP8okPX7</code></td>
+        <td><code style="font-size:11px">TP8okPX79o8cvBA1wXy6swpG6HzrX4mbiR</code></td>
+        <td><b>14</b></td>
+        <td>0.3%</td>
+      </tr>
+      
+      <tr>
+        <td>6</td>
+        <td><code>TTHahWHiW</code></td>
+        <td><code style="font-size:11px">THahWHiWsHcR12cDamaNrswPVJkQS1GcuD</code></td>
+        <td><b>10</b></td>
+        <td>0.2%</td>
+      </tr>
+      
+      <tr>
+        <td>7</td>
+        <td><code>TTC1WNyN1</code></td>
+        <td><code style="font-size:11px">TC1WNyN1dHBNP8LCcYUcrF2S4JP9SSZbQ4</code></td>
+        <td><b>5</b></td>
+        <td>0.1%</td>
+      </tr>
+      
+      <tr>
+        <td>8</td>
+        <td><code>TTQgPqDUN</code></td>
+        <td><code style="font-size:11px">TQgPqDUNkrSsTc6mm6aaX2xkR44aKAq39D</code></td>
+        <td><b>5</b></td>
+        <td>0.1%</td>
+      </tr>
+      
+      <tr>
+        <td>9</td>
+        <td><code>TTXgcr2ui</code></td>
+        <td><code style="font-size:11px">TXgcr2uiQiR2RJyvB3xbzda9atbkdZw3r6</code></td>
+        <td><b>5</b></td>
+        <td>0.1%</td>
+      </tr>
+      
+      <tr>
+        <td>10</td>
+        <td><code>TTF8vw2MS</code></td>
+        <td><code style="font-size:11px">TF8vw2MSSuZoGnkDWT17nvZG5RJBGuncUx</code></td>
+        <td><b>4</b></td>
+        <td>0.1%</td>
+      </tr>
+      
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- 8 SAMPLES -->
+<div class="section">
+  <h2><span class="emoji">📝</span> 8 条单笔样本（主网存证 + Nile 直达）</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>#</th><th>链上存证（前缀）</th><th>Nile 完整地址</th><th>金额 USDT</th><th>Nile 区块</th><th>Nile 交易</th></tr></thead>
+    <tbody>
+      
+      <tr>
+        <td><span class="tag tag-green">[1]</span></td>
+        <td><code>TC1WNyN1</code></td>
+        <td><code style="font-size:11px">TC1WNyN1dHBNP8LCcYUcrF2S4JP9SSZbQ4</code></td>
+        <td><b>0</b></td>
+        <td>None</td>
+        <td><a href="https://nile.tronscan.org/#/transaction/a238120bf698c5bf0bca4663754341060f5983f1b8138fbd7b6ced7c586c79db" target="_blank">🔗 查看</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="tag tag-green">[2]</span></td>
+        <td><code>TP8okPX7</code></td>
+        <td><code style="font-size:11px">TP8okPX79o8cvBA1wXy6swpG6HzrX4mbiR</code></td>
+        <td><b>1</b></td>
+        <td>None</td>
+        <td><a href="https://nile.tronscan.org/#/transaction/93d53af283d3425e7b60da16fc9f66baa9fa41dca85eec33bb5541eb79d26ad3" target="_blank">🔗 查看</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="tag tag-green">[3]</span></td>
+        <td><code>TXUSTBCr</code></td>
+        <td><code style="font-size:11px">TXUSTBCrT7veZp813Gcd4QWZuvyH9YRBm3</code></td>
+        <td><b>3</b></td>
+        <td>None</td>
+        <td><a href="https://nile.tronscan.org/#/transaction/87ed9b08b854beed21f2a72bb069309616f0d60c222d21ef1af43b2be2d91334" target="_blank">🔗 查看</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="tag tag-green">[4]</span></td>
+        <td><code>TDKBnuJ8</code></td>
+        <td><code style="font-size:11px">TDKBnuJ8sZtpRcjvxzEe5S8C1YhMNekNBJ</code></td>
+        <td><b>9</b></td>
+        <td>None</td>
+        <td><a href="https://nile.tronscan.org/#/transaction/12da552afbbe8d472bc3984ccac09994023c5bd55cad8ec01febec9858acf890" target="_blank">🔗 查看</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="tag tag-green">[5]</span></td>
+        <td><code>TFrnsSck</code></td>
+        <td><code style="font-size:11px">TFrnsSckPje2PKxhzP1F5CV3M69xTj4Ep4</code></td>
+        <td><b>168</b></td>
+        <td>None</td>
+        <td><a href="https://nile.tronscan.org/#/transaction/3cbbf1b6bdc4baa9f66762fdf688a7ff0e673e33ebe301688843f7cb83099c80" target="_blank">🔗 查看</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="tag tag-green">[6]</span></td>
+        <td><code>THahWHiW</code></td>
+        <td><code style="font-size:11px">THahWHiWsHcR12cDamaNrswPVJkQS1GcuD</code></td>
+        <td><b>1</b></td>
+        <td>None</td>
+        <td><a href="https://nile.tronscan.org/#/transaction/2b420b375d292dc5c004a1d4eb82518c805e73cb0be493ca7a2b0a8a3190ccd4" target="_blank">🔗 查看</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="tag tag-green">[7]</span></td>
+        <td><code>TKiJ2phg</code></td>
+        <td><code style="font-size:11px">TKiJ2phgaLv7S5V9YSC4AeXJt4372dDNR3</code></td>
+        <td><b>2</b></td>
+        <td>None</td>
+        <td><a href="https://nile.tronscan.org/#/transaction/a5de80fde446078c6f3f286433484b4179db10b3e7f8233d484d83a963fe48b3" target="_blank">🔗 查看</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="tag tag-green">[8]</span></td>
+        <td><code>TYSfgUcv</code></td>
+        <td><code style="font-size:11px">TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx</code></td>
+        <td><b>0</b></td>
+        <td>None</td>
+        <td><a href="https://nile.tronscan.org/#/transaction/f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0" target="_blank">🔗 查看</a></td>
+      </tr>
+      
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- VERIFICATION METHOD -->
+<div class="section">
+  <h2><span class="emoji">🔍</span> 如何自己验证</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div style="background:#0a0f1c;border:1px solid var(--border);border-radius:10px;padding:20px;">
+      <h3 style="margin-bottom:10px;">方法 1：主网 Memo 查阅</h3>
+      <ol style="padding-left:20px;color:var(--muted);font-size:13px;line-height:2;">
+        <li>打开 <a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">Tronscan 主网 V3</a></li>
+        <li>找到 <b>Memo</b> 字段</li>
+        <li>JSON 里 <code>sum.top</code> 是 Top10 接收方</li>
+        <li><code>sp</code> 是 8 条单笔样本</li>
+      </ol>
+    </div>
+    <div style="background:#0a0f1c;border:1px solid var(--border);border-radius:10px;padding:20px;">
+      <h3 style="margin-bottom:10px;">方法 2：Nile 链上交叉验证</h3>
+      <ol style="padding-left:20px;color:var(--muted);font-size:13px;line-height:2;">
+        <li>取主网存证的前缀地址（如 <code>TFrnsSck</code>）</li>
+        <li>打开 Nile Tronscan 搜索该前缀</li>
+        <li>匹配金额 → 确认主网存证与 Nile 链上数据一致</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>⚡ 本报告自动生成 · 数据来源 TRON 主网 + Nile 测试网链上实时查询</p>
+  <p>主网 Tronscan: <a href="https://tronscan.org" target="_blank">tronscan.org</a> · 
+     Nile Tronscan: <a href="https://nile.tronscan.org" target="_blank">nile.tronscan.org</a></p>
+  <p>存证永久不可逆 · 任何人均可通过主网 txID 查阅 Memo 完整内容</p>
+</div>
+
+</div>
+</body>
+</html>
