@@ -90,7 +90,7 @@
 
 <!-- Anchor Banner (on-chain attestation) -->
 <div class="anchor-banner">
-  <div class="icon"><svg width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="48" fill="#26a17b"/><circle cx="50" cy="50" r="42" fill="none" stroke="#ffffff" stroke-width="3"/><text x="50" y="68" font-family="Arial Black, sans-serif" font-size="52" font-weight="900" fill="#ffffff" text-anchor="middle">₮</text></svg></div>
+  <div class="icon"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;width:100%;height:100%;"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></div>
   <div class="content">
     <div class="title">🔒 Anchor Hash · On-chain Attestation</div>
     <div class="hash" id="bannerAnchorHash">loading...</div>
@@ -126,7 +126,8 @@
         <div style="display:flex;align-items:center;gap:6px;">
           <span class="sc-tag">sc</span>
           <span class="val-blue">TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</span>
-          <span class="token-badge">USDT Token</span>
+          <span class="usdt-inline-icon" style="width:22px;height:22px;display:inline-block;vertical-align:middle;margin:0 2px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></span>
+          <span style="font-size:12px;font-weight:600;color:#26a17b;">USDT</span>
           <button class="copy-btn" onclick="copy('TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
         </div>
       </div>
@@ -154,7 +155,10 @@
     </div>
     <div class="transfer-amount">
       <span id="amountVal">—</span>
-      <span class="unit">USDT</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;margin-left:6px;">
+        <span style="width:22px;height:22px;display:inline-block;vertical-align:middle;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></span>
+        <span class="unit" style="color:#26a17b;">USDT</span>
+      </span>
     </div>
   </div>
 
