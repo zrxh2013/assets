@@ -80,9 +80,6 @@ tbody tr:last-child td{border-bottom:none;}
 .seal-card{text-align:center;padding:14px;border:1px dashed #d1d5db;border-radius:12px;background:linear-gradient(180deg,#fffbeb 0%,#fff 100%);}
 .seal-card svg{width:150px;height:150px;margin:0 auto;}
 .seal-card .seal-name{font-weight:700;color:#7c2d12;margin-top:8px;font-size:14px;}
-.seal-card .seal-type{font-size:11px;color:#92400e;background:#fef3c7;padding:2px 10px;border-radius:10px;display:inline-block;margin-top:4px;font-weight:600;}
-.seal-card .seal-hash{font-family:ui-monospace,monospace;font-size:11px;color:#6b7280;background:#f9fafb;padding:8px;border-radius:6px;margin-top:10px;text-align:left;word-break:break-all;line-height:1.6;}
-.seal-card .seal-hash b{color:#059669;}
 .notary-meta{margin-top:20px;background:#f8fafc;border-radius:12px;padding:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px 20px;border:1px solid #e2e8f0;}
 @media (max-width:700px){.notary-meta{grid-template-columns:1fr;}}
 .notary-meta .m-item{display:flex;flex-direction:column;gap:2px;}
@@ -169,12 +166,10 @@ tbody tr:last-child td{border-bottom:none;}
 <div class="notary-section">
   <div class="notary-header">
     <div>
-      <div class="lbl">CHINA APPOINTED ATTORNEY (HONG KONG) · ON-CHAIN NOTARIZATION</div>
+      <div class="lbl">链上公证</div>
       <div class="title">
         🔐 中国委托公证人 · 链上公证电子章
-        <span class="badge">VERIFIED</span>
-        <span class="badge">三章齐全</span>
-      </div>
+        </div>
     </div>
     <div class="date">签发日期 2026-09-02</div>
   </div>
@@ -234,8 +229,6 @@ tbody tr:last-child td{border-bottom:none;}
 </svg>
 
         <div class="seal-name">中国委托公证人 · 执业章</div>
-        <div class="seal-type">NOTARY PUBLIC (H.K.)</div>
-        <div class="seal-hash"><b>keccak256:</b><br>0x5054114693c124e11389…cad1f9d810</div>
       </div>
       <div class="seal-card">
         <svg width="400" height="440" viewBox="0 0 400 440" xmlns="http://www.w3.org/2000/svg">
@@ -301,8 +294,6 @@ tbody tr:last-child td{border-bottom:none;}
 </svg>
 
         <div class="seal-name">中国法律服务 · 转递专用章</div>
-        <div class="seal-type">TRANSMISSION SEAL</div>
-        <div class="seal-hash"><b>keccak256:</b><br>0xe7098af38d91faff876d…c2db908698</div>
       </div>
       <div class="seal-card">
         <svg width="320" height="180" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
@@ -349,8 +340,6 @@ tbody tr:last-child td{border-bottom:none;}
 </svg>
 
         <div class="seal-name">邓达明 · 电子签名章</div>
-        <div class="seal-type">SIGNATURE · 楷体手写风</div>
-        <div class="seal-hash"><b>keccak256:</b><br>0x0a60cdf74877f566a850…d72f3a487c</div>
       </div>
     </div>
 
@@ -359,16 +348,13 @@ tbody tr:last-child td{border-bottom:none;}
       <div class="m-item"><span class="mk">执业机构</span><span class="mv">葉謝鄧律師行 (YIP, TSE & TANG, SOLICITORS)</span></div>
       <div class="m-item"><span class="mk">执业证号</span><span class="mv">14413202200495450</span></div>
       <div class="m-item"><span class="mk">转递编号</span><span class="mv">深办第 2026-0892 号</span></div>
-      <div class="m-item"><span class="mk">公证事项</span><span class="mv">Nile 测试网 1,156 笔 USDT 转账 · 主网锚定存证</span></div>
-      <div class="m-item"><span class="mk">凭据 HTML keccak256</span><span class="mv" style="font-family:ui-monospace,monospace;">0x9288b42d8200cc4693131bbae1ab22aa0d546a31fe60a10c82fd6d78111a323d</span></div>
+      
+      
     </div>
 
     <div class="notary-roots">
-      <h4>⛓️ 公证印章 ↔ 交易数据 · 链上联合根哈希</h4>
-      <div class="root-row">
-        <div class="rl">公证摘要哈希 (3章 + 编号 + 日期)</div>
-        <div class="rv">0x7f46ae27165a2abf3df2b27d20a072392c5ea61256a5d9f01c0ab37d84f4ce0a<button class="cp" onclick="navigator.clipboard.writeText(this.parentElement.childNodes[0].textContent)">复制</button></div>
-      </div>
+      <h4>链上根哈希</h4>
+      
       <div class="root-row">
         <div class="rl">交易 Merkle Root (1156 笔)</div>
         <div class="rv">0xd474c2d6c717415385a7ca2e91b688758a8b7b78565db5f7345c5462a52732d9<button class="cp" onclick="navigator.clipboard.writeText(this.parentElement.childNodes[0].textContent)">复制</button></div>

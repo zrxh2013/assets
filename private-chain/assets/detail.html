@@ -67,7 +67,6 @@ img{display:block}
 .nm-seal{text-align:center;padding:6px;border:1px dashed #e5e7eb;border-radius:8px;background:#fffbeb;}
 .nm-seal svg{width:64px;height:64px;margin:0 auto;}
 .nm-seal .nm-n{font-size:10px;color:#7c2d12;font-weight:700;margin-top:2px;}
-.nm-seal .nm-t{font-size:9px;color:#92400e;background:#fef3c7;padding:1px 6px;border-radius:6px;display:inline-block;margin-top:2px;}
 .nm-info{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;padding:10px 12px;border-radius:10px;}
 @media (max-width:640px){.nm-info{grid-template-columns:1fr;}}
 .nm-info .nm-mk{font-size:10px;color:#64748b;font-weight:600;letter-spacing:.2px;text-transform:uppercase;}
@@ -134,10 +133,8 @@ img{display:block}
   <div class="notary-mini">
     <div class="nm-head">
       <div class="title">
-        🔐 中国委托公证人 · 链上电子章
-        <span class="bd">VERIFIED</span>
-        <span class="bd">三章齐全</span>
-      </div>
+        🔐 中国委托公证人 · 电子章
+        </div>
       <div class="date">2026-09-02</div>
     </div>
     <div class="nm-body">
@@ -145,17 +142,14 @@ img{display:block}
         <div class="nm-seal">
           <img src="stamp-1-notary.svg" alt="执业章" style="width:64px;height:64px;margin:0 auto;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<svg width=&quot;64&quot; height=&quot;64&quot; viewBox=&quot;0 0 100 100&quot;><circle cx=&quot;50&quot; cy=&quot;50&quot; r=&quot;45&quot; fill=&quot;none&quot; stroke=&quot;#b91c1c&quot; stroke-width=&quot;3&quot;/><text x=&quot;50&quot; y=&quot;55&quot; text-anchor=&quot;middle&quot; font-size=&quot;14&quot; fill=&quot;#b91c1c&quot;>公证</text></svg>');">
           <div class="nm-n">执业章</div>
-          <div class="nm-t">NOTARY</div>
         </div>
         <div class="nm-seal">
           <img src="stamp-2-transmission.svg" alt="转递章" style="width:64px;height:64px;margin:0 auto;" onerror="this.style.display='none'">
           <div class="nm-n">转递专用章</div>
-          <div class="nm-t">TRANSFER</div>
         </div>
         <div class="nm-seal">
           <img src="stamp-3-signature.svg" alt="签名章" style="width:64px;height:64px;margin:0 auto;" onerror="this.style.display='none'">
           <div class="nm-n">签名章</div>
-          <div class="nm-t">SIGN</div>
         </div>
       </div>
 
@@ -167,11 +161,8 @@ img{display:block}
       </div>
 
       <div class="nm-root">
-        <h5>⛓ 公证印章 ↔ 本笔交易 · 联合根哈希</h5>
-        <div class="nm-row">
-          <div class="nm-rl">公证摘要 (3章 + 编号 + 日期)</div>
-          <div class="nm-rv">0x7f46ae27165a2abf3df2b27d20a072392c5ea61256a5d9f01c0ab37d84f4ce0a</div>
-        </div>
+        <h5>链上根哈希</h5>
+        
         <div class="nm-row">
           <div class="nm-rl">交易 Merkle Root</div>
           <div class="nm-rv">0xd474c2d6c717415385a7ca2e91b688758a8b7b78565db5f7345c5462a52732d9</div>
