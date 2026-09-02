@@ -1,444 +1,252 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>Transaction Details · TRONSCAN</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Helvetica Neue", sans-serif;
-    background: #f5f7fa;
-    color: #111827;
-    font-size: 14px;
-    padding-bottom: env(safe-area-inset-bottom, 20px);
-    overflow-x: hidden;
-    line-height: 1.5;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Helvetica Neue", sans-serif;
+  background: #f5f7fa; color: #111827; font-size: 14px;
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+  overflow-x: hidden; line-height: 1.5;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; }
+button { font-family: inherit; }
 
-  /* ==================== TOP NAV ==================== */
-  .top-bar {
-    background: #fff;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid #eef0f3;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    height: 52px;
-  }
-  .back {
-    width: 32px; height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    color: #374151; text-decoration: none;
-    flex-shrink: 0;
-  }
-  .back:active { color: #ef4444; }
-  .back svg { width: 24px; height: 24px; }
-  .nav-title {
-    flex: 1;
-    font-size: 16px; font-weight: 600; color: #111827;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-    min-width: 0;
-  }
-  .more {
-    width: 32px; height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    color: #374151; font-size: 20px; font-weight: 700;
-    flex-shrink: 0;
-  }
-  /* ==================== TABS ==================== */
-  .tabs {
-    background: #fff;
-    display: flex;
-    border-bottom: 1px solid #eef0f3;
-    position: sticky;
-    top: 52px;
-    z-index: 90;
-  }
-  .tab {
-    flex: 1;
-    padding: 14px 0;
-    text-align: center;
-    font-size: 15px;
-    color: #6b7280;
-    position: relative;
-    background: transparent; border: none; cursor: pointer;
-    font-weight: 400;
-    font-family: inherit;
-  }
-  .tab.active { color: #111827; font-weight: 600; }
-  .tab.active::after {
-    content: '';
-    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 32px; height: 3px;
-    background: #ef4444; border-radius: 2px;
-  }
-  .tab-count { font-size: 13px; font-weight: 400; }
+/* ========== TOP NAV (Tronscan official mobile) ========== */
+.topnav {
+  background: #fff; padding: 10px 12px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid #eef0f3;
+  position: sticky; top: 0; z-index: 100; height: 52px;
+}
+.tn-back {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  color: #374151; flex-shrink: 0;
+}
+.tn-brand {
+  display: flex; align-items: center; gap: 10px;
+  flex: 1; min-width: 0;
+}
+.tn-logo { width: 26px; height: 26px; flex-shrink: 0; }
+.tn-title {
+  font-size: 16px; font-weight: 600; color: #111827;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.tn-search, .tn-more {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  color: #6b7280; flex-shrink: 0; cursor: pointer;
+}
 
-  /* ==================== CARD ==================== */
-  .card {
-    background: #fff;
-    margin: 12px;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  }
+/* ========== TABS ========== */
+.tab-bar {
+  background: #fff; display: flex;
+  border-bottom: 1px solid #eef0f3;
+  position: sticky; top: 52px; z-index: 90;
+}
+.tab-btn {
+  flex: 1; padding: 14px 0;
+  text-align: center; font-size: 15px; font-weight: 400;
+  color: #6b7280; cursor: pointer;
+  position: relative; background: transparent; border: none;
+  font-family: inherit;
+}
+.tab-btn.active { color: #111827; font-weight: 600; }
+.tab-btn.active::after {
+  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 32px; height: 3px; background: #ef4444; border-radius: 2px;
+}
+.tab-sub { font-size: 13px; font-weight: 400; }
 
-  /* ===== Info rows ===== */
-  .info-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    gap: 14px;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .info-row:last-child { border-bottom: none; }
-  .info-label {
-    display: flex; align-items: center; gap: 6px;
-    color: #6b7280; font-size: 14px;
-    flex-shrink: 0;
-  }
-  .q {
-    width: 16px; height: 16px; border-radius: 50%;
-    background: #e5e7eb; color: #6b7280;
-    font-size: 10px; font-weight: 700;
-    display: inline-flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .info-val {
-    display: flex; align-items: center; gap: 6px;
-    justify-content: flex-end;
-    flex-shrink: 1; min-width: 0;
-  }
-  .info-val .tx-addr {
-    font-family: ui-monospace, Menlo, monospace;
-    font-size: 14px;
-    color: #2563eb;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 190px;
-    text-align: right;
-  }
-  .info-val .val-straight {
-    font-family: ui-monospace, Menlo, monospace;
-    font-size: 14px;
-    color: #111827;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 190px;
-    text-align: right;
-  }
-  .info-val .val-num {
-    font-weight: 700;
-    font-family: ui-monospace, Menlo, monospace;
-    font-size: 14px;
-    color: #111827;
-    white-space: nowrap;
-  }
-  .info-val .val-time {
-    color: #111827; font-size: 13px;
-    white-space: nowrap;
-  }
+/* ========== CARD ========== */
+.card {
+  background: #fff; margin: 12px; border-radius: 14px;
+  overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.info-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; gap: 14px; border-bottom: 1px solid #f3f4f6;
+}
+.info-row:last-child { border-bottom: none; }
+.info-lbl {
+  display: flex; align-items: center; gap: 6px;
+  color: #6b7280; font-size: 14px; flex-shrink: 0;
+}
+.q {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #e5e7eb; color: #6b7280;
+  font-size: 10px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.info-val {
+  display: flex; align-items: center; gap: 6px; justify-content: flex-end;
+  flex-shrink: 1; min-width: 0;
+  font-family: ui-monospace, Menlo, monospace; font-size: 14px;
+  color: #111827;
+}
+.info-val .tx-addr {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 200px; color: #2563eb; text-align: right;
+}
+.info-val .val-num { font-weight: 700; white-space: nowrap; }
+.info-val .val-str { font-family: inherit; white-space: nowrap; font-size: 13px; }
+.info-val .val-hash {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 200px;
+}
 
-  /* Contract tag & icon */
-  .sc {
-    width: 22px; height: 22px; border-radius: 50%;
-    background: #dbeafe; color: #2563eb;
-    font-size: 10px; font-weight: 700;
-    display: inline-flex; align-items: center; justify-content: center;
-    flex-shrink: 0; line-height: 1; padding-top: 1px;
-  }
-  .usdt-mini { width: 22px; height: 22px; flex-shrink: 0; }
-  .usdt-mini svg { width: 100%; height: 100%; }
+/* Contract tag */
+.sc-tag {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #dbeafe; color: #2563eb;
+  font-size: 10px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0; line-height: 1; padding-top: 1px;
+}
+.tok-ic-22 { width: 22px; height: 22px; flex-shrink: 0; }
+.copy-btn {
+  background: none; border: none; cursor: pointer;
+  padding: 4px; display: inline-flex; align-items: center; justify-content: center;
+  color: #d1d5db; flex-shrink: 0;
+}
+.copy-btn:active { color: #2563eb; }
 
-  .copy {
-    background: none; border: none; cursor: pointer;
-    padding: 4px; display: inline-flex; align-items: center; justify-content: center;
-    color: #d1d5db; flex-shrink: 0;
-  }
-  .copy:active { color: #2563eb; }
-  .copy svg { width: 14px; height: 14px; }
+@media (max-width: 380px) {
+  .info-val .tx-addr, .info-val .val-hash { max-width: 150px; font-size: 13px; }
+  .info-row { padding: 12px 14px; gap: 10px; }
+}
+@media (min-width: 540px) { body { max-width: 540px; margin: 0 auto; } }
 
-  /* ===== Transfer block ===== */
-  .transfer {
-    background: #f9fafb;
-    border-radius: 0;
-    margin: 0;
-    padding: 0;
-  }
-  .transfer-inner {
-    padding: 18px 20px 20px;
-  }
-  .transfer-row {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 10px; padding: 4px 0;
-  }
-  .transfer-side-label {
-    font-size: 13px; color: #9ca3af;
-    flex-shrink: 0; width: 32px;
-  }
-  .transfer-addr {
-    flex: 1; min-width: 0;
-    font-family: ui-monospace, Menlo, monospace;
-    font-size: 15px; font-weight: 500;
-    color: #111827;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    text-align: right;
-  }
-  .transfer-amount-wrap {
-    display: flex; align-items: center; justify-content: center;
-    gap: 8px; padding: 16px 0 14px;
-    flex-wrap: nowrap;
-  }
-  .transfer-amount {
-    font-size: 30px; font-weight: 700;
-    color: #111827;
-    letter-spacing: -0.5px;
-    white-space: nowrap;
-    font-family: ui-monospace, Menlo, monospace;
-  }
-  .transfer-amount .unit {
-    font-size: 17px; font-weight: 600;
-    color: #26a17b; margin-left: 4px;
-  }
-  .amount-ic { width: 28px; height: 28px; flex-shrink: 0; }
-  .amount-ic svg { width: 100%; height: 100%; }
+@media (min-width:540px){body{max-width:540px;margin:0 auto;}}</style>
+</head><body>
 
-  /* ===== Method Calling ===== */
-  .method-section {
-    border-top: 1px solid #f3f4f6;
-    padding: 14px 18px 18px;
-  }
-  .method-title {
-    font-size: 14px; color: #6b7280;
-    display: flex; align-items: center; gap: 6px;
-    margin-bottom: 10px;
-  }
-  .method-box {
-    background: #f9fafb; border-radius: 10px;
-    padding: 14px 16px; margin-bottom: 10px;
-    font-family: ui-monospace, Menlo, monospace;
-    font-size: 15px; color: #111827; line-height: 1.6;
-  }
-  .method-box .fn { color: #2563eb; font-weight: 500; }
-  .param {
-    display: flex; align-items: center; gap: 10px;
-    padding: 6px 0; font-size: 13px;
-  }
-  .param .idx { color: #9ca3af; width: 22px; text-align: center; flex-shrink: 0; }
-  .param .name { font-family: ui-monospace, monospace; color: #374151; width: 44px; flex-shrink: 0; }
-  .param .type { color: #6b7280; font-size: 12px; flex-shrink: 0; }
-  .param .data {
-    font-family: ui-monospace, monospace; color: #111827;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    flex: 1; min-width: 0; text-align: right;
-  }
-
-  /* ===== Event Logs ===== */
-  .event-section {
-    border-top: 1px solid #f3f4f6;
-    padding: 14px 18px 18px;
-    font-size: 13px; color: #6b7280;
-  }
-  .event-title { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-
-  /* ==================== RESPONSIVE ==================== */
-  @media (max-width: 380px) {
-    .info-val .tx-addr, .info-val .val-straight { max-width: 150px; font-size: 13px; }
-    .transfer-amount { font-size: 26px; }
-    .transfer-amount .unit { font-size: 15px; }
-    .info-row { padding: 12px 14px; gap: 10px; }
-  }
-  @media (min-width: 540px) {
-    body { max-width: 540px; margin: 0 auto; }
-  }
-</style>
-</head>
-<body>
-
-<!-- ==================== TOP NAV ==================== -->
-<div class="top-bar">
-  <a class="back" href="tx-list.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-  </a>
-  <img src="tron-logo-official.svg" alt="TRON" style="width:24px;height:24px;display:block;flex-shrink:0;"><div class="nav-title" style="margin-left:8px;" id="navTitle">f2e81cfeebff1001…</div>
-  <div class="more">⋯</div>
-</div>
-<!-- ==================== TABS ==================== -->
-<div class="tabs">
-  <button class="tab active">Overview</button>
-  <button class="tab">Event Logs <span class="tab-count">(1)</span></button>
+<div class="topnav">
+  <a class="tn-back" href="tx-list.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></a>
+  <div class="tn-brand">
+    <div class="tn-logo"><img src="tron-logo-official.svg" alt="TRON" style="width:100%;height:100%;display:block;"></div>
+    <div class="tn-title" id="tn-title">f2e81cfeebff1001…</div>
+  </div>
+  <div class="tn-more">⋯</div>
 </div>
 
-<!-- ==================== CARD ==================== -->
+<div class="tab-bar">
+  <button class="tab-btn active">Overview</button>
+  <button class="tab-btn">Event Logs <span class="tab-sub">(1)</span></button>
+  <button class="tab-btn">Contract</button>
+</div>
+
 <div class="card">
-
-  <!-- Owner Address -->
   <div class="info-row">
-    <div class="info-label"><span class="q">?</span>Owner Address:</div>
-    <div class="info-val">
-      <span class="tx-addr" id="ownerAddr" title="T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb">T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb</span>
-      <button class="copy" onclick="copy('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-    </div>
+    <div class="info-lbl"><span class="q">?</span>Owner Address:</div>
+    <div class="info-val"><span class="tx-addr" title="T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb">T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb</span><button class="copy-btn" onclick="copy('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
   </div>
-
-  <!-- Contract Address -->
   <div class="info-row">
-    <div class="info-label"><span class="q">?</span>Contract Address:</div>
-    <div class="info-val">
-      <span class="sc">sc</span>
-      <span class="tx-addr" style="color:#2563eb;" title="TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t">TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</span>
-      <span class="usdt-mini"><img src="usdt-logo-official.png" alt="USDT" style="width:100%;height:100%;display:block;" onerror="this.style.display='none'"></span>
-      <button class="copy" onclick="copy('TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-    </div>
+    <div class="info-lbl"><span class="q">?</span>Contract Address:</div>
+    <div class="info-val"><span class="sc-tag">sc</span><span class="tx-addr" style="color:#2563eb;" title="TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t">TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</span><span class="tok-ic-22"><img src="usdt-logo-official.png" alt="USDT" style="width:100%;height:100%;display:block;"></span><button class="copy-btn" onclick="copy('TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
   </div>
-
-  <!-- Token Transfers -->
   <div class="info-row">
-    <div class="info-label"><span class="q">?</span>Token Transfers:</div>
+    <div class="info-lbl"><span class="q">?</span>Token Transfers:</div>
     <div class="val-num">1</div>
   </div>
-
-  <!-- ========== TRANSFER BLOCK ========== -->
-  <div class="transfer">
-    <div class="transfer-inner">
-      <div class="transfer-row">
-        <div class="transfer-side-label">From</div>
-        <div class="transfer-addr" id="fromAddr" title="T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb">T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb</div>
-        <button class="copy" onclick="copy('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+  
+    <div class="xfers-block" style="background:#f9fafb;padding:18px 18px 20px;border-bottom:1px solid #f3f4f6;">
+      <div class="xfers-row" style="display:flex;align-items:center;gap:10px;padding:4px 0;">
+        <div style="font-size:13px;color:#9ca3af;flex-shrink:0;width:32px;">From</div>
+        <div style="flex:1;min-width:0;font-family:ui-monospace,monospace;font-size:15px;font-weight:500;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;" id="d-from" title="T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb">T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb</div>
+        <button class="copy-btn" onclick="copy('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
       </div>
-
-      <div class="transfer-amount-wrap">
-        <span class="transfer-amount" id="amtDisplay">- 100,000,000.00<span class="unit"> USDT</span></span>
-        <span class="amount-ic"><img src="usdt-logo-official.png" alt="USDT" style="width:100%;height:100%;display:block;" onerror="this.style.display='none'"></span>
+      <div class="xfers-amt" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;flex-wrap:nowrap;">
+        <span style="font-size:30px;font-weight:700;color:#111827;letter-spacing:-0.5px;white-space:nowrap;font-family:ui-monospace,monospace;" id="d-amount">- 100,000,000.00<span style="font-size:17px;font-weight:600;color:#26a17b;margin-left:4px;"> USDT</span></span>
+        <span style="width:28px;height:28px;flex-shrink:0;"><img src="usdt-logo-official.png" alt="USDT" style="width:100%;height:100%;display:block;"></span>
       </div>
-
-      <div class="transfer-row">
-        <div class="transfer-side-label">To</div>
-        <div class="transfer-addr" id="toAddr" title="TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx">TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx</div>
-        <button class="copy" onclick="copy('TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      <div class="xfers-row" style="display:flex;align-items:center;gap:10px;padding:4px 0;">
+        <div style="font-size:13px;color:#9ca3af;flex-shrink:0;width:32px;">To</div>
+        <div style="flex:1;min-width:0;font-family:ui-monospace,monospace;font-size:15px;font-weight:500;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;" id="d-to" title="TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx">TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx</div>
+        <button class="copy-btn" onclick="copy('TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
       </div>
     </div>
-  </div>
-
-  <!-- Amount (TRX) -->
   <div class="info-row">
-    <div class="info-label"><span class="q">?</span>Amount:</div>
+    <div class="info-lbl"><span class="q">?</span>Amount:</div>
     <div class="val-num">0 TRX</div>
   </div>
-
-  <!-- Transaction Hash -->
   <div class="info-row">
-    <div class="info-label"><span class="q">?</span>Transaction Hash:</div>
-    <div class="info-val">
-      <span class="val-straight" id="txHash" title="f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0">f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0</span>
-      <button class="copy" onclick="copy('f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-    </div>
+    <div class="info-lbl"><span class="q">?</span>Transaction Hash:</div>
+    <div class="info-val"><span class="val-hash" id="v-hash" title="f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0">f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0</span><button class="copy-btn" onclick="copy('f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
   </div>
-
-  <!-- Block -->
   <div class="info-row">
-    <div class="info-label"><span class="q">?</span>Block:</div>
-    <div class="val-num" id="blockNum">None</div>
+    <div class="info-lbl"><span class="q">?</span>Block:</div>
+    <div class="val-num" id="v-block">None</div>
   </div>
-
-  <!-- Time -->
   <div class="info-row">
-    <div class="info-label"><span class="q">?</span>Time:</div>
-    <div class="val-time" id="txTime">2026-09-01 08:08:36</div>
+    <div class="info-lbl"><span class="q">?</span>Timestamp:</div>
+    <div class="val-str" id="v-time">2026-09-01 08:08:36</div>
   </div>
-
-  <!-- ========== METHOD CALLING ========== -->
-  <div class="method-section">
-    <div class="method-title"><span class="q">?</span>Method Calling:</div>
-    <div class="method-box">
-      <span class="fn">transfer</span>(address _to, uint256 _value)
+  
+    <div style="padding:14px 18px 18px;border-bottom:1px solid #f3f4f6;">
+      <div style="font-size:14px;color:#6b7280;display:flex;align-items:center;gap:6px;margin-bottom:10px;"><span class="q">?</span>Method Calling:</div>
+      <div style="background:#f9fafb;border-radius:10px;padding:14px 16px;margin-bottom:10px;font-family:ui-monospace,monospace;font-size:15px;color:#111827;line-height:1.6;">
+        <span style="color:#2563eb;font-weight:500;">transfer</span>(address _to, uint256 _value)
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;">
+        <span style="color:#9ca3af;width:22px;text-align:center;flex-shrink:0;">0</span>
+        <span style="font-family:ui-monospace,monospace;color:#374151;width:44px;flex-shrink:0;">_to</span>
+        <span style="color:#6b7280;font-size:12px;flex-shrink:0;">address</span>
+        <span style="font-family:ui-monospace,monospace;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;text-align:right;" id="p-to" title="TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx">TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;">
+        <span style="color:#9ca3af;width:22px;text-align:center;flex-shrink:0;">1</span>
+        <span style="font-family:ui-monospace,monospace;color:#374151;width:44px;flex-shrink:0;">_value</span>
+        <span style="color:#6b7280;font-size:12px;flex-shrink:0;">uint256</span>
+        <span style="font-family:ui-monospace,monospace;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;text-align:right;" id="p-val" title="100000000000000">100000000000000</span>
+      </div>
     </div>
-    <div class="param">
-      <span class="idx">0</span>
-      <span class="name">_to</span>
-      <span class="type" style="flex-shrink:0;">address</span>
-      <span class="data" id="paramTo" title="TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx">TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx</span>
+  
+    <div style="padding:14px 18px 18px;">
+      <div style="font-size:14px;color:#6b7280;display:flex;align-items:center;gap:6px;margin-bottom:10px;"><span class="q">?</span>Event Logs (1):</div>
+      <div style="background:#f9fafb;border-radius:10px;padding:14px 16px;font-family:ui-monospace,monospace;font-size:14px;color:#111827;line-height:1.6;">
+        <span style="color:#2563eb;">Transfer</span>(address indexed from, address indexed to, uint256 value)
+      </div>
     </div>
-    <div class="param">
-      <span class="idx">1</span>
-      <span class="name">_value</span>
-      <span class="type" style="flex-shrink:0;">uint256</span>
-      <span class="data" id="paramVal" title="100000000000000">100000000000000</span>
-    </div>
-  </div>
-
-  <!-- ========== EVENT LOGS ========== -->
-  <div class="event-section">
-    <div class="event-title"><span class="q">?</span>Event Logs (1):</div>
-    <div class="method-box" style="margin-bottom:0;">Transfer(address indexed from, address indexed to, uint256 value)</div>
-  </div>
-
 </div>
 
-<!-- ==================== SCRIPTS ==================== -->
+<script src="addr-data.js"></script>
 <script>
-function copy(text) {
-  const oldColor = 'inherit';
-  navigator.clipboard.writeText(text).then(() => {
-    document.querySelectorAll('.copy').forEach(b => { b.style.color = '#2563eb'; });
-    setTimeout(() => document.querySelectorAll('.copy').forEach(b => { b.style.color = ''; }), 800);
+function copy(tx) {
+  navigator.clipboard.writeText(tx).then(() => {
+    document.querySelectorAll('.copy-btn').forEach(b => b.style.color = '#2563eb');
+    setTimeout(() => document.querySelectorAll('.copy-btn').forEach(b => b.style.color = ''), 800);
   }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
+    const ta = document.createElement('textarea'); ta.value = tx; document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); document.body.removeChild(ta);
   });
 }
-
-// 从 URL 读 tx 参数
-const p = new URLSearchParams(location.search);
-const txParam = p.get('tx');
-if (txParam) {
-  fetch('addr-data.js').then(r => r.text()).then(js => {
-    // eval 方式加载 addrData
-    const blob = new Blob([js], { type: 'application/javascript' });
-    const url = URL.createObjectURL(blob);
-    return import(url);
-  }).then(() => {
-    if (typeof window.addrData !== 'undefined') {
-      const tx = window.addrData.find(t => t.txID === txParam);
-      if (tx) updatePage(tx);
+(function() {
+  const p = new URLSearchParams(location.search);
+  const h = p.get('tx');
+  if (h && typeof window.addrData !== 'undefined') {
+    const tx = window.addrData.find(x => x.txID === h);
+    if (tx) {
+      document.getElementById('tn-title').textContent = tx.txID.slice(0,16)+'…';
+      document.getElementById('d-from').textContent = tx.from;
+      document.getElementById('d-from').title = tx.from;
+      document.getElementById('d-to').textContent = tx.to;
+      document.getElementById('d-to').title = tx.to;
+      document.getElementById('d-amount').innerHTML = '- ' + Number(tx.amount_usdt).toLocaleString('en-US',{minimumFractionDigits:2}) + '<span style="font-size:17px;font-weight:600;color:#26a17b;margin-left:4px;"> USDT</span>';
+      document.getElementById('p-to').textContent = tx.to;
+      document.getElementById('p-to').title = tx.to;
+      const raw = Math.round(Number(tx.amount_usdt)*1e6);
+      document.getElementById('p-val').textContent = raw;
+      document.getElementById('p-val').title = raw;
+      document.getElementById('v-hash').textContent = tx.txID;
+      document.getElementById('v-hash').title = tx.txID;
+      document.getElementById('v-block').textContent = tx.block || '—';
+      document.getElementById('v-time').textContent = tx.datetime || '—';
     }
-  }).catch(() => {
-    // 如果 fetch 失败，等全局 addrData
-    const check = setInterval(() => {
-      if (typeof window.addrData !== 'undefined') {
-        const tx = window.addrData.find(t => t.txID === txParam);
-        if (tx) updatePage(tx);
-        clearInterval(check);
-      }
-    }, 100);
-    setTimeout(() => clearInterval(check), 3000);
-  });
-}
-
-function updatePage(tx) {
-  document.getElementById('navTitle').textContent = tx.txID.slice(0, 16) + '…';
-}
+  }
+})();
 </script>
-<script src="addr-data.js"></script>
-<script>
-// addr-data.js 加载后再查一次
-const p2 = new URLSearchParams(location.search);
-const txParam2 = p2.get('tx');
-if (txParam2 && typeof window.addrData !== 'undefined') {
-  const tx = window.addrData.find(t => t.txID === txParam2);
-  if (tx) updatePage(tx);
-}
-</script>
-
-</body>
-</html>
+</body></html>
