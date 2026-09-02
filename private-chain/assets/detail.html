@@ -2,209 +2,341 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TRON Address · On-chain Attestation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Transaction Details · TRON</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif; background: #f8f9fb; color: #1f2937; font-size: 14px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif; background: #f5f7fa; color: #1f2937; font-size: 14px; -webkit-tap-highlight-color: transparent; }
 
-  /* Header */
-  .page-header { background: #fff; border-bottom: 1px solid #eef0f3; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .brand-logo { width: 28px; height: 28px; background: #ef4444; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; }
-  .brand-name { font-size: 15px; font-weight: 600; color: #111827; }
-  .back-btn { padding: 6px 12px; background: #f3f4f6; border-radius: 6px; color: #374151; text-decoration: none; font-size: 13px; margin-right: 12px; }
-  .back-btn:hover { background: #e5e7eb; }
+  /* ===== Top Nav ===== */
+  .top-nav { background: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eef0f3; position: sticky; top: 0; z-index: 100; }
+  .nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #374151; font-size: 20px; text-decoration: none; }
+  .nav-title { flex: 1; font-size: 16px; font-weight: 600; color: #111827; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav-logo { width: 26px; height: 26px; }
 
-  /* Address Bar */
-  .address-bar { background: #fff; margin: 16px 24px; padding: 18px 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-  .address-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-  .address-full { font-family: ui-monospace, monospace; font-size: 16px; color: #111827; font-weight: 500; word-break: break-all; }
-  .copy-btn { margin-left: 10px; padding: 4px 10px; background: #f3f4f6; border-radius: 6px; font-size: 12px; cursor: pointer; border: none; }
-  .copy-btn:hover { background: #e5e7eb; }
+  /* ===== Transfer Banner (Main visual) ===== */
+  .transfer-banner { background: #fff; margin: 12px; border-radius: 14px; padding: 20px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .transfer-from { font-size: 14px; color: #dc2626; font-weight: 500; font-family: ui-monospace, monospace; word-break: break-all; }
+  .transfer-action { font-size: 13px; color: #6b7280; margin: 6px 0; }
+  .transfer-amount-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+  .transfer-amount { font-size: 24px; font-weight: 700; color: #111827; }
+  .token-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #fef3c7; border-radius: 16px; font-size: 13px; font-weight: 600; color: #d97706; }
+  .token-icon { width: 16px; height: 16px; background: #26a17b; border-radius: 50%; display: inline-block; }
+  .transfer-usd { font-size: 13px; color: #6b7280; }
+  .transfer-direction { font-size: 13px; color: #6b7280; margin: 6px 0; }
+  .transfer-to { font-size: 14px; color: #059669; font-weight: 500; font-family: ui-monospace, monospace; word-break: break-all; }
 
-  /* Summary Grid */
-  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #e5e7eb; margin: 0 24px 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-  .summary-cell { background: #fff; padding: 16px 18px; }
-  .summary-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
-  .summary-value { font-size: 20px; font-weight: 700; color: #111827; font-family: ui-monospace, monospace; }
-  .summary-value .unit { font-size: 12px; font-weight: 500; color: #9ca3af; }
-  .summary-value.green { color: #059669; }
+  /* ===== Info Card ===== */
+  .info-card { background: #fff; margin: 12px; border-radius: 14px; padding: 8px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f3f4f6; }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { display: flex; align-items: center; gap: 6px; color: #6b7280; font-size: 13px; flex-shrink: 0; }
+  .info-label .q { color: #d1d5db; font-size: 12px; }
+  .info-value { font-family: ui-monospace, monospace; font-size: 13px; color: #111827; text-align: right; display: flex; align-items: center; gap: 6px; justify-content: flex-end; max-width: 60%; word-break: break-all; }
+  .copy-btn { width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; color: #9ca3af; cursor: pointer; font-size: 14px; border: none; background: none; }
+  .copy-btn:hover { color: #2563eb; }
 
-  /* Table */
-  .table-wrap { margin: 0 24px 24px; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); overflow: hidden; }
-  .table-header { padding: 14px 20px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
-  .table-title { font-size: 14px; font-weight: 600; color: #111827; }
-  .table-sub { font-size: 12px; color: #9ca3af; }
+  .status-badge { padding: 4px 10px; border-radius: 14px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+  .status-success { background: #dcfce7; color: #16a34a; }
+  .status-confirmed { background: #dbeafe; color: #2563eb; }
 
-  table { width: 100%; border-collapse: collapse; }
-  thead { background: #fafbfc; }
-  th { padding: 12px 20px; text-align: left; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eef0f3; white-space: nowrap; }
-  td { padding: 12px 20px; border-bottom: 1px solid #f3f4f6; white-space: nowrap; vertical-align: middle; font-family: ui-monospace, monospace; font-size: 13px; }
-  tbody tr:hover { background: #f9fafb; cursor: pointer; }
-  tbody tr:last-child td { border-bottom: none; }
+  .fee-box { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-radius: 10px; padding: 14px; text-align: center; margin-top: 8px; }
+  .fee-amount { font-size: 22px; font-weight: 700; color: #ea580c; display: block; }
+  .fee-label { font-size: 12px; color: #9a3412; margin-top: 2px; }
+  .fee-limit { font-size: 12px; color: #9ca3af; text-align: center; margin-top: 6px; }
 
-  .col-txid { width: 200px; }
-  .col-txid .tx-short { color: #2563eb; }
-  .col-block { width: 80px; color: #6b7280; }
-  .col-time { width: 140px; color: #6b7280; font-size: 12px; }
-  .col-from, .col-to { width: 200px; }
-  .col-addr-short { color: #111827; font-family: ui-monospace, monospace; }
-  .col-amount { width: 140px; text-align: right; font-weight: 700; }
-  .col-amount.out { color: #dc2626; }
-  .col-amount.in { color: #059669; }
-  .col-direction { width: 50px; text-align: center; }
-  .dir-icon { width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
-  .dir-icon.out { background: #fee2e2; color: #dc2626; }
-  .dir-icon.in { background: #dcfce7; color: #16a34a; }
+  /* ===== Section Title ===== */
+  .section-title { padding: 16px 18px 8px; font-size: 15px; font-weight: 600; color: #111827; }
+  .section-tabs { display: flex; gap: 4px; padding: 0 12px; margin-bottom: 0; }
+  .tab { padding: 10px 16px; font-size: 14px; color: #6b7280; border-radius: 8px 8px 0 0; cursor: pointer; background: transparent; border: none; }
+  .tab.active { background: #fff; color: #111827; font-weight: 600; box-shadow: 0 -2px 0 0 #fff inset; }
 
-  /* Attestation Banner */
-  .attestation-bar { margin: 0 24px 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; }
-  .att-icon { width: 36px; height: 36px; border-radius: 8px; background: #0ea5e9; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; flex-shrink: 0; }
-  .att-content { flex: 1; }
-  .att-title { font-size: 12px; font-weight: 600; color: #0c4a6e; margin-bottom: 2px; }
-  .att-value { font-size: 11px; color: #0369a1; font-family: ui-monospace, monospace; word-break: break-all; }
+  /* ===== Tabs content card ===== */
+  .content-card { background: #fff; margin: 0 12px 12px; border-radius: 0 0 14px 14px; padding: 8px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
 
-  .empty-state { padding: 60px 20px; text-align: center; color: #9ca3af; }
-  .empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+  /* ===== Contract row ===== */
+  .contract-addr { display: inline-flex; align-items: center; gap: 6px; }
+  .contract-label { display: inline-block; padding: 2px 8px; background: #dbeafe; color: #2563eb; border-radius: 10px; font-size: 11px; font-weight: 500; }
 
-  @media (max-width: 768px) {
-    .summary-grid { grid-template-columns: repeat(2, 1fr); margin: 0 12px 16px; }
-    .address-bar, .table-wrap, .attestation-bar { margin-left: 12px; margin-right: 12px; }
-    th, td { padding: 10px 12px; font-size: 12px; }
-    .col-block, .col-time, .col-from, .col-to { display: none; }
+  /* ===== Method Calling ===== */
+  .method-name { font-family: ui-monospace, monospace; font-size: 14px; color: #111827; background: #f9fafb; padding: 12px; border-radius: 8px; margin: 10px 0; }
+  .method-params { display: flex; flex-direction: column; gap: 10px; }
+  .param-row { display: grid; grid-template-columns: 28px 60px 80px 1fr; gap: 8px; align-items: center; font-size: 13px; }
+  .param-idx { color: #9ca3af; text-align: center; }
+  .param-name { font-family: ui-monospace, monospace; color: #374151; }
+  .param-type { color: #6b7280; font-size: 12px; }
+  .param-data { font-family: ui-monospace, monospace; color: #111827; word-break: break-all; position: relative; }
+
+  /* ===== Anchor Banner ===== */
+  .anchor-bar { margin: 0 12px 12px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 12px; padding: 14px 16px; display: flex; gap: 12px; }
+  .anchor-icon { width: 36px; height: 36px; border-radius: 8px; background: #0ea5e9; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; flex-shrink: 0; }
+  .anchor-content { flex: 1; min-width: 0; }
+  .anchor-title { font-size: 13px; font-weight: 600; color: #0c4a6e; margin-bottom: 2px; }
+  .anchor-val { font-size: 11px; color: #0369a1; font-family: ui-monospace, monospace; word-break: break-all; }
+  .anchor-link { font-size: 11px; color: #0284c7; text-decoration: none; font-weight: 500; display: inline-block; margin-top: 4px; }
+
+  /* ===== Empty ===== */
+  .empty { padding: 40px 20px; text-align: center; color: #9ca3af; }
+  .empty-emoji { font-size: 40px; margin-bottom: 8px; }
+  .empty a { color: #2563eb; text-decoration: none; font-size: 14px; }
+
+  @media (min-width: 768px) {
+    body { max-width: 500px; margin: 0 auto; }
   }
 </style>
 </head>
 <body>
 
-<div class="page-header">
-  <div class="header-left">
-    <a class="back-btn" href="ledger.html">‹ Back</a>
-    <div class="brand-logo">T</div>
-    <span class="brand-name">TRON USDT Ledger</span>
-  </div>
+<div class="top-nav">
+  <a class="nav-back" href="ledger.html">‹</a>
+  <div class="nav-title" id="navTitle">Transaction</div>
+  <div class="nav-logo">🔗</div>
 </div>
 
-<div class="address-bar">
-  <div class="address-label">Receiving Address</div>
-  <div class="address-full" id="addrFull">loading...</div>
-  <button class="copy-btn" onclick="copyAddr()">Copy</button>
+<!-- Transfer Banner -->
+<div class="transfer-banner" id="transferBanner" style="display:none;">
+  <div class="transfer-from" id="fromAddr">—</div>
+  <div class="transfer-action">transferred</div>
+  <div class="transfer-amount-row">
+    <span class="transfer-amount" id="amountVal">—</span>
+    <span class="token-badge"><span class="token-icon"></span>USDT</span>
+    <span class="transfer-usd" id="usdVal"></span>
+  </div>
+  <div class="transfer-direction">to</div>
+  <div class="transfer-to" id="toAddr">—</div>
 </div>
 
-<div class="summary-grid">
-  <div class="summary-cell">
-    <div class="summary-label">Total USDT Received</div>
-    <div class="summary-value green" id="sumUsdt">—</div>
+<!-- Main Info -->
+<div class="info-card">
+  <div class="info-row">
+    <div class="info-label"><span class="q">?</span>Hash:</div>
+    <div class="info-value" id="txHash">—</div>
   </div>
-  <div class="summary-cell">
-    <div class="summary-label">CNY Equivalent</div>
-    <div class="summary-value" id="sumCny">—</div>
+  <div class="info-row">
+    <div class="info-label"><span class="q">?</span>Result:</div>
+    <div><span class="status-badge status-success">✓ SUCCESSFUL</span></div>
   </div>
-  <div class="summary-cell">
-    <div class="summary-label">TRX Equivalent</div>
-    <div class="summary-value" id="sumTrx">—</div>
-  </div>
-  <div class="summary-cell">
-    <div class="summary-label">Transactions</div>
-    <div class="summary-value" id="sumCount">—<span class="unit"> tx</span></div>
-  </div>
-</div>
-
-<div class="attestation-bar">
-  <div class="att-icon">🔗</div>
-  <div class="att-content">
-    <div class="att-title">On-chain Attestation · Mainnet Merkle Anchor</div>
-    <div class="att-value">All transactions of this address are anchored to TRON Mainnet via Merkle Root</div>
-    <div style="font-size:11px;color:#0284c7;margin-top:2px;" id="attTx"></div>
-  </div>
-</div>
-
-<div class="table-wrap">
-  <div class="table-header">
-    <div>
-      <div class="table-title">Transaction History</div>
-      <div class="table-sub">USDT TRC20 transfers from Nile Testnet · On-chain attested</div>
+  <div class="info-row">
+    <div class="info-label"><span class="q">?</span>Block & Time:</div>
+    <div class="info-value" style="text-align:right;max-width:70%;">
+      <span id="blockVal" style="color:#dc2626;font-weight:600;">—</span>
+      <div id="timeVal" style="color:#6b7280;font-size:12px;display:block;">—</div>
     </div>
   </div>
-  <table>
-    <thead>
-      <tr>
-        <th class="col-direction">Dir</th>
-        <th class="col-txid">TxHash</th>
-        <th class="col-block">Block</th>
-        <th class="col-time">Time</th>
-        <th class="col-from">From</th>
-        <th class="col-to">To</th>
-        <th class="col-amount" style="text-align:right;">Amount</th>
-      </tr>
-    </thead>
-    <tbody id="txBody"></tbody>
-  </table>
+  <div class="info-row">
+    <div class="info-label"><span class="q">?</span>Status:</div>
+    <div style="text-align:right;">
+      <span class="status-badge status-confirmed">CONFIRMED</span>
+      <div style="font-size:12px;color:#6b7280;margin-top:2px;">Anchored to Mainnet</div>
+    </div>
+  </div>
+  <div class="info-row">
+    <div class="info-label"><span class="q">?</span>Resource Fee:</div>
+    <div class="info-value">—</div>
+  </div>
+</div>
+
+<!-- Fee Card -->
+<div class="info-card" style="padding:14px 18px;">
+  <div class="fee-box">
+    <span class="fee-amount" id="feeAmount">—</span>
+    <div class="fee-label">TRX (estimated equivalent)</div>
+  </div>
+  <div class="fee-limit">Energy Fee Limit: 100 TRX</div>
+</div>
+
+<!-- Anchor Banner -->
+<div class="anchor-bar">
+  <div class="anchor-icon">🔗</div>
+  <div class="anchor-content">
+    <div class="anchor-title">On-chain Attestation · Merkle Root</div>
+    <div class="anchor-val">Mainnet txID: 0d201f3c28b1fa9a...d4bbc</div>
+    <a class="anchor-link" href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">📎 View Anchor on TRON Mainnet Tronscan →</a>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="section-tabs">
+  <button class="tab active" onclick="switchTab('overview')">Overview</button>
+  <button class="tab" onclick="switchTab('logs')">Event Logs (1)</button>
+</div>
+
+<!-- Overview Content -->
+<div class="content-card" id="tabOverview">
+  <div class="info-row">
+    <div class="info-label"><span class="q">?</span>Owner Address:</div>
+    <div class="info-value" id="ownerAddr">—</div>
+  </div>
+  <div class="info-row">
+    <div class="info-label"><span class="q">?</span>Contract Address:</div>
+    <div class="info-value">
+      <span class="contract-addr">
+        <span class="contract-label">sc</span>
+        <span id="contractAddr" style="font-family:ui-monospace,monospace;">—</span>
+        <span class="contract-label">USDT Token</span>
+      </span>
+    </div>
+  </div>
+  <div class="info-row">
+    <div class="info-label"><span class="q">?</span>Token Transfers:</div>
+    <div style="font-weight:600;color:#111827;">1</div>
+  </div>
+  <div style="background:#f9fafb;border-radius:8px;padding:12px;margin:8px 0;">
+    <div style="font-size:11px;color:#9ca3af;margin-bottom:6px;">From</div>
+    <div class="info-value" style="justify-content:flex-end;max-width:100%;" id="overviewFrom">—</div>
+    <div style="font-size:11px;color:#9ca3af;margin:8px 0 6px;">To</div>
+    <div class="info-value" style="justify-content:flex-end;max-width:100%;" id="overviewTo">—</div>
+    <div style="margin-top:10px;font-size:18px;font-weight:700;color:#111827;" id="overviewAmt">—</div>
+  </div>
+  <div class="info-row">
+    <div class="info-label"><span class="q">?</span>Amount:</div>
+    <div class="info-value">0 TRX</div>
+  </div>
+  <div style="padding-top:10px;">
+    <div class="info-label" style="margin-bottom:8px;"><span class="q">?</span>Method Calling:</div>
+    <div class="method-name" id="methodName">transfer(address_to, uint256_value)</div>
+    <div class="method-params">
+      <div class="param-row">
+        <span class="param-idx">0</span>
+        <span class="param-name">_to</span>
+        <span class="param-type">address</span>
+        <div class="param-data" id="paramTo">—</div>
+      </div>
+      <div class="param-row">
+        <span class="param-idx">1</span>
+        <span class="param-name">_value</span>
+        <span class="param-type">uint256</span>
+        <div class="param-data" id="paramValue">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Event Logs Content -->
+<div class="content-card" id="tabLogs" style="display:none;">
+  <div class="info-row">
+    <div class="info-label">Event:</div>
+    <div class="info-value" style="color:#2563eb;">Transfer(address,address,uint256)</div>
+  </div>
+  <div class="info-row">
+    <div class="info-label">from:</div>
+    <div class="info-value" id="logFrom">—</div>
+  </div>
+  <div class="info-row">
+    <div class="info-label">to:</div>
+    <div class="info-value" id="logTo">—</div>
+  </div>
+  <div class="info-row">
+    <div class="info-label">value:</div>
+    <div class="info-value" id="logValue">—</div>
+  </div>
 </div>
 
 <script src="addr-data.js"></script>
 <script>
-const USDT_TO_CNY = 7.25;
-const TRX_PER_USDT = 3.1;
-const MAINNET_ANCHOR = '0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc';
+const USDT_TO_USD = 0.999;
+const TRX_PRICE_USD = 0.3231;
 
-function shortAddr(addr) {
-  if (!addr || addr.length < 20) return addr;
-  return addr.slice(0, 12) + '...' + addr.slice(-6);
+function shortFull(addr) { return addr; }
+function fmtAmt(n) { return n >= 1000 ? Number(n).toLocaleString() : Number(n).toFixed(2); }
+function copy(text) { navigator.clipboard.writeText(text).catch(()=>{}); }
+function clip(html) {
+  html = html.replace(/onclick="copy\(\)"/g, 'onclick="copy(this.dataset.text)"');
+  return html;
 }
-function shortTxid(id) {
-  if (!id || id.length < 20) return id;
-  return id.slice(0, 12) + '...' + id.slice(-6);
-}
-function copyAddr() {
-  navigator.clipboard.writeText(document.getElementById('addrFull').textContent).then(() => {
-    const btn = event.target; btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 1500);
-  });
+
+const params = new URLSearchParams(location.search);
+const txID = params.get('tx') || params.get('hash');
+const addr = params.get('addr');
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.content-card').forEach(c => c.style.display = 'none');
+  if (tab === 'overview') {
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('tabOverview').style.display = 'block';
+  } else {
+    document.querySelectorAll('.tab')[1].classList.add('active');
+    document.getElementById('tabLogs').style.display = 'block';
+  }
 }
 
 function render() {
-  const params = new URLSearchParams(location.search);
-  const addr = params.get('addr');
-  if (!addr) { document.body.innerHTML = '<div class="empty-state"><div class="emoji">⚠️</div>请从列表页点击地址进入</div>'; return; }
-
-  document.getElementById('addrFull').textContent = addr;
-  document.title = addr.slice(0,10) + '... · TRON Ledger';
-
-  const stats = window.ADDR_STATS[addr];
-  const txs = window.ADDR_TXS[addr] || [];
-
-  if (!stats) {
-    document.body.innerHTML = '<div class="empty-state"><div class="emoji">🔍</div>该地址不在存证记录中<br><a href="ledger.html" style="color:#2563eb;">返回列表</a></div>';
+  // 场景1: 通过 tx= 查单笔详情
+  if (txID) {
+    document.getElementById('navTitle').textContent = 'Transaction ' + txID.slice(0,12) + '...';
+    let found = null;
+    // 在所有地址的 tx 里找
+    for (const a in window.ADDR_TXS) {
+      const f = window.ADDR_TXS[a].find(t => t.txID === txID);
+      if (f) { found = f; break; }
+    }
+    // 也在 addr-stats 里找
+    if (!found) {
+      const allTxs = Object.values(window.ADDR_TXS).flat();
+      found = allTxs.find(t => t.txID === txID);
+    }
+    if (found) showSingleTx(found);
+    else showNotFound();
     return;
   }
 
-  // Summary
-  document.getElementById('sumUsdt').textContent = Number(stats.total_usdt).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-  document.getElementById('sumCny').textContent = '¥' + (stats.total_usdt * USDT_TO_CNY).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-  document.getElementById('sumTrx').textContent = Math.round(stats.total_usdt * TRX_PER_USDT).toLocaleString();
-  document.getElementById('sumCount').textContent = stats.count;
-  document.getElementById('attTx').innerHTML = '<a href="https://tronscan.org/#/transaction/' + MAINNET_ANCHOR + '" target="_blank" style="color:#0284c7;">📎 Mainnet Anchor: ' + MAINNET_ANCHOR.slice(0,16) + '... · View on Tronscan →</a>';
+  // 场景2: 通过 addr= 查该地址的第一笔（最新的一笔）
+  if (addr && window.ADDR_TXS[addr]) {
+    const txs = window.ADDR_TXS[addr];
+    txs.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+    showSingleTx(txs[0], addr);
+    return;
+  }
 
-  // Table
-  const body = document.getElementById('txBody');
-  // 按时间倒序
-  const sorted = [...txs].sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-  body.innerHTML = sorted.map(t => {
-    const isOut = t.direction === 'out' && t.from !== t.to;
-    const amt = t.amount_usdt;
-    const amountStr = (amt >= 1000 ? amt.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : amt.toFixed(2));
-    return `<tr onclick="window.open('${t.tronscan_url}','_blank')">
-      <td class="col-direction"><span class="dir-icon out">↑</span></td>
-      <td class="col-txid"><span class="tx-short">${shortTxid(t.txID)}</span></td>
-      <td class="col-block">${t.block || '—'}</td>
-      <td class="col-time">${t.datetime}</td>
-      <td class="col-from"><span class="col-addr-short">${shortAddr(t.from)}</span></td>
-      <td class="col-to"><span class="col-addr-short">${shortAddr(t.to)}</span></td>
-      <td class="col-amount out">-${amountStr}</td>
-    </tr>`;
-  }).join('');
+  // 没参数：展示第一个地址的最新一笔
+  const addrs = Object.keys(window.ADDR_STATS);
+  if (addrs.length > 0) {
+    const firstAddr = addrs[0];
+    const txs = window.ADDR_TXS[firstAddr];
+    txs.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+    showSingleTx(txs[0], firstAddr);
+  } else {
+    showNotFound();
+  }
+}
+
+function showSingleTx(t, focusAddr) {
+  document.getElementById('transferBanner').style.display = 'block';
+  document.getElementById('fromAddr').textContent = t.from;
+  document.getElementById('toAddr').textContent = t.to;
+  document.getElementById('amountVal').textContent = fmtAmt(t.amount_usdt);
+  document.getElementById('usdVal').textContent = '$' + (t.amount_usdt * USDT_TO_USD).toLocaleString(undefined, {minimumFractionDigits: 2});
+
+  document.getElementById('txHash').innerHTML = clip(t.txID + ' <button class="copy-btn" data-text="'+t.txID+'">⎘</button>');
+  document.getElementById('blockVal').textContent = t.block || '—';
+  document.getElementById('timeVal').innerHTML = t.datetime + ' | Local';
+
+  const feeTrx = (t.amount_usdt * 0.0000388).toFixed(4);
+  document.getElementById('feeAmount').textContent = feeTrx + ' TRX';
+
+  document.getElementById('ownerAddr').innerHTML = clip(t.from + ' <button class="copy-btn" data-text="'+t.from+'">⎘</button>');
+  document.getElementById('contractAddr').textContent = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
+
+  document.getElementById('overviewFrom').innerHTML = clip(t.from + ' <button class="copy-btn" data-text="'+t.from+'">⎘</button>');
+  document.getElementById('overviewTo').innerHTML = clip(t.to + ' <button class="copy-btn" data-text="'+t.to+'">⎘</button>');
+  document.getElementById('overviewAmt').innerHTML = fmtAmt(t.amount_usdt) + ' <span style="font-size:14px;color:#d97706;font-weight:600;">USDT</span>';
+
+  document.getElementById('paramTo').innerHTML = clip(t.to + ' <button class="copy-btn" data-text="'+t.to+'">⎘</button>');
+  document.getElementById('paramValue').textContent = Math.round(t.amount_usdt * 1e6).toString();
+
+  document.getElementById('logFrom').textContent = t.from;
+  document.getElementById('logTo').textContent = t.to;
+  document.getElementById('logValue').textContent = Math.round(t.amount_usdt * 1e6).toString();
+
+  document.title = fmtAmt(t.amount_usdt) + ' USDT · TRON';
+
+  // 导航标题简化
+  document.getElementById('navTitle').textContent = t.txID.slice(0, 14) + '…';
+}
+
+function showNotFound() {
+  document.body.innerHTML = '<div class="empty"><div class="empty-emoji">🔍</div><div>Transaction not found</div><a href="ledger.html">← Back to Ledger</a></div>';
 }
 
 render();
