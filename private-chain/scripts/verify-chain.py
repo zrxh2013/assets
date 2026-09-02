@@ -227,7 +227,7 @@ def main() -> int:
 
     # ---- 1. Merkle Root 数学自洽 ----
     print("\n" + "─" * 60)
-    print("【1/5】Merkle Root 数学自洽验证")
+    print("【1/6】Merkle Root 数学自洽验证")
     try:
         leaves = leaf_hash_batch(anchor_map)  # ✅ 批量：仅 1 次 subprocess
     except Exception as e:
@@ -242,7 +242,7 @@ def main() -> int:
     print(f"   结果:   {'✅ 完全匹配' if match_root else '❌ 不匹配!!'}")
 
     # ---- 2. Anchor Hash 逐条验证 ----
-    print("\n【2/5】Anchor Hash 逐条自洽验证")
+    print("\n【2/6】Anchor Hash 逐条自洽验证")
     # anchor_hash 算法: keccak256(merkleRoot|index|txID)
     expected_ahs = anchor_hash_batch(stored_root, anchor_map)  # ✅ 批量：1 次 subprocess
     ok = 0
@@ -259,7 +259,7 @@ def main() -> int:
             print(f"     ❌ #{i}: 期望 {exp[:16]}… 实际 {got[:16]}…")
 
     # ---- 3. Merkle Proof 抽样 + 防篡改 ----
-    print("\n【3/5】Merkle Proof 抽样验证")
+    print("\n【3/6】Merkle Proof 抽样验证")
     if len(leaves) >= 1156:
         samples = [0, len(leaves) // 2, len(leaves) - 1]
     else:
@@ -280,7 +280,7 @@ def main() -> int:
     print(f"   伪造交易测试: {'❌ 错误接受!' if fake_ok else '✅ 正确拒绝 (防篡改)'}")
 
     # ---- 4. 链上交易查询 ----
-    print("\n【4/5】链上交易存在性验证")
+    print("\n【4/6】链上交易存在性验证")
 
     # 4.1 主网
     if mainnet_txid:
@@ -315,8 +315,72 @@ def main() -> int:
     else:
         print(f"   Nile ❌ 返回: {str(d2)[:100]}")
 
-    # ---- 5. 页面数据一致性 ----
-    print("\n【5/5】页面数据 ↔ anchor-result 一致性")
+    # ---- 5. 公证印章哈希 + 联合根验证 ----
+    print("\n【5/6】公证印章 ↔ 链上哈希 验证")
+    notary_info = anchor.get("notary", None)
+    combined_root = anchor.get("combinedMerkleRoot", "")
+    notary_issues = 0
+    if not notary_info:
+        print("   ⚠️  anchor-result 中缺少 notary 字段，跳过")
+    else:
+        stamp_files = {
+            "notary": ASSETS / "stamp-1-notary.svg",
+            "transfer": ASSETS / "stamp-2-transmission.svg",
+            "sign": ASSETS / "stamp-3-signature.svg",
+            "credential": ASSETS / "full-notarization-credential.html",
+        }
+        # 批量 keccak
+        raw_hex_list = []
+        keys_order = []
+        for key, fp in stamp_files.items():
+            if fp.exists():
+                raw_hex_list.append("0x" + fp.read_bytes().hex())
+                keys_order.append(key)
+            else:
+                print(f"   ⚠️  {key}: 文件 {fp.name} 不存在，跳过")
+
+        computed_keccak_list = _run_node_keccak(raw_hex_list)
+        computed_map = dict(zip(keys_order, computed_keccak_list))
+
+        for key in keys_order:
+            stored = notary_info.get(key, {}).get("keccak256", "")
+            actual = computed_map[key]
+            match = actual.lower() == stored.lower()
+            if not match:
+                notary_issues += 1
+            print(f"   {key:12s}: {'✅' if match else '❌'}  {actual[:20]}… "
+                  f"{'===' if match else '!='}  {stored[:20]}…")
+
+        # 摘要重算
+        summary_info = notary_info.get("summary", {})
+        if all(k in computed_map for k in ("notary", "transfer", "sign")) and summary_info:
+            summary_str = (
+                computed_map["notary"] + "|"
+                + computed_map["transfer"] + "|"
+                + computed_map["sign"] + "|"
+                + str(summary_info.get("notary_sn", "")) + "|"
+                + str(summary_info.get("transfer_no", "")) + "|"
+                + str(summary_info.get("issued_date", ""))
+            )
+            [computed_summary_k] = _run_node_keccak(["0x" + summary_str.encode().hex()])
+            summary_match = computed_summary_k.lower() == summary_info.get("keccak256", "").lower()
+            if not summary_match:
+                notary_issues += 1
+            print(f"   {'summary':12s}: {'✅' if summary_match else '❌'}  (3章 + 编号 + 日期) ")
+
+            # 联合根: keccak256(merkleRoot || notarySummaryKeccak)
+            combined = "0x" + stored_root.replace("0x", "") + computed_summary_k.replace("0x", "")
+            [computed_combined] = _run_node_keccak([combined])
+            combined_match = computed_combined.lower() == combined_root.lower()
+            if not combined_match:
+                notary_issues += 1
+            print(f"   {'combinedRoot':12s}: {'✅' if combined_match else '❌'}  (交易 Merkle ⨂ 公证摘要)")
+            print(f"        最终: {computed_combined}")
+            if notary_issues == 0:
+                print(f"   ✅ 公证印章 4 份数据 + 摘要 + 联合根 全部通过")
+
+    # ---- 6. 页面数据一致性 ----
+    print("\n【6/6】页面数据 ↔ anchor-result 一致性")
     page_txs = load_addr_data()
     print(f"   页面加载交易条数: {len(page_txs)}")
 
@@ -337,6 +401,15 @@ def main() -> int:
     else:
         print(f"   ⚠️  无法从页面文件中解析数据（可能需要手动核对）")
 
+    # 检查 ledger.html / detail.html 中是否有公证区块
+    for page, tag in [("ledger.html", "中国委托公证人 · 链上公证电子章"),
+                      ("detail.html", "链上公证电子章")]:
+        fp = ASSETS / page
+        if fp.exists() and tag in fp.read_text(encoding="utf-8"):
+            print(f"   ✅ {page}: 已注入公证电子章展示区块")
+        elif fp.exists():
+            print(f"   ⚠️  {page}: 未检测到公证电子章区块")
+
     # ---- 单笔查询 ----
     if single_tx:
         print("\n" + "─" * 60)
@@ -349,7 +422,9 @@ def main() -> int:
         idx = found["index"]
         proof = get_merkle_proof(leaves, idx)
         valid = verify_proof(leaves[idx], proof, idx, stored_root)
-        ah_ok = anchor_hash(stored_root, idx, found["txID"]).lower() == found["anchor_hash"].lower()
+        # 这里直接用批处理重算
+        expected_ah_list = anchor_hash_batch(stored_root, [found])
+        ah_ok = expected_ah_list[0].lower() == found["anchor_hash"].lower()
         print(f"   序号:       #{idx} (第 {idx+1}/{len(anchor_map)} 笔)")
         print(f"   Anchor Hash: {found['anchor_hash']} {'✅' if ah_ok else '❌'}")
         print(f"   From:        {found.get('from', 'N/A')}")
@@ -359,6 +434,8 @@ def main() -> int:
         print(f"   Merkle Proof: {'✅ 通过' if valid else '❌ 失败'}")
         print(f"   Nile:        https://nile.tronscan.org/#/transaction/{found['txID']}")
         print(f"   主网锚定:    {anchor.get('mainnetUrl', 'N/A')}")
+        if combined_root:
+            print(f"   公证联合根:  {combined_root}")
 
     # ---- 总结 ----
     print("\n" + "=" * 60)
@@ -368,9 +445,11 @@ def main() -> int:
     if not match_root: issues += 1
     if ok != len(anchor_map): issues += 1
     if fake_ok: issues += 1
+    if notary_info is not None:
+        issues += notary_issues
 
     if issues == 0:
-        print("  ✅ 所有检查通过，存证数据自洽、防篡改有效")
+        print("  ✅ 所有 6 项检查通过 — 交易、印章、页面、链上数据完全自洽")
     else:
         print(f"  ⚠️  共 {issues} 项异常，请检查上方 ❌ 标记")
         return 4

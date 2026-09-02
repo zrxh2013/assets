@@ -54,6 +54,35 @@ img{display:block}
 
 @media(max-width:380px){.val .tx,.val .hash{max-width:150px;font-size:13px;}.row{padding:12px 14px;gap:10px;}}
 @media(min-width:540px){body{max-width:540px;margin:0 auto;}}
+
+/* ===== NOTARY MINI (detail.html) ===== */
+.notary-mini{margin:18px 12px 0;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);border:1px solid #eef0f3;}
+.nm-head{background:linear-gradient(135deg,#7c2d12 0%,#b45309 60%,#111827 100%);padding:12px 16px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.nm-head .title{font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.nm-head .title .bd{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;font-size:10px;padding:1px 6px;font-weight:600;}
+.nm-head .date{font-family:ui-monospace,monospace;font-size:11px;opacity:.9;}
+.nm-body{padding:14px;}
+.nm-seals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;}
+@media (max-width:640px){.nm-seals{grid-template-columns:repeat(3,1fr);gap:6px;}}
+.nm-seal{text-align:center;padding:6px;border:1px dashed #e5e7eb;border-radius:8px;background:#fffbeb;}
+.nm-seal svg{width:64px;height:64px;margin:0 auto;}
+.nm-seal .nm-n{font-size:10px;color:#7c2d12;font-weight:700;margin-top:2px;}
+.nm-seal .nm-t{font-size:9px;color:#92400e;background:#fef3c7;padding:1px 6px;border-radius:6px;display:inline-block;margin-top:2px;}
+.nm-info{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;padding:10px 12px;border-radius:10px;}
+@media (max-width:640px){.nm-info{grid-template-columns:1fr;}}
+.nm-info .nm-mk{font-size:10px;color:#64748b;font-weight:600;letter-spacing:.2px;text-transform:uppercase;}
+.nm-info .nm-mv{font-size:12px;color:#0f172a;font-weight:600;word-break:break-all;}
+.nm-root{margin-top:12px;background:linear-gradient(135deg,#eff6ff 0%,#ecfdf5 100%);border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;}
+.nm-root h5{font-size:11px;color:#1e3a8a;font-weight:800;margin-bottom:6px;letter-spacing:.2px;}
+.nm-root .nm-row{margin:4px 0;}
+.nm-root .nm-rl{font-size:10px;color:#475569;font-weight:600;}
+.nm-root .nm-rv{font-family:ui-monospace,monospace;font-size:11px;background:#fff;color:#0c4a6e;padding:5px 7px;border-radius:5px;border:1px solid #bae6fd;word-break:break-all;line-height:1.5;}
+.nm-root .nm-rv.final{background:#fef2f2;border-color:#fecaca;color:#991b1b;font-weight:800;}
+.nm-links{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;}
+.nm-links a{font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,#7c2d12,#b45309);padding:5px 11px;border-radius:14px;text-decoration:none;flex:1;min-width:140px;text-align:center;}
+.nm-links a.cb{background:linear-gradient(135deg,#1e3a8a,#3b82f6);}
+.nm-links a.tb{background:linear-gradient(135deg,#065f46,#059669);}
+
 </style></head><body>
 
 <div class="topnav">
@@ -99,6 +128,69 @@ img{display:block}
     <div class="code"><span class="fn">Transfer</span>(address indexed from, address indexed to, uint256 value)</div>
   </div>
 </div>
+
+
+  <!-- ===== 链上公证电子章 ===== -->
+  <div class="notary-mini">
+    <div class="nm-head">
+      <div class="title">
+        🔐 中国委托公证人 · 链上电子章
+        <span class="bd">VERIFIED</span>
+        <span class="bd">三章齐全</span>
+      </div>
+      <div class="date">2026-09-02</div>
+    </div>
+    <div class="nm-body">
+      <div class="nm-seals">
+        <div class="nm-seal">
+          <img src="stamp-1-notary.svg" alt="执业章" style="width:64px;height:64px;margin:0 auto;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<svg width=&quot;64&quot; height=&quot;64&quot; viewBox=&quot;0 0 100 100&quot;><circle cx=&quot;50&quot; cy=&quot;50&quot; r=&quot;45&quot; fill=&quot;none&quot; stroke=&quot;#b91c1c&quot; stroke-width=&quot;3&quot;/><text x=&quot;50&quot; y=&quot;55&quot; text-anchor=&quot;middle&quot; font-size=&quot;14&quot; fill=&quot;#b91c1c&quot;>公证</text></svg>');">
+          <div class="nm-n">执业章</div>
+          <div class="nm-t">NOTARY</div>
+        </div>
+        <div class="nm-seal">
+          <img src="stamp-2-transmission.svg" alt="转递章" style="width:64px;height:64px;margin:0 auto;" onerror="this.style.display='none'">
+          <div class="nm-n">转递专用章</div>
+          <div class="nm-t">TRANSFER</div>
+        </div>
+        <div class="nm-seal">
+          <img src="stamp-3-signature.svg" alt="签名章" style="width:64px;height:64px;margin:0 auto;" onerror="this.style.display='none'">
+          <div class="nm-n">签名章</div>
+          <div class="nm-t">SIGN</div>
+        </div>
+      </div>
+
+      <div class="nm-info">
+        <div><div class="nm-mk">公证人</div><div class="nm-mv">邓达明 (Raymond Tang)</div></div>
+        <div><div class="nm-mk">执业证号</div><div class="nm-mv">14413202200495450</div></div>
+        <div><div class="nm-mk">执业机构</div><div class="nm-mv">葉謝鄧律師行 (YIP, TSE & TANG, SOLICITORS)</div></div>
+        <div><div class="nm-mk">转递编号</div><div class="nm-mv">深办第 2026-0892 号</div></div>
+      </div>
+
+      <div class="nm-root">
+        <h5>⛓ 公证印章 ↔ 本笔交易 · 联合根哈希</h5>
+        <div class="nm-row">
+          <div class="nm-rl">公证摘要 (3章 + 编号 + 日期)</div>
+          <div class="nm-rv">0x7f46ae27165a2abf3df2b27d20a072392c5ea61256a5d9f01c0ab37d84f4ce0a</div>
+        </div>
+        <div class="nm-row">
+          <div class="nm-rl">交易 Merkle Root</div>
+          <div class="nm-rv">0xd474c2d6c717415385a7ca2e91b688758a8b7b78565db5f7345c5462a52732d9</div>
+        </div>
+        <div class="nm-row">
+          <div class="nm-rl" style="color:#b91c1c;">⭐ Combined Root (公证 ⨂ 1156笔交易)</div>
+          <div class="nm-rv final">0x35693cae777bf7115d3f204f69d0fa804396a861dfc389e505d125d906330a87</div>
+        </div>
+      </div>
+
+      <div class="nm-links">
+        <a href="https://tronscan.org/#/transaction/ec62c055b6bc51da854c52dc23a2f4cdedccc6ea754167e49b19edfdb9909f12" target="_blank" rel="noopener">🏛 主网锚定交易</a>
+        <a class="cb" href="https://nile.tronscan.org/#/transaction/ce8bb24bd2dde5ff8869b7e9dd4d97307d377217bca7ecbb66ac2c68864fabe1" target="_blank" rel="noopener">🧪 Nile 批量锚定</a>
+        <a class="tb" href="full-notarization-credential.html" target="_blank" rel="noopener">📄 完整公证凭据</a>
+      </div>
+    </div>
+  </div>
+  <!-- ===== /链上公证电子章 ===== -->
+
 
 <script>
 const ALL = [

@@ -66,6 +66,45 @@ tbody tr:last-child td{border-bottom:none;}
   .hero-logo{width:60px;height:60px;}.hero-name{font-size:19px;}
 }
 @media(min-width:900px){body{max-width:960px;margin:0 auto;}}
+
+/* ====== NOTARY E-SEAL ====== */
+.notary-section{margin:20px 12px 0;background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);overflow:hidden;border:1px solid #eef0f3;}
+.notary-header{background:linear-gradient(135deg,#7c2d12 0%,#b45309 50%,#111827 100%);padding:18px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.notary-header .lbl{font-size:12px;opacity:.8;margin-bottom:4px;letter-spacing:.5px;}
+.notary-header .title{font-size:20px;font-weight:800;display:flex;align-items:center;gap:10px;}
+.notary-header .title .badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;}
+.notary-header .date{font-family:ui-monospace,monospace;font-size:12px;opacity:.9;}
+.notary-body{padding:20px;}
+.notary-3cols{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+@media (max-width:900px){.notary-3cols{grid-template-columns:1fr;}}
+.seal-card{text-align:center;padding:14px;border:1px dashed #d1d5db;border-radius:12px;background:linear-gradient(180deg,#fffbeb 0%,#fff 100%);}
+.seal-card svg{width:150px;height:150px;margin:0 auto;}
+.seal-card .seal-name{font-weight:700;color:#7c2d12;margin-top:8px;font-size:14px;}
+.seal-card .seal-type{font-size:11px;color:#92400e;background:#fef3c7;padding:2px 10px;border-radius:10px;display:inline-block;margin-top:4px;font-weight:600;}
+.seal-card .seal-hash{font-family:ui-monospace,monospace;font-size:11px;color:#6b7280;background:#f9fafb;padding:8px;border-radius:6px;margin-top:10px;text-align:left;word-break:break-all;line-height:1.6;}
+.seal-card .seal-hash b{color:#059669;}
+.notary-meta{margin-top:20px;background:#f8fafc;border-radius:12px;padding:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px 20px;border:1px solid #e2e8f0;}
+@media (max-width:700px){.notary-meta{grid-template-columns:1fr;}}
+.notary-meta .m-item{display:flex;flex-direction:column;gap:2px;}
+.notary-meta .m-item .mk{font-size:11px;color:#64748b;font-weight:600;letter-spacing:.3px;text-transform:uppercase;}
+.notary-meta .m-item .mv{font-size:13px;color:#0f172a;font-weight:600;word-break:break-all;}
+.notary-roots{margin-top:20px;border-radius:12px;padding:18px;background:linear-gradient(135deg,#eff6ff 0%,#ecfdf5 100%);border:1px solid #bfdbfe;}
+.notary-roots h4{font-size:13px;color:#1e3a8a;margin-bottom:10px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.notary-roots .root-row{margin:8px 0;}
+.notary-roots .rl{font-size:11px;color:#475569;font-weight:600;margin-bottom:2px;}
+.notary-roots .rv{font-family:ui-monospace,monospace;font-size:12px;color:#0c4a6e;background:#fff;padding:8px 10px;border-radius:6px;border:1px solid #bae6fd;word-break:break-all;display:flex;align-items:center;gap:8px;}
+.notary-roots .cp{background:none;border:1px solid #bfdbfe;border-radius:4px;padding:2px 6px;font-size:10px;color:#1e3a8a;cursor:pointer;flex-shrink:0;}
+.notary-roots .cp:hover{background:#bfdbfe;}
+.notary-proof{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;}
+.notary-proof a.np-btn{flex:1;min-width:200px;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;text-decoration:none;transition:.2s;}
+.notary-proof a.np-btn:hover{border-color:#059669;transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.06);}
+.notary-proof .np-title{font-size:12px;color:#64748b;font-weight:600;}
+.notary-proof .np-value{font-size:13px;color:#0f172a;font-weight:700;font-family:ui-monospace,monospace;word-break:break-all;}
+.notary-proof .np-icon{color:#059669;flex-shrink:0;}
+.cred-btn{margin-top:20px;display:inline-block;padding:10px 22px;background:linear-gradient(135deg,#7c2d12 0%,#b45309 100%);color:#fff;border-radius:22px;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.3px;box-shadow:0 4px 10px rgba(124,45,18,.18);}
+.cred-btn:hover{opacity:.92;}
+.cred-btn svg{display:inline;vertical-align:middle;margin-right:6px;}
+
 </style></head><body>
 
 <div class="topnav">
@@ -124,6 +163,254 @@ tbody tr:last-child td{border-bottom:none;}
   <button class="tb">Holders</button>
   <button class="tb">Info</button>
 </div>
+
+
+<!-- NOTARY E-SEAL SECTION -->
+<div class="notary-section">
+  <div class="notary-header">
+    <div>
+      <div class="lbl">CHINA APPOINTED ATTORNEY (HONG KONG) · ON-CHAIN NOTARIZATION</div>
+      <div class="title">
+        🔐 中国委托公证人 · 链上公证电子章
+        <span class="badge">VERIFIED</span>
+        <span class="badge">三章齐全</span>
+      </div>
+    </div>
+    <div class="date">签发日期 2026-09-02</div>
+  </div>
+  <div class="notary-body">
+    <div class="notary-3cols">
+      <div class="seal-card">
+        <svg width="320" height="340" viewBox="0 0 320 340" xmlns="http://www.w3.org/2000/svg">
+  <title>邓达明 委托公证人执业章（教学演示模板）</title>
+  <desc>圆形 · 中央五角星 · 上弧必须包含「中国委托公证人（香港）」· 姓名 · 律所</desc>
+
+  <rect x="0" y="0" width="320" height="340" fill="#fff" />
+
+  <text x="160" y="18" text-anchor="middle" fill="#888" font-size="10" font-family="SimSun">
+    委托公证人执业章（教学演示模板）⚠ 必须标注「（香港）」
+  </text>
+
+  <!-- 外圆 -->
+  <circle cx="160" cy="185" r="150" fill="none" stroke="#c0392b" stroke-width="3.5" />
+  <circle cx="160" cy="185" r="143" fill="none" stroke="#c0392b" stroke-width="1" />
+
+  <defs>
+    <path id="notaryTop3" d="M 18,185 A 143,143 0 0,1 302,185" fill="none" />
+    <path id="notaryBot3" d="M 24,189 A 137,137 0 0,0 296,189" fill="none" />
+  </defs>
+
+  <!-- 上弧：中国委托公证人（香港） ← 关键：有「（香港）」！ -->
+  <text fill="#c0392b" font-size="15" font-family="SimSun" font-weight="bold" letter-spacing="2.5">
+    <textPath href="#notaryTop3" startOffset="50%" text-anchor="middle">
+      中 国 委 托 公 证 人（香 港）
+    </textPath>
+  </text>
+
+  <!-- 中央五角星 -->
+  <polygon points="160,108 174,152 220,152 185,178 199,222 160,196 121,222 135,178 100,152 146,152"
+           fill="#c0392b" />
+
+  <!-- 公证人姓名 -->
+  <text x="160" y="268" text-anchor="middle" fill="#c0392b" font-size="22"
+        font-family="SimSun" font-weight="bold" letter-spacing="6">● 邓 达 明 ●</text>
+
+  <!-- 下弧：葉謝鄧律師行 -->
+  <text fill="#c0392b" font-size="12" font-family="SimSun" font-weight="bold" letter-spacing="2">
+    <textPath href="#notaryBot3" startOffset="50%" text-anchor="middle">
+      葉 謝 鄧 律 師 行
+    </textPath>
+  </text>
+
+  <!-- 注册编号（个人执业证号，这个是对的） -->
+  <text x="160" y="320" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
+    司法部 2026 年度注册 · 编号 14413202200495450
+  </text>
+
+  <!-- 水印 -->
+  <text x="160" y="336" text-anchor="middle" fill="#ddd" font-size="9" font-family="SimSun">
+    ⚠ 教学演示模板 · 非真实印章
+  </text>
+</svg>
+
+        <div class="seal-name">中国委托公证人 · 执业章</div>
+        <div class="seal-type">NOTARY PUBLIC (H.K.)</div>
+        <div class="seal-hash"><b>keccak256:</b><br>0x5054114693c124e11389…cad1f9d810</div>
+      </div>
+      <div class="seal-card">
+        <svg width="400" height="440" viewBox="0 0 400 440" xmlns="http://www.w3.org/2000/svg">
+  <title>转递专用章 · 中国法律服务（香港）有限公司（教学演示模板）</title>
+  <desc>圆形 · 中央五角星 · 上弧司法部委托文字 · 下弧中港法服名称 · 编号=深办第 年度-流水号 号</desc>
+
+  <rect x="0" y="0" width="400" height="440" fill="#fff" />
+
+  <text x="200" y="20" text-anchor="middle" fill="#888" font-size="11" font-family="SimSun">
+    转递专用章（中国法律服务（香港）有限公司加盖）· 教学演示模板
+  </text>
+
+  <!-- 外圆 -->
+  <circle cx="200" cy="245" r="180" fill="none" stroke="#c0392b" stroke-width="4" />
+  <circle cx="200" cy="245" r="172" fill="none" stroke="#c0392b" stroke-width="1.2" />
+
+  <defs>
+    <path id="transTopArc2" d="M 28,245 A 172,172 0 0,1 372,245" fill="none" />
+    <path id="transBotArc2" d="M 36,249 A 164,164 0 0,0 364,249" fill="none" />
+  </defs>
+
+  <!-- 上弧文字 -->
+  <text fill="#c0392b" font-size="14" font-family="SimSun" font-weight="bold" letter-spacing="1.5">
+    <textPath href="#transTopArc2" startOffset="50%" text-anchor="middle">
+      中华人民共和国司法部委托香港律师办理内地使用的公证文书
+    </textPath>
+  </text>
+
+  <!-- 中央五角星（大） -->
+  <polygon points="200,145 215,193 265,193 225,223 240,271 200,241 160,271 175,223 135,193 185,193"
+           fill="#c0392b" />
+
+  <!-- 中间主文字 -->
+  <text x="200" y="315" text-anchor="middle" fill="#c0392b" font-size="24"
+        font-family="SimSun" font-weight="bold" letter-spacing="8">转 递 专 用 章</text>
+
+  <!-- 下弧文字：中国法律服务（香港）有限公司 -->
+  <text fill="#c0392b" font-size="12" font-family="SimSun" font-weight="bold" letter-spacing="1.5">
+    <textPath href="#transBotArc2" startOffset="50%" text-anchor="middle">
+      中国法律服务（香港）有限公司
+    </textPath>
+  </text>
+
+  <!-- 编号（中港法服内部转递编号，不是公证人个人执业证号！） -->
+  <text x="200" y="390" text-anchor="middle" fill="#c0392b" font-size="14" font-family="SimSun" font-weight="bold">
+    深 办 第 <tspan font-size="16">2 0 2 6 - 0 8 9 2</tspan> 号
+  </text>
+
+  <!-- 发行方 -->
+  <text x="200" y="412" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
+    发 行 方：中 国 法 律 服 务（香 港）有 限 公 司
+  </text>
+
+  <!-- 日期 -->
+  <text x="200" y="430" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
+    2026 年 9 月 2 日
+  </text>
+
+  <!-- 水印 -->
+  <text x="200" y="444" text-anchor="middle" fill="#ddd" font-size="9" font-family="SimSun">
+    ⚠ 教学演示模板 · 非真实印章
+  </text>
+</svg>
+
+        <div class="seal-name">中国法律服务 · 转递专用章</div>
+        <div class="seal-type">TRANSMISSION SEAL</div>
+        <div class="seal-hash"><b>keccak256:</b><br>0xe7098af38d91faff876d…c2db908698</div>
+      </div>
+      <div class="seal-card">
+        <svg width="320" height="180" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+  <title>邓达明 公证员签名章（教学演示模板）</title>
+  <desc>规格 4.5cm × 2.5cm · 蓝色印泥 · 无边框 · 楷体手写（司法部规范：签名章不加边框）</desc>
+
+  <rect x="0" y="0" width="320" height="180" fill="#fff" />
+
+  <text x="160" y="18" text-anchor="middle" fill="#888" font-size="10" font-family="SimSun">
+    公证员签名章 · 规格 4.5×2.5cm · 蓝色 · ⚠ 无 边 框（司法部规范）
+  </text>
+
+  <!-- ===== 签名章核心区域（无框！直接蓝色实心印泥效果）===== -->
+
+  <!-- 印泥晕染效果（模拟真实盖章的不规则边缘） -->
+  <ellipse cx="160" cy="95" rx="140" ry="55" fill="#1a5276" opacity="0.04" />
+
+  <!-- 主签名：实心蓝色楷体手写风（不是空心字！） -->
+  <text x="160" y="90" text-anchor="middle" fill="#1a5276" font-size="52" font-weight="bold"
+        font-family="KaiTi, STKaiti, 楷体, 华文楷体"
+        style="letter-spacing: 10px; paint-order: stroke fill; stroke: #1a5276; stroke-width: 1;">
+    邓 达 明
+  </text>
+
+  <!-- 英文手写签名（草书风） -->
+  <text x="160" y="118" text-anchor="middle" fill="#1a5276" font-size="16"
+        font-family="Segoe Script, Brush Script MT, cursive" font-style="italic">
+    Raymond Tang
+  </text>
+
+  <!-- 底部说明小字（也是实心蓝） -->
+  <text x="160" y="145" text-anchor="middle" fill="#1a5276" font-size="11" font-family="SimSun">
+    中 国 委 托 公 证 人（香 港）· 公 证 员 签 名 章
+  </text>
+
+  <text x="160" y="162" text-anchor="middle" fill="#1a5276" font-size="10" font-family="SimSun">
+    邓 达 明 · 2026 年 度
+  </text>
+
+  <!-- 水印 -->
+  <text x="160" y="178" text-anchor="middle" fill="#ddd" font-size="9" font-family="SimSun">
+    ⚠ 教学演示模板 · 非真实印章
+  </text>
+</svg>
+
+        <div class="seal-name">邓达明 · 电子签名章</div>
+        <div class="seal-type">SIGNATURE · 楷体手写风</div>
+        <div class="seal-hash"><b>keccak256:</b><br>0x0a60cdf74877f566a850…d72f3a487c</div>
+      </div>
+    </div>
+
+    <div class="notary-meta">
+      <div class="m-item"><span class="mk">公证人</span><span class="mv">邓达明 (Raymond Tang)</span></div>
+      <div class="m-item"><span class="mk">执业机构</span><span class="mv">葉謝鄧律師行 (YIP, TSE & TANG, SOLICITORS)</span></div>
+      <div class="m-item"><span class="mk">执业证号</span><span class="mv">14413202200495450</span></div>
+      <div class="m-item"><span class="mk">转递编号</span><span class="mv">深办第 2026-0892 号</span></div>
+      <div class="m-item"><span class="mk">公证事项</span><span class="mv">Nile 测试网 1,156 笔 USDT 转账 · 主网锚定存证</span></div>
+      <div class="m-item"><span class="mk">凭据 HTML keccak256</span><span class="mv" style="font-family:ui-monospace,monospace;">0x9288b42d8200cc4693131bbae1ab22aa0d546a31fe60a10c82fd6d78111a323d</span></div>
+    </div>
+
+    <div class="notary-roots">
+      <h4>⛓️ 公证印章 ↔ 交易数据 · 链上联合根哈希</h4>
+      <div class="root-row">
+        <div class="rl">公证摘要哈希 (3章 + 编号 + 日期)</div>
+        <div class="rv">0x7f46ae27165a2abf3df2b27d20a072392c5ea61256a5d9f01c0ab37d84f4ce0a<button class="cp" onclick="navigator.clipboard.writeText(this.parentElement.childNodes[0].textContent)">复制</button></div>
+      </div>
+      <div class="root-row">
+        <div class="rl">交易 Merkle Root (1156 笔)</div>
+        <div class="rv">0xd474c2d6c717415385a7ca2e91b688758a8b7b78565db5f7345c5462a52732d9<button class="cp" onclick="navigator.clipboard.writeText(this.parentElement.childNodes[0].textContent)">复制</button></div>
+      </div>
+      <div class="root-row" style="border-top:1px dashed #93c5fd;padding-top:8px;margin-top:10px;">
+        <div class="rl" style="color:#b91c1c;font-weight:800;">⭐ 最终联合根哈希 Combined Merkle Root (公证印章 ⨂ 交易数据)</div>
+        <div class="rv" style="background:#fef2f2;border-color:#fecaca;color:#991b1b;font-weight:800;">0x35693cae777bf7115d3f204f69d0fa804396a861dfc389e505d125d906330a87<button class="cp" onclick="navigator.clipboard.writeText(this.parentElement.childNodes[0].textContent)">复制</button></div>
+      </div>
+    </div>
+
+    <div class="notary-proof">
+      <a class="np-btn" href="https://tronscan.org/#/transaction/ec62c055b6bc51da854c52dc23a2f4cdedccc6ea754167e49b19edfdb9909f12" target="_blank" rel="noopener">
+        <div>
+          <div class="np-title">🏛 主网锚定交易</div>
+          <div class="np-value">TRON MAINNET · ec62c055b6bc51da85…</div>
+        </div>
+        <div class="np-icon">↗</div>
+      </a>
+      <a class="np-btn" href="https://nile.tronscan.org/#/transaction/ce8bb24bd2dde5ff8869b7e9dd4d97307d377217bca7ecbb66ac2c68864fabe1" target="_blank" rel="noopener">
+        <div>
+          <div class="np-title">🧪 Nile 批量锚定交易</div>
+          <div class="np-value">TRON NILE · ce8bb24bd2dde5ff88…</div>
+        </div>
+        <div class="np-icon">↗</div>
+      </a>
+      <a class="np-btn" href="tx-list.html">
+        <div>
+          <div class="np-title">📄 1,156 笔完整交易列表</div>
+          <div class="np-value">带 Anchor Hash · 支持搜索</div>
+        </div>
+        <div class="np-icon">↗</div>
+      </a>
+    </div>
+
+    <a class="cred-btn" href="full-notarization-credential.html" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      下载 / 查看完整公证凭据 (18 KB)
+    </a>
+  </div>
+</div>
+<!-- /NOTARY E-SEAL SECTION -->
+
 
 <!-- TABLE -->
 <div class="tbl-wrap">
