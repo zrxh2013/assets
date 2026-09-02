@@ -1,0 +1,53 @@
+<svg width="320" height="340" viewBox="0 0 320 340" xmlns="http://www.w3.org/2000/svg">
+  <title>邓达明 委托公证人执业章（教学演示模板）</title>
+  <desc>圆形 · 中央五角星 · 上弧中国委托公证人（香港） · 姓名邓达明 · 下弧葉謝鄧律師行</desc>
+
+  <!-- 背景 -->
+  <rect x="0" y="0" width="320" height="340" fill="#fff" />
+
+  <!-- 标题 -->
+  <text x="160" y="18" text-anchor="middle" fill="#888" font-size="10" font-family="SimSun">
+    委托公证人执业章（教学演示模板）
+  </text>
+
+  <!-- 外圆 -->
+  <circle cx="160" cy="185" r="150" fill="none" stroke="#c0392b" stroke-width="3.5" />
+  <circle cx="160" cy="185" r="143" fill="none" stroke="#c0392b" stroke-width="1" />
+
+  <defs>
+    <path id="notaryTop" d="M 18,185 A 143,143 0 0,1 302,185" fill="none" />
+    <path id="notaryBot" d="M 24,189 A 137,137 0 0,0 296,189" fill="none" />
+  </defs>
+
+  <!-- 上弧：中国委托公证人（香港） -->
+  <text fill="#c0392b" font-size="16" font-family="SimSun" font-weight="bold" letter-spacing="3">
+    <textPath href="#notaryTop" startOffset="50%" text-anchor="middle">
+      中 国 委 托 公 证 人（香 港）
+    </textPath>
+  </text>
+
+  <!-- 中央五角星 -->
+  <polygon points="160,108 174,152 220,152 185,178 199,222 160,196 121,222 135,178 100,152 146,152"
+           fill="#c0392b" />
+
+  <!-- 公证人姓名 -->
+  <text x="160" y="268" text-anchor="middle" fill="#c0392b" font-size="22"
+        font-family="SimSun" font-weight="bold" letter-spacing="6">● 邓 达 明 ●</text>
+
+  <!-- 下弧：葉謝鄧律師行 -->
+  <text fill="#c0392b" font-size="12" font-family="SimSun" font-weight="bold" letter-spacing="2">
+    <textPath href="#notaryBot" startOffset="50%" text-anchor="middle">
+      葉 謝 鄧 律 師 行
+    </textPath>
+  </text>
+
+  <!-- 注册编号 -->
+  <text x="160" y="320" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
+    司法部 2026 年度注册 · 编号 14413202200495450
+  </text>
+
+  <!-- 水印 -->
+  <text x="160" y="336" text-anchor="middle" fill="#ddd" font-size="9" font-family="SimSun">
+    ⚠ 教学演示模板 · 非真实印章
+  </text>
+</svg>

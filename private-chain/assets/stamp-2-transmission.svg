@@ -1,0 +1,60 @@
+<svg width="400" height="420" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg">
+  <title>转递专用章 · 中国法律服务（香港）有限公司（教学演示模板）</title>
+  <desc>圆形 · 中央五角星 · 上弧司法部委托文字 · 下弧中港法服名称 · 编号+日期</desc>
+
+  <!-- 背景 -->
+  <rect x="0" y="0" width="400" height="420" fill="#fff" />
+
+  <!-- 标题 -->
+  <text x="200" y="20" text-anchor="middle" fill="#888" font-size="11" font-family="SimSun">
+    转递专用章（中国法律服务（香港）有限公司加盖）· 教学演示模板
+  </text>
+
+  <!-- 外圆 -->
+  <circle cx="200" cy="230" r="180" fill="none" stroke="#c0392b" stroke-width="4" />
+  <circle cx="200" cy="230" r="172" fill="none" stroke="#c0392b" stroke-width="1.2" />
+
+  <!-- 上弧路径：中华人民共和国司法部委托香港律师办理内地使用的公证文书 -->
+  <defs>
+    <path id="transTopArc" d="M 28,230 A 172,172 0 0,1 372,230" fill="none" />
+    <path id="transBotArc" d="M 36,234 A 164,164 0 0,0 364,234" fill="none" />
+    <path id="transMidArc" d="M 70,230 A 130,130 0 0,1 330,230" fill="none" />
+  </defs>
+
+  <!-- 上弧文字 -->
+  <text fill="#c0392b" font-size="15" font-family="SimSun" font-weight="bold" letter-spacing="2">
+    <textPath href="#transTopArc" startOffset="50%" text-anchor="middle">
+      中华人民共和国司法部委托香港律师办理内地使用的公证文书
+    </textPath>
+  </text>
+
+  <!-- 中央五角星（大） -->
+  <polygon points="200,130 215,178 265,178 225,208 240,256 200,226 160,256 175,208 135,178 185,178"
+           fill="#c0392b" />
+
+  <!-- 中间主文字 -->
+  <text x="200" y="300" text-anchor="middle" fill="#c0392b" font-size="26"
+        font-family="SimSun" font-weight="bold" letter-spacing="8">转 递 专 用 章</text>
+
+  <!-- 下弧文字：中国法律服务（香港）有限公司 -->
+  <text fill="#c0392b" font-size="13" font-family="SimSun" font-weight="bold" letter-spacing="1.5">
+    <textPath href="#transBotArc" startOffset="50%" text-anchor="middle">
+      中国法律服务（香港）有限公司
+    </textPath>
+  </text>
+
+  <!-- 编号 -->
+  <text x="200" y="380" text-anchor="middle" fill="#c0392b" font-size="13" font-family="SimSun">
+    深办第 <tspan font-weight="bold">2026-XX</tspan> 号
+  </text>
+
+  <!-- 日期 -->
+  <text x="200" y="400" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
+    2026 年 X 月 X 日
+  </text>
+
+  <!-- 水印 -->
+  <text x="200" y="418" text-anchor="middle" fill="#ddd" font-size="9" font-family="SimSun">
+    ⚠ 教学演示模板 · 非真实印章
+  </text>
+</svg>
