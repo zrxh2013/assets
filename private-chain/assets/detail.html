@@ -2,215 +2,443 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
 <title>Transaction Details · TRONSCAN</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #111827; font-size: 14px; padding-bottom: 60px; overflow-x: hidden; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Helvetica Neue", sans-serif;
+    background: #f5f7fa;
+    color: #111827;
+    font-size: 14px;
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+    overflow-x: hidden;
+    line-height: 1.5;
+  }
 
-  /* ===== Top Bar ===== */
-  .top-bar { background: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #eef0f3; position: sticky; top: 0; z-index: 100; }
-  .back { color: #374151; text-decoration: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .nav-title { flex: 1; font-size: 16px; font-weight: 600; color: #111827; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, monospace; min-width: 0; }
-  .more-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #374151; flex-shrink: 0; }
+  /* ==================== TOP NAV ==================== */
+  .top-bar {
+    background: #fff;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #eef0f3;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 52px;
+  }
+  .back {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    color: #374151; text-decoration: none;
+    flex-shrink: 0;
+  }
+  .back:active { color: #ef4444; }
+  .back svg { width: 24px; height: 24px; }
+  .nav-title {
+    flex: 1;
+    font-size: 16px; font-weight: 600; color: #111827;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    min-width: 0;
+  }
+  .more {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    color: #374151; font-size: 20px; font-weight: 700;
+    flex-shrink: 0;
+  }
 
-  /* ===== Anchor Banner ===== */
-  .anchor-banner { margin: 12px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; border-radius: 12px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
-  .anchor-banner .ic { width: 36px; height: 36px; flex-shrink: 0; }
-  .anchor-banner .content { flex: 1; min-width: 0; }
-  .anchor-banner .title { font-size: 13px; font-weight: 600; color: #065f46; margin-bottom: 2px; }
-  .anchor-banner .hash { font-size: 12px; color: #047857; font-family: ui-monospace, monospace; word-break: break-all; line-height: 1.4; }
-  .anchor-banner a { font-size: 11px; color: #059669; text-decoration: none; font-weight: 500; display: inline-block; margin-top: 4px; }
+  /* ==================== ANCHOR BANNER ==================== */
+  .anchor {
+    margin: 12px;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1px solid #a7f3d0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .anchor-ic {
+    width: 36px; height: 36px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .anchor-ic svg { width: 100%; height: 100%; }
+  .anchor-body { flex: 1; min-width: 0; }
+  .anchor-title {
+    font-size: 13px; font-weight: 600; color: #065f46;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .anchor-hash {
+    font-size: 12px; color: #047857;
+    font-family: ui-monospace, Menlo, monospace;
+    margin-top: 3px;
+    word-break: break-all;
+    line-height: 1.5;
+  }
+  .anchor-link {
+    font-size: 12px; color: #059669; text-decoration: none; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 3px; margin-top: 6px;
+  }
+  .anchor-link:active { opacity: 0.7; }
 
-  /* ===== Tabs ===== */
-  .tabs { background: #fff; display: flex; border-bottom: 1px solid #eef0f3; position: sticky; top: 60px; z-index: 90; }
-  .tab { flex: 1; padding: 14px 0; text-align: center; font-size: 15px; color: #6b7280; cursor: pointer; position: relative; background: transparent; border: none; font-weight: 400; }
+  /* ==================== TABS ==================== */
+  .tabs {
+    background: #fff;
+    display: flex;
+    border-bottom: 1px solid #eef0f3;
+    position: sticky;
+    top: 52px;
+    z-index: 90;
+  }
+  .tab {
+    flex: 1;
+    padding: 14px 0;
+    text-align: center;
+    font-size: 15px;
+    color: #6b7280;
+    position: relative;
+    background: transparent; border: none; cursor: pointer;
+    font-weight: 400;
+    font-family: inherit;
+  }
   .tab.active { color: #111827; font-weight: 600; }
-  .tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 32px; height: 3px; background: #ef4444; border-radius: 2px; }
-  .tab-count { font-size: 13px; }
+  .tab.active::after {
+    content: '';
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 32px; height: 3px;
+    background: #ef4444; border-radius: 2px;
+  }
+  .tab-count { font-size: 13px; font-weight: 400; }
 
-  /* ===== Info Card ===== */
-  .card { background: #fff; margin: 12px; border-radius: 14px; padding: 4px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); overflow: hidden; }
-  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f3f4f6; gap: 10px; }
+  /* ==================== CARD ==================== */
+  .card {
+    background: #fff;
+    margin: 12px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  /* ===== Info rows ===== */
+  .info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    gap: 14px;
+    border-bottom: 1px solid #f3f4f6;
+  }
   .info-row:last-child { border-bottom: none; }
-  .info-row-cols { flex-direction: column; align-items: stretch; }
-  
-  .info-label { display: flex; align-items: center; gap: 6px; color: #6b7280; font-size: 14px; flex-shrink: 0; }
-  .q-icon { width: 16px; height: 16px; border-radius: 50%; background: #e5e7eb; color: #6b7280; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .info-label {
+    display: flex; align-items: center; gap: 6px;
+    color: #6b7280; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .q {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #e5e7eb; color: #6b7280;
+    font-size: 10px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .info-val {
+    display: flex; align-items: center; gap: 6px;
+    justify-content: flex-end;
+    flex-shrink: 1; min-width: 0;
+  }
+  .info-val .tx-addr {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 14px;
+    color: #2563eb;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 190px;
+    text-align: right;
+  }
+  .info-val .val-straight {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 14px;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 190px;
+    text-align: right;
+  }
+  .info-val .val-num {
+    font-weight: 700;
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 14px;
+    color: #111827;
+    white-space: nowrap;
+  }
+  .info-val .val-time {
+    color: #111827; font-size: 13px;
+    white-space: nowrap;
+  }
 
-  /* === 🔑 关键修复：info-value 不换行 === */
-  .info-value { font-family: ui-monospace, Menlo, monospace; font-size: 14px; color: #111827; display: flex; align-items: center; gap: 6px; justify-content: flex-end; flex-shrink: 1; min-width: 0; overflow: hidden; }
-  .info-value .addr { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; color: #2563eb; text-align: right; }
+  /* Contract tag & icon */
+  .sc {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #dbeafe; color: #2563eb;
+    font-size: 10px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; line-height: 1; padding-top: 1px;
+  }
+  .usdt-mini { width: 22px; height: 22px; flex-shrink: 0; }
+  .usdt-mini svg { width: 100%; height: 100%; }
 
-  .val-blue { color: #2563eb; text-decoration: none; white-space: nowrap; }
-  .val-num { color: #111827; font-weight: 700; }
-
-  .copy-btn { background: none; border: none; cursor: pointer; padding: 4px; display: inline-flex; align-items: center; justify-content: center; color: #d1d5db; flex-shrink: 0; }
-  .copy-btn:active { color: #2563eb; }
-
-  /* Contract tag — 缩小不挤 */
-  .sc-tag { width: 22px; height: 22px; border-radius: 50%; background: #dbeafe; color: #2563eb; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; padding-top: 1px; }
-  .usdt-ic { width: 22px; height: 22px; flex-shrink: 0; }
+  .copy {
+    background: none; border: none; cursor: pointer;
+    padding: 4px; display: inline-flex; align-items: center; justify-content: center;
+    color: #d1d5db; flex-shrink: 0;
+  }
+  .copy:active { color: #2563eb; }
+  .copy svg { width: 14px; height: 14px; }
 
   /* ===== Transfer block ===== */
-  .transfer-block { background: #f9fafb; border-radius: 12px; padding: 16px 18px; margin: 8px 0; }
-  .transfer-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; }
-  .transfer-label { font-size: 12px; color: #9ca3af; flex-shrink: 0; width: 36px; }
-  .transfer-addr { font-family: ui-monospace, Menlo, monospace; font-size: 15px; color: #111827; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; text-align: right; }
-  .transfer-copy { flex-shrink: 0; color: #d1d5db; }
-  
-  .transfer-amount-row { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 0 4px; flex-wrap: wrap; }
-  .transfer-amount { font-size: 28px; font-weight: 700; color: #111827; letter-spacing: -0.5px; white-space: nowrap; }
-  .transfer-amount .unit { font-size: 18px; font-weight: 600; color: #26a17b; margin-left: 4px; white-space: nowrap; }
-  .amount-usdt-ic { width: 28px; height: 28px; flex-shrink: 0; }
+  .transfer {
+    background: #f9fafb;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+  }
+  .transfer-inner {
+    padding: 18px 20px 20px;
+  }
+  .transfer-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 4px 0;
+  }
+  .transfer-side-label {
+    font-size: 13px; color: #9ca3af;
+    flex-shrink: 0; width: 32px;
+  }
+  .transfer-addr {
+    flex: 1; min-width: 0;
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 15px; font-weight: 500;
+    color: #111827;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    text-align: right;
+  }
+  .transfer-amount-wrap {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 16px 0 14px;
+    flex-wrap: nowrap;
+  }
+  .transfer-amount {
+    font-size: 30px; font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+    font-family: ui-monospace, Menlo, monospace;
+  }
+  .transfer-amount .unit {
+    font-size: 17px; font-weight: 600;
+    color: #26a17b; margin-left: 4px;
+  }
+  .amount-ic { width: 28px; height: 28px; flex-shrink: 0; }
+  .amount-ic svg { width: 100%; height: 100%; }
 
   /* ===== Method Calling ===== */
-  .method-title { font-size: 12px; color: #9ca3af; margin-bottom: 8px; padding-top: 8px; }
-  .method-box { background: #f9fafb; border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; font-family: ui-monospace, Menlo, monospace; font-size: 14px; color: #111827; line-height: 1.6; }
-  .method-box .func { color: #2563eb; }
-  .param-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; }
-  .param-row .idx { color: #9ca3af; width: 24px; text-align: center; flex-shrink: 0; }
-  .param-row .name { font-family: ui-monospace, monospace; color: #374151; width: 40px; flex-shrink: 0; }
-  .param-row .type { color: #6b7280; font-size: 12px; flex-shrink: 0; }
-  .param-row .data { font-family: ui-monospace, monospace; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; text-align: right; }
-
-  @media (max-width: 400px) {
-    .info-value .addr { max-width: 140px; font-size: 13px; }
-    .transfer-amount { font-size: 24px; }
-    .transfer-amount .unit { font-size: 15px; }
+  .method-section {
+    border-top: 1px solid #f3f4f6;
+    padding: 14px 18px 18px;
   }
-  @media (min-width: 520px) {
-    body { max-width: 520px; margin: 0 auto; }
+  .method-title {
+    font-size: 14px; color: #6b7280;
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 10px;
+  }
+  .method-box {
+    background: #f9fafb; border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 10px;
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 15px; color: #111827; line-height: 1.6;
+  }
+  .method-box .fn { color: #2563eb; font-weight: 500; }
+  .param {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 0; font-size: 13px;
+  }
+  .param .idx { color: #9ca3af; width: 22px; text-align: center; flex-shrink: 0; }
+  .param .name { font-family: ui-monospace, monospace; color: #374151; width: 44px; flex-shrink: 0; }
+  .param .type { color: #6b7280; font-size: 12px; flex-shrink: 0; }
+  .param .data {
+    font-family: ui-monospace, monospace; color: #111827;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    flex: 1; min-width: 0; text-align: right;
+  }
+
+  /* ===== Event Logs ===== */
+  .event-section {
+    border-top: 1px solid #f3f4f6;
+    padding: 14px 18px 18px;
+    font-size: 13px; color: #6b7280;
+  }
+  .event-title { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 380px) {
+    .info-val .tx-addr, .info-val .val-straight { max-width: 150px; font-size: 13px; }
+    .transfer-amount { font-size: 26px; }
+    .transfer-amount .unit { font-size: 15px; }
+    .info-row { padding: 12px 14px; gap: 10px; }
+  }
+  @media (min-width: 540px) {
+    body { max-width: 540px; margin: 0 auto; }
   }
 </style>
 </head>
 <body>
 
-<!-- Top Bar -->
+<!-- ==================== TOP NAV ==================== -->
 <div class="top-bar">
-  <a class="back" href="ledger.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></a>
-  <div class="nav-title" id="navTitle">f2e81cfeebff10...</div>
-  <div class="more-btn">⋯</div>
+  <a class="back" href="tx-list.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </a>
+  <div class="nav-title" id="navTitle">f2e81cfeebff1001…</div>
+  <div class="more">⋯</div>
 </div>
 
-<!-- Anchor Banner -->
-<div class="anchor-banner">
-  <div class="ic"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></div>
-  <div class="content">
-    <div class="title">🔒 Anchor Hash · On-chain Attestation</div>
-    <div class="hash" id="bannerAnchorHash">5db16f7146c0aed274e1229bccffea983694357e17bc7c13bec406ed29822928</div>
-    <a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">📎 View Mainnet Anchor →</a>
+<!-- ==================== ANCHOR ==================== -->
+<div class="anchor">
+  <div class="anchor-ic"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></div>
+  <div class="anchor-body">
+    <div class="anchor-title">🔒 Anchor Hash · On-chain Attestation</div>
+    <div class="anchor-hash" id="anchorHash">5db16f7146c0aed274e1229bccffea983694357e17bc7c13bec406ed29822928</div>
+    <a class="anchor-link" href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">📎 View Mainnet Anchor →</a>
   </div>
 </div>
 
-<!-- Tabs -->
+<!-- ==================== TABS ==================== -->
 <div class="tabs">
   <button class="tab active">Overview</button>
   <button class="tab">Event Logs <span class="tab-count">(1)</span></button>
 </div>
 
-<!-- Info Card -->
+<!-- ==================== CARD ==================== -->
 <div class="card">
+
   <!-- Owner Address -->
   <div class="info-row">
-    <div class="info-label"><span class="q-icon">?</span>Owner Address:</div>
-    <div class="info-value">
-      <span class="addr" id="ownerAddr" title="T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb">T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb</span>
-      <button class="copy-btn" onclick="copy('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+    <div class="info-label"><span class="q">?</span>Owner Address:</div>
+    <div class="info-val">
+      <span class="tx-addr" id="ownerAddr" title="T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb">T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb</span>
+      <button class="copy" onclick="copy('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
     </div>
   </div>
 
   <!-- Contract Address -->
   <div class="info-row">
-    <div class="info-label"><span class="q-icon">?</span>Contract Address:</div>
-    <div class="info-value">
-      <span class="sc-tag">sc</span>
-      <span class="val-blue" title="TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t">TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</span>
-      <span class="usdt-ic"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></span>
-      <button class="copy-btn" onclick="copy('TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+    <div class="info-label"><span class="q">?</span>Contract Address:</div>
+    <div class="info-val">
+      <span class="sc">sc</span>
+      <span class="tx-addr" style="color:#2563eb;" title="TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t">TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</span>
+      <span class="usdt-mini"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></span>
+      <button class="copy" onclick="copy('TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
     </div>
   </div>
 
   <!-- Token Transfers -->
   <div class="info-row">
-    <div class="info-label"><span class="q-icon">?</span>Token Transfers:</div>
+    <div class="info-label"><span class="q">?</span>Token Transfers:</div>
     <div class="val-num">1</div>
   </div>
 
-  <!-- Transfer block (From / Amount / To) -->
-  <div class="transfer-block">
-    <div class="transfer-row">
-      <div class="transfer-label">From</div>
-      <div class="transfer-addr" id="fromAddr" title="T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb">T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb</div>
-      <button class="copy-btn transfer-copy" onclick="copy('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-    </div>
+  <!-- ========== TRANSFER BLOCK ========== -->
+  <div class="transfer">
+    <div class="transfer-inner">
+      <div class="transfer-row">
+        <div class="transfer-side-label">From</div>
+        <div class="transfer-addr" id="fromAddr" title="T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb">T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb</div>
+        <button class="copy" onclick="copy('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      </div>
 
-    <div class="transfer-amount-row">
-      <span class="transfer-amount">- 100,000,000.00</span>
-      <span class="unit">USDT</span>
-    </div>
+      <div class="transfer-amount-wrap">
+        <span class="transfer-amount" id="amtDisplay">- 100,000,000.00<span class="unit"> USDT</span></span>
+        <span class="amount-ic"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></span>
+      </div>
 
-    <div class="transfer-row">
-      <div class="transfer-label">To</div>
-      <div class="transfer-addr" id="toAddr" title="TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx">TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx</div>
-      <button class="copy-btn transfer-copy" onclick="copy('TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      <div class="transfer-row">
+        <div class="transfer-side-label">To</div>
+        <div class="transfer-addr" id="toAddr" title="TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx">TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx</div>
+        <button class="copy" onclick="copy('TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      </div>
     </div>
   </div>
 
   <!-- Amount (TRX) -->
   <div class="info-row">
-    <div class="info-label"><span class="q-icon">?</span>Amount:</div>
-    <div class="val-num" style="white-space:nowrap;">0 TRX</div>
+    <div class="info-label"><span class="q">?</span>Amount:</div>
+    <div class="val-num">0 TRX</div>
   </div>
 
   <!-- Transaction Hash -->
   <div class="info-row">
-    <div class="info-label"><span class="q-icon">?</span>Transaction Hash:</div>
-    <div class="info-value">
-      <span class="addr" style="color:#111827;" title="f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0">f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0</span>
-      <button class="copy-btn" onclick="copy('f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+    <div class="info-label"><span class="q">?</span>Transaction Hash:</div>
+    <div class="info-val">
+      <span class="val-straight" id="txHash" title="f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0">f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0</span>
+      <button class="copy" onclick="copy('f2e81cfeebff10018877aaa3b68087de71f93bfa098e3095b19d586ce2282ea0')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
     </div>
   </div>
 
   <!-- Block -->
   <div class="info-row">
-    <div class="info-label"><span class="q-icon">?</span>Block:</div>
-    <div class="val-num">None</div>
+    <div class="info-label"><span class="q">?</span>Block:</div>
+    <div class="val-num" id="blockNum">None</div>
   </div>
 
   <!-- Time -->
   <div class="info-row">
-    <div class="info-label"><span class="q-icon">?</span>Time:</div>
-    <div style="white-space:nowrap;color:#111827;">2026-09-01 08:08:36</div>
+    <div class="info-label"><span class="q">?</span>Time:</div>
+    <div class="val-time" id="txTime">2026-09-01 08:08:36</div>
   </div>
 
-  <!-- Method Calling -->
-  <div class="info-row" style="flex-direction:column;align-items:stretch;gap:6px;padding-bottom:14px;">
-    <div class="info-label" style="padding-top:2px;"><span class="q-icon">?</span>Method Calling:</div>
+  <!-- ========== METHOD CALLING ========== -->
+  <div class="method-section">
+    <div class="method-title"><span class="q">?</span>Method Calling:</div>
     <div class="method-box">
-      <span class="func">transfer</span>(address _to, uint256 _value)
+      <span class="fn">transfer</span>(address _to, uint256 _value)
     </div>
-    <div class="param-row">
+    <div class="param">
       <span class="idx">0</span>
       <span class="name">_to</span>
       <span class="type" style="flex-shrink:0;">address</span>
-      <span class="data" title="TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx">TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx</span>
+      <span class="data" id="paramTo" title="TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx">TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx</span>
     </div>
-    <div class="param-row">
+    <div class="param">
       <span class="idx">1</span>
       <span class="name">_value</span>
       <span class="type" style="flex-shrink:0;">uint256</span>
-      <span class="data" title="100000000000000">100000000000000</span>
+      <span class="data" id="paramVal" title="100000000000000">100000000000000</span>
     </div>
   </div>
+
+  <!-- ========== EVENT LOGS ========== -->
+  <div class="event-section">
+    <div class="event-title"><span class="q">?</span>Event Logs (1):</div>
+    <div class="method-box" style="margin-bottom:0;">Transfer(address indexed from, address indexed to, uint256 value)</div>
+  </div>
+
 </div>
 
+<!-- ==================== SCRIPTS ==================== -->
 <script>
 function copy(text) {
+  const oldColor = 'inherit';
   navigator.clipboard.writeText(text).then(() => {
-    const btns = document.querySelectorAll('.copy-btn');
-    btns.forEach(b => { b.style.color = '#2563eb'; });
-    setTimeout(() => btns.forEach(b => { b.style.color = ''; }), 600);
+    document.querySelectorAll('.copy').forEach(b => { b.style.color = '#2563eb'; });
+    setTimeout(() => document.querySelectorAll('.copy').forEach(b => { b.style.color = ''; }), 800);
   }).catch(() => {
     const ta = document.createElement('textarea');
     ta.value = text; document.body.appendChild(ta); ta.select();
@@ -219,44 +447,63 @@ function copy(text) {
 }
 
 // 从 URL 读 tx 参数
-const params = new URLSearchParams(location.search);
-const txParam = params.get('tx');
-if (txParam && window.addrData) {
-  const tx = window.addrData.find(t => t.txID === txParam);
-  if (tx) {
-    document.getElementById('navTitle').textContent = tx.txID.slice(0, 14) + '...';
-    document.getElementById('bannerAnchorHash').textContent = tx.anchor_hash;
-    document.getElementById('ownerAddr').textContent = tx.from;
-    document.getElementById('ownerAddr').title = tx.from;
-    document.getElementById('fromAddr').textContent = tx.from;
-    document.getElementById('fromAddr').title = tx.from;
-    document.getElementById('toAddr').textContent = tx.to;
-    document.getElementById('toAddr').title = tx.to;
-    const amtEl = document.querySelector('.transfer-amount');
-    amtEl.innerHTML = '- ' + Number(tx.amount_usdt).toLocaleString('en-US', {minimumFractionDigits:2}) + ' <span class="unit">USDT</span>';
-  }
+const p = new URLSearchParams(location.search);
+const txParam = p.get('tx');
+if (txParam) {
+  fetch('addr-data.js').then(r => r.text()).then(js => {
+    // eval 方式加载 addrData
+    const blob = new Blob([js], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+    return import(url);
+  }).then(() => {
+    if (typeof window.addrData !== 'undefined') {
+      const tx = window.addrData.find(t => t.txID === txParam);
+      if (tx) updatePage(tx);
+    }
+  }).catch(() => {
+    // 如果 fetch 失败，等全局 addrData
+    const check = setInterval(() => {
+      if (typeof window.addrData !== 'undefined') {
+        const tx = window.addrData.find(t => t.txID === txParam);
+        if (tx) updatePage(tx);
+        clearInterval(check);
+      }
+    }, 100);
+    setTimeout(() => clearInterval(check), 3000);
+  });
+}
+
+function updatePage(tx) {
+  document.getElementById('navTitle').textContent = tx.txID.slice(0, 16) + '…';
+  document.getElementById('anchorHash').textContent = tx.anchor_hash;
+  document.getElementById('ownerAddr').textContent = tx.from;
+  document.getElementById('ownerAddr').title = tx.from;
+  document.getElementById('fromAddr').textContent = tx.from;
+  document.getElementById('fromAddr').title = tx.from;
+  document.getElementById('toAddr').textContent = tx.to;
+  document.getElementById('toAddr').title = tx.to;
+  document.getElementById('txHash').textContent = tx.txID;
+  document.getElementById('txHash').title = tx.txID;
+  document.getElementById('blockNum').textContent = tx.block || '—';
+  document.getElementById('txTime').textContent = tx.datetime || '—';
+  document.getElementById('paramTo').textContent = tx.to;
+  document.getElementById('paramTo').title = tx.to;
+  const raw = Math.round(Number(tx.amount_usdt) * 1e6);
+  document.getElementById('paramVal').textContent = raw;
+  document.getElementById('paramVal').title = raw;
+  document.getElementById('amtDisplay').innerHTML = '- ' + Number(tx.amount_usdt).toLocaleString('en-US', {minimumFractionDigits:2}) + '<span class="unit"> USDT</span>';
 }
 </script>
 <script src="addr-data.js"></script>
 <script>
-// 加载 addr-data 后再查一次（如果先加载则不会重复）
-const params2 = new URLSearchParams(location.search);
-const txParam2 = params2.get('tx');
+// addr-data.js 加载后再查一次
+const p2 = new URLSearchParams(location.search);
+const txParam2 = p2.get('tx');
 if (txParam2 && typeof window.addrData !== 'undefined') {
   const tx = window.addrData.find(t => t.txID === txParam2);
-  if (tx) {
-    document.getElementById('navTitle').textContent = tx.txID.slice(0, 14) + '...';
-    document.getElementById('bannerAnchorHash').textContent = tx.anchor_hash;
-    document.getElementById('ownerAddr').textContent = tx.from;
-    document.getElementById('ownerAddr').title = tx.from;
-    document.getElementById('fromAddr').textContent = tx.from;
-    document.getElementById('fromAddr').title = tx.from;
-    document.getElementById('toAddr').textContent = tx.to;
-    document.getElementById('toAddr').title = tx.to;
-    const amtEl = document.querySelector('.transfer-amount');
-    amtEl.innerHTML = '- ' + Number(tx.amount_usdt).toLocaleString('en-US', {minimumFractionDigits:2}) + ' <span class="unit">USDT</span>';
-  }
+  if (tx) updatePage(tx);
 }
 </script>
+
 </body>
 </html>
