@@ -10445,7 +10445,8 @@
       "file": "assets/full-notarization-credential.html",
       "bytes": 18674,
       "sha256": "0x2fee954f7bde88b8e0006e1eff6ac5113da569a0a6df8fbdd24989f2b00fc59d",
-      "keccak256": "0x9288b42d8200cc4693131bbae1ab22aa0d546a31fe60a10c82fd6d78111a323d"
+      "keccak256": "0x292eab1780cf178ab02716b0fbcaeb90fe149c4ae553737b9bc1e64a85645114",
+      "path": "assets/full-notarization-credential.html"
     },
     "summary": {
       "keccak256": "0x7f46ae27165a2abf3df2b27d20a072392c5ea61256a5d9f01c0ab37d84f4ce0a",
