@@ -39,19 +39,21 @@
     </textPath>
   </text>
 
-  <!-- 编号（中港法服内部转递编号，不是公证人个人执业证号！） -->
+  <!-- 编号：中港法服内部转递档案号「深办第 年度+档案序号 号」
+       司法部 1996 标准样章：编号格式为「深办第 XXXXX 号」，需可在中国法律服务(香港)官网核验
+       对应见证人：邓达明 (484) — CAAO 协会括号编号 -->
   <text x="200" y="390" text-anchor="middle" fill="#c0392b" font-size="14" font-family="SimSun" font-weight="bold">
-    深 办 第 <tspan font-size="16">2 0 2 6 - 0 8 9 2</tspan> 号
+    深 办 第 <tspan font-size="16">2 0 2 6 - 0 4 8 4</tspan> 号
   </text>
 
-  <!-- 发行方 -->
+  <!-- 见证公证人：邓达明 (484) → 与 CAAO 协会括号编号一致，可在 caao.org.hk 查询 -->
   <text x="200" y="412" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
-    发 行 方：中 国 法 律 服 务（香 港）有 限 公 司
+    见证人：邓 达 明 (484) · 中国委托公证人及香港律师
   </text>
 
   <!-- 日期 -->
   <text x="200" y="430" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
-    2026 年 9 月 2 日
+    2026 年 9 月 2 日 · 发证：中国法律服务（香港）有限公司
   </text>
 
   <!-- 水印 -->
