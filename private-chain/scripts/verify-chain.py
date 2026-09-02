@@ -32,93 +32,11 @@ HERE = Path(__file__).resolve().parent.parent
 ASSETS = HERE / "assets"
 ANCHOR_FILE = ASSETS / "anchor-result-v2.json"
 
+
 # ========== keccak256（通过 ethers subprocess，避免 Python C 扩展编译问题） ==========
-_KECCAK_CACHE: dict[str, str] = {}
 
-
-def keccak256_hex(hex_or_bytes: str | bytes) -> str:
-    """计算 keccak256，返回 0x 开头的 66 字符十六进制字符串。
-
-    通过 Node.js + ethers 调用，避免 pysha3/pycryptodome 在 Python 3.14 下编译失败。
-    批量计算时用 stdin 管道一次性处理。
-    """
-    if isinstance(hex_or_bytes, bytes):
-        inputs = ["0x" + hex_or_bytes.hex()]
-    elif isinstance(hex_or_bytes, str):
-        inputs = [hex_or_bytes]
-    else:
-        raise TypeError(f"不支持的输入类型 {type(hex_or_bytes)}")
-
-    # 先查缓存
-    cache_key = inputs[0]
-    if cache_key in _KECCAK_CACHE:
-        return _KECCAK_CACHE[cache_key]
-
-    node_script = r"""
-const fs = require('fs');
-const lines = fs.readFileSync(0, 'utf-8').trim().split('\n');
-for (const line of lines) {
-  if (!line) continue;
-  let input = line;
-  if (input.startsWith('0x')) {
-    // input may be hex OR '0x' + utf8hex
-    // Determine: if it has an even number of chars after 0x, treat as bytes;
-    // else treat as raw string (shouldn't happen here)
-    process.stdout.write(ethers.keccak256(input) + '\n');
-  } else {
-    // raw string bytes
-    process.stdout.write(ethers.keccak256(Buffer.from(input, 'utf-8')) + '\n');
-  }
-}
-"""
-    # 先在 Node 里 require ethers
-    proc = subprocess.run(
-        ["node", "-e", "const ethers = require('ethers');\n" + node_script],
-        input="\n".join(inputs),
-        capture_output=True, text=True, timeout=15,
-        cwd=str(HERE),
-    )
-    if proc.returncode != 0:
-        raise RuntimeError(
-            f"ethers keccak 失败 (exit {proc.returncode}): {proc.stderr[:300]}"
-        )
-    result = proc.stdout.strip().splitlines()[0]
-    _KECCAK_CACHE[cache_key] = result
-    return result
-
-
-def batch_keccak(hex_inputs: list[str]) -> list[str]:
-    """批量计算 keccak256，减少 Node 子进程开销。"""
-    # 先过滤已缓存的
-    uncached_idx = [i for i, h in enumerate(hex_inputs) if h not in _KECCAK_CACHE]
-    if uncached_idx:
-        uncached_inputs = [hex_inputs[i] for i in uncached_idx]
-        payload = "\n".join(uncached_inputs)
-        node_script = r"""
-const fs = require('fs');
-const lines = fs.readFileSync(0, 'utf-8').trim().split('\n');
-for (const line of lines) {
-  process.stdout.write(require('ethers').keccak256(line) + '\n');
-}
-"""
-        proc = subprocess.run(
-            ["node", "-e", node_script],
-            input=payload,
-            capture_output=True, text=True, timeout=60,
-            cwd=str(HERE),
-        )
-        if proc.returncode != 0:
-            raise RuntimeError(f"batch keccak failed: {proc.stderr[:200]}")
-        outs = proc.stdout.strip().splitlines()
-        for k, v in zip(uncached_inputs, outs):
-            _KECCAK_CACHE[k] = v
-
-    return [_KECCAK_CACHE[h] for h in hex_inputs]
-
-
-# ========== 叶子 / 锚定 / Merkle Tree 算法 ==========
-
-def _run_node_keccak(hex_inputs: list[str]) -> list[str]:
+def _run_node_keccak(hex_inputs):
+    # type: (list[str]) -> list[str]
     """通过一次 Node.js 子进程批量计算一组 keccak256，输入是 0x 开头的十六进制字符串列表。"""
     if not hex_inputs:
         return []
@@ -141,10 +59,12 @@ process.stdout.write(out);
     )
     if proc.returncode != 0:
         raise RuntimeError(
-            f"node keccak 失败 (exit {proc.returncode}): {proc.stderr[:400]}"
+            "node keccak 失败 (exit %d): %s" % (proc.returncode, proc.stderr[:400])
         )
     return [l for l in proc.stdout.strip().splitlines() if l]
 
+
+# ========== 叶子 / 锚定 / Merkle Tree 算法 ==========
 
 def leaf_hash_batch(tx_list: list[dict]) -> list[str]:
     """批量计算所有叶子 = keccak256(txID|amount|from|to)，仅 1 次 Node 调用。"""
