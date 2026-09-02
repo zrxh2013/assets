@@ -7,133 +7,103 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif; background: #f8f9fb; color: #1f2937; font-size: 13px; }
-  
-  /* ===== 顶部 Header ===== */
   .page-header { background: #fff; border-bottom: 1px solid #eef0f3; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
   .header-left { display: flex; align-items: center; gap: 12px; }
   .brand-logo { width: 28px; height: 28px; background: #ef4444; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; }
   .brand-name { font-size: 15px; font-weight: 600; color: #111827; }
   .brand-sub { font-size: 12px; color: #9ca3af; margin-left: 8px; }
   .network-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; background: #dbeafe; color: #2563eb; }
-  
-  /* ===== Summary Card ===== */
-  .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #e5e7eb; margin: 20px 24px; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .attestation-bar { margin: 20px 24px 0; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; }
+  .att-icon { width: 36px; height: 36px; border-radius: 8px; background: #0ea5e9; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; flex-shrink: 0; }
+  .att-content { flex: 1; }
+  .att-title { font-size: 12px; font-weight: 600; color: #0c4a6e; margin-bottom: 2px; }
+  .att-value { font-size: 11px; color: #0369a1; font-family: ui-monospace, monospace; word-break: break-all; }
+  .att-link { font-size: 11px; color: #0284c7; text-decoration: none; font-weight: 500; }
+  .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #e5e7eb; margin: 16px 24px; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
   .summary-cell { background: #fff; padding: 18px 20px; }
   .summary-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
   .summary-value { font-size: 22px; font-weight: 700; color: #111827; font-family: ui-monospace, monospace; }
   .summary-value .unit { font-size: 12px; font-weight: 500; color: #9ca3af; margin-left: 4px; }
   .summary-value.green { color: #059669; }
-  
-  /* ===== Table ===== */
   .table-wrap { margin: 0 24px 24px; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); overflow: hidden; }
   .table-header { padding: 14px 20px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
   .table-title { font-size: 14px; font-weight: 600; color: #111827; }
   .table-sub { font-size: 12px; color: #9ca3af; }
-  
   table { width: 100%; border-collapse: collapse; }
   thead { background: #fafbfc; }
   th { padding: 12px 20px; text-align: left; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eef0f3; white-space: nowrap; }
   td { padding: 12px 20px; border-bottom: 1px solid #f3f4f6; white-space: nowrap; vertical-align: middle; }
   tbody tr { cursor: pointer; transition: background 0.15s; }
-  tbody tr:hover { background: #f9fafb; }
+  tbody tr:hover { background: #eff6ff; }
   tbody tr:last-child td { border-bottom: none; }
-  
-  /* Column widths */
   .col-rank { width: 48px; text-align: center; color: #9ca3af; font-weight: 600; }
   .col-addr { width: 280px; }
   .col-usdt, .col-cny, .col-trx { width: 160px; text-align: right; font-family: ui-monospace, monospace; font-weight: 600; }
   .col-pct { width: 80px; text-align: right; color: #6b7280; }
-  
-  /* Row rank highlights */
   tr.rank-1 td { background: linear-gradient(90deg, #fffbeb 0%, #fff 100%); }
   tr.rank-2 td { background: linear-gradient(90deg, #f9fafb 0%, #fff 100%); }
   tr.rank-3 td { background: linear-gradient(90deg, #fff7ed 0%, #fff 100%); }
-  
-  /* Address cell */
   .addr-short { display: block; font-family: ui-monospace, monospace; font-size: 13px; color: #111827; font-weight: 500; }
   .addr-count { font-size: 11px; color: #9ca3af; }
-  
-  /* Number formatting */
   .col-usdt { color: #059669; }
   .col-cny { color: #111827; }
   .col-trx { color: #7c3aed; }
-  
-  /* On-chain attestation banner */
-  .attestation-bar { margin: 0 24px 24px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 14px; }
-  .att-icon { width: 40px; height: 40px; border-radius: 10px; background: #0ea5e9; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; flex-shrink: 0; }
-  .att-content { flex: 1; }
-  .att-title { font-size: 13px; font-weight: 600; color: #0c4a6e; margin-bottom: 2px; }
-  .att-value { font-size: 12px; color: #0369a1; font-family: ui-monospace, monospace; word-break: break-all; }
-  .att-link { font-size: 12px; color: #0284c7; text-decoration: none; font-weight: 500; }
-  .att-link:hover { text-decoration: underline; }
-  
-  /* Footer */
-  .footer { padding: 20px 24px; text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #f3f4f6; margin: 0 24px; }
-  
-  /* Mobile responsive */
+  .footer { padding: 16px 24px; text-align: center; font-size: 11px; color: #9ca3af; }
+  .hint { padding: 0 24px 12px; font-size: 11px; color: #9ca3af; }
   @media (max-width: 768px) {
     .summary-bar { grid-template-columns: repeat(2, 1fr); margin: 12px; }
-    .table-wrap, .attestation-bar, .footer { margin: 12px; }
-    .page-header { padding: 10px 16px; }
+    .table-wrap, .attestation-bar { margin: 12px; }
     th, td { padding: 10px 12px; font-size: 12px; }
     .col-cny, .col-pct { display: none; }
-    .col-addr { width: auto; }
   }
 </style>
 </head>
 <body>
 
-<!-- Header -->
 <div class="page-header">
   <div class="header-left">
     <div class="brand-logo">T</div>
     <span class="brand-name">TRON USDT Ledger</span>
     <span class="brand-sub">Chain-Attested Transfer Record</span>
   </div>
-  <span class="network-badge">Nile Testnet</span>
+  <span class="network-badge">Nile Testnet → Mainnet Anchored</span>
 </div>
 
-<!-- Attestation Banner -->
 <div class="attestation-bar">
   <div class="att-icon">🔗</div>
   <div class="att-content">
     <div class="att-title">On-chain Attestation · Merkle Root Anchor</div>
     <div class="att-value">Mainnet txID: 0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc</div>
-    <a class="att-link" href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">📎 View on Tronscan →</a>
+    <a class="att-link" href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">📎 View on TRON Mainnet Tronscan →</a>
   </div>
 </div>
 
-<!-- Summary Bar -->
 <div class="summary-bar">
   <div class="summary-cell">
     <div class="summary-label">Total Transfers</div>
-    <div class="summary-value green">1,153<span class="unit"> tx</span></div>
+    <div class="summary-value green">322<span class="unit"> tx</span></div>
   </div>
   <div class="summary-cell">
     <div class="summary-label">Total Volume (USDT)</div>
-    <div class="summary-value">299,999,903.27<span class="unit"> USDT</span></div>
+    <div class="summary-value">292,374,969.07<span class="unit"> USDT</span></div>
   </div>
   <div class="summary-cell">
     <div class="summary-label">Total Volume (CNY)</div>
-    <div class="summary-value">¥2,174,999,298.71</div>
+    <div class="summary-value">¥2,119,718,525.76</div>
   </div>
   <div class="summary-cell">
     <div class="summary-label">Equivalent (TRX)</div>
-    <div class="summary-value">930,232,258<span class="unit"> TRX</span></div>
+    <div class="summary-value">906,589,051<span class="unit"> TRX</span></div>
   </div>
 </div>
 
-<!-- Price note -->
-<div style="padding: 0 24px 12px; font-size: 11px; color: #9ca3af;">
-  💱 Rate: 1 USDT = ¥7.25 CNY · 1 USDT ≈ 3.1 TRX (TRX $0.3225)
-</div>
+<div class="hint">💱 Rate: 1 USDT = ¥7.25 CNY · 1 USDT ≈ 3.1 TRX (TRX $0.3225) · Click any row → Address Detail</div>
 
-<!-- Table -->
 <div class="table-wrap">
   <div class="table-header">
     <div>
       <div class="table-title">Transfer Ledger · Top 50 Recipients</div>
-      <div class="table-sub">All transfers from TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx · Nile Testnet</div>
+      <div class="table-sub">All USDT TRC20 transfers from TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx · Nile Testnet</div>
     </div>
   </div>
   <table>
@@ -148,7 +118,7 @@
       </tr>
     </thead>
     <tbody>
-  <tr class="rank-1" onclick="openAddr('TFrnsSckPje2PKxhzP1F5CV3M69xTj4Ep4')">
+  <tr class="rank-1" onclick="location.href='detail.html?addr=TFrnsSckPje2PKxhzP1F5CV3M69xTj4Ep4'">
     <td class="col-rank">1</td>
     <td class="col-addr">
       <span class="addr-short">TFrnsSckPje2PK...9xTj4Ep4</span>
@@ -157,9 +127,9 @@
     <td class="col-num col-usdt">167,585,579.80</td>
     <td class="col-num col-cny">¥1,214,995,453.55</td>
     <td class="col-num col-trx">519,645,209</td>
-    <td class="col-pct">55.9%</td>
+    <td class="col-pct">57.3%</td>
   </tr>
-  <tr class="rank-2" onclick="openAddr('TDKBnuJ8sZtpRcjvxzEe5S8C1YhMNekNBJ')">
+  <tr class="rank-2" onclick="location.href='detail.html?addr=TDKBnuJ8sZtpRcjvxzEe5S8C1YhMNekNBJ'">
     <td class="col-rank">2</td>
     <td class="col-addr">
       <span class="addr-short">TDKBnuJ8sZtpRc...hMNekNBJ</span>
@@ -168,9 +138,9 @@
     <td class="col-num col-usdt">55,079,258.00</td>
     <td class="col-num col-cny">¥399,324,620.50</td>
     <td class="col-num col-trx">170,788,397</td>
-    <td class="col-pct">18.4%</td>
+    <td class="col-pct">18.8%</td>
   </tr>
-  <tr class="rank-3" onclick="openAddr('TXUSTBCrT7veZp813Gcd4QWZuvyH9YRBm3')">
+  <tr class="rank-3" onclick="location.href='detail.html?addr=TXUSTBCrT7veZp813Gcd4QWZuvyH9YRBm3'">
     <td class="col-rank">3</td>
     <td class="col-addr">
       <span class="addr-short">TXUSTBCrT7veZp...yH9YRBm3</span>
@@ -179,9 +149,9 @@
     <td class="col-num col-usdt">20,751,601.00</td>
     <td class="col-num col-cny">¥150,449,107.25</td>
     <td class="col-num col-trx">64,346,050</td>
-    <td class="col-pct">6.9%</td>
+    <td class="col-pct">7.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TKiJ2phgaLv7S5V9YSC4AeXJt4372dDNR3')">
+  <tr class="" onclick="location.href='detail.html?addr=TKiJ2phgaLv7S5V9YSC4AeXJt4372dDNR3'">
     <td class="col-rank">4</td>
     <td class="col-addr">
       <span class="addr-short">TKiJ2phgaLv7S5...372dDNR3</span>
@@ -190,9 +160,9 @@
     <td class="col-num col-usdt">9,042,003.00</td>
     <td class="col-num col-cny">¥65,554,521.75</td>
     <td class="col-num col-trx">28,037,219</td>
-    <td class="col-pct">3.0%</td>
+    <td class="col-pct">3.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TP8okPX79o8cvBA1wXy6swpG6HzrX4mbiR')">
+  <tr class="" onclick="location.href='detail.html?addr=TP8okPX79o8cvBA1wXy6swpG6HzrX4mbiR'">
     <td class="col-rank">5</td>
     <td class="col-addr">
       <span class="addr-short">TP8okPX79o8cvB...zrX4mbiR</span>
@@ -201,9 +171,9 @@
     <td class="col-num col-usdt">5,411,276.00</td>
     <td class="col-num col-cny">¥39,231,751.00</td>
     <td class="col-num col-trx">16,779,150</td>
-    <td class="col-pct">1.8%</td>
+    <td class="col-pct">1.9%</td>
   </tr>
-  <tr class="" onclick="openAddr('THahWHiWsHcR12cDamaNrswPVJkQS1GcuD')">
+  <tr class="" onclick="location.href='detail.html?addr=THahWHiWsHcR12cDamaNrswPVJkQS1GcuD'">
     <td class="col-rank">6</td>
     <td class="col-addr">
       <span class="addr-short">THahWHiWsHcR12...kQS1GcuD</span>
@@ -214,7 +184,7 @@
     <td class="col-num col-trx">14,916,122</td>
     <td class="col-pct">1.6%</td>
   </tr>
-  <tr class="" onclick="openAddr('TQgPqDUNkrSsTc6mm6aaX2xkR44aKAq39D')">
+  <tr class="" onclick="location.href='detail.html?addr=TQgPqDUNkrSsTc6mm6aaX2xkR44aKAq39D'">
     <td class="col-rank">7</td>
     <td class="col-addr">
       <span class="addr-short">TQgPqDUNkrSsTc...4aKAq39D</span>
@@ -223,9 +193,9 @@
     <td class="col-num col-usdt">3,422,862.00</td>
     <td class="col-num col-cny">¥24,815,749.50</td>
     <td class="col-num col-trx">10,613,526</td>
-    <td class="col-pct">1.1%</td>
+    <td class="col-pct">1.2%</td>
   </tr>
-  <tr class="" onclick="openAddr('TXgcr2uiQiR2RJyvB3xbzda9atbkdZw3r6')">
+  <tr class="" onclick="location.href='detail.html?addr=TXgcr2uiQiR2RJyvB3xbzda9atbkdZw3r6'">
     <td class="col-rank">8</td>
     <td class="col-addr">
       <span class="addr-short">TXgcr2uiQiR2RJ...bkdZw3r6</span>
@@ -236,7 +206,7 @@
     <td class="col-num col-trx">6,752,474</td>
     <td class="col-pct">0.7%</td>
   </tr>
-  <tr class="" onclick="openAddr('TC1WNyN1dHBNP8LCcYUcrF2S4JP9SSZbQ4')">
+  <tr class="" onclick="location.href='detail.html?addr=TC1WNyN1dHBNP8LCcYUcrF2S4JP9SSZbQ4'">
     <td class="col-rank">9</td>
     <td class="col-addr">
       <span class="addr-short">TC1WNyN1dHBNP8...P9SSZbQ4</span>
@@ -247,7 +217,7 @@
     <td class="col-num col-trx">6,046,747</td>
     <td class="col-pct">0.7%</td>
   </tr>
-  <tr class="" onclick="openAddr('TSuUjf2FHzfcccaTcd2ZdVd1D9a8YjPukg')">
+  <tr class="" onclick="location.href='detail.html?addr=TSuUjf2FHzfcccaTcd2ZdVd1D9a8YjPukg'">
     <td class="col-rank">10</td>
     <td class="col-addr">
       <span class="addr-short">TSuUjf2FHzfccc...a8YjPukg</span>
@@ -258,7 +228,7 @@
     <td class="col-num col-trx">4,219,386</td>
     <td class="col-pct">0.5%</td>
   </tr>
-  <tr class="" onclick="openAddr('TDn2L49LvNWeRK9hQwqS611JGV2VNXA1T9')">
+  <tr class="" onclick="location.href='detail.html?addr=TDn2L49LvNWeRK9hQwqS611JGV2VNXA1T9'">
     <td class="col-rank">11</td>
     <td class="col-addr">
       <span class="addr-short">TDn2L49LvNWeRK...2VNXA1T9</span>
@@ -269,7 +239,7 @@
     <td class="col-num col-trx">3,645,817</td>
     <td class="col-pct">0.4%</td>
   </tr>
-  <tr class="" onclick="openAddr('TTF2HZKPBghDehoQn8xVd9NKt6qqdWdbEV')">
+  <tr class="" onclick="location.href='detail.html?addr=TTF2HZKPBghDehoQn8xVd9NKt6qqdWdbEV'">
     <td class="col-rank">12</td>
     <td class="col-addr">
       <span class="addr-short">TTF2HZKPBghDeh...qqdWdbEV</span>
@@ -280,7 +250,7 @@
     <td class="col-num col-trx">3,643,039</td>
     <td class="col-pct">0.4%</td>
   </tr>
-  <tr class="" onclick="openAddr('TF8vw2MSSuZoGnkDWT17nvZG5RJBGuncUx')">
+  <tr class="" onclick="location.href='detail.html?addr=TF8vw2MSSuZoGnkDWT17nvZG5RJBGuncUx'">
     <td class="col-rank">13</td>
     <td class="col-addr">
       <span class="addr-short">TF8vw2MSSuZoGn...JBGuncUx</span>
@@ -291,7 +261,7 @@
     <td class="col-num col-trx">3,448,065</td>
     <td class="col-pct">0.4%</td>
   </tr>
-  <tr class="" onclick="openAddr('TXfENYGDXsiGoyXW7RfRjP6NwdZ1eZxv2M')">
+  <tr class="" onclick="location.href='detail.html?addr=TXfENYGDXsiGoyXW7RfRjP6NwdZ1eZxv2M'">
     <td class="col-rank">14</td>
     <td class="col-addr">
       <span class="addr-short">TXfENYGDXsiGoy...Z1eZxv2M</span>
@@ -302,7 +272,7 @@
     <td class="col-num col-trx">3,333,343</td>
     <td class="col-pct">0.4%</td>
   </tr>
-  <tr class="" onclick="openAddr('TWCrTXQPWFm9Tzyrn5tC9U52icRpUvEnNt')">
+  <tr class="" onclick="location.href='detail.html?addr=TWCrTXQPWFm9Tzyrn5tC9U52icRpUvEnNt'">
     <td class="col-rank">15</td>
     <td class="col-addr">
       <span class="addr-short">TWCrTXQPWFm9Tz...RpUvEnNt</span>
@@ -313,7 +283,7 @@
     <td class="col-num col-trx">3,116,282</td>
     <td class="col-pct">0.3%</td>
   </tr>
-  <tr class="" onclick="openAddr('TQGNpbRVQKZ8E9c8LWpnjWwdqPE8Z5iwYW')">
+  <tr class="" onclick="location.href='detail.html?addr=TQGNpbRVQKZ8E9c8LWpnjWwdqPE8Z5iwYW'">
     <td class="col-rank">16</td>
     <td class="col-addr">
       <span class="addr-short">TQGNpbRVQKZ8E9...E8Z5iwYW</span>
@@ -324,7 +294,7 @@
     <td class="col-num col-trx">2,871,305</td>
     <td class="col-pct">0.3%</td>
   </tr>
-  <tr class="" onclick="openAddr('TVvZPzVLxnHwxW7mdoyv29dgEfLR9TAAzf')">
+  <tr class="" onclick="location.href='detail.html?addr=TVvZPzVLxnHwxW7mdoyv29dgEfLR9TAAzf'">
     <td class="col-rank">17</td>
     <td class="col-addr">
       <span class="addr-short">TVvZPzVLxnHwxW...LR9TAAzf</span>
@@ -335,7 +305,7 @@
     <td class="col-num col-trx">2,543,988</td>
     <td class="col-pct">0.3%</td>
   </tr>
-  <tr class="" onclick="openAddr('TC8SKdpYJ2MjZv2VE3DJZwHsf43MEG6NCo')">
+  <tr class="" onclick="location.href='detail.html?addr=TC8SKdpYJ2MjZv2VE3DJZwHsf43MEG6NCo'">
     <td class="col-rank">18</td>
     <td class="col-addr">
       <span class="addr-short">TC8SKdpYJ2MjZv...3MEG6NCo</span>
@@ -346,7 +316,7 @@
     <td class="col-num col-trx">2,398,577</td>
     <td class="col-pct">0.3%</td>
   </tr>
-  <tr class="" onclick="openAddr('TCPC2Td8sBoh6sauz3976bp2X9shZuxZMx')">
+  <tr class="" onclick="location.href='detail.html?addr=TCPC2Td8sBoh6sauz3976bp2X9shZuxZMx'">
     <td class="col-rank">19</td>
     <td class="col-addr">
       <span class="addr-short">TCPC2Td8sBoh6s...shZuxZMx</span>
@@ -357,7 +327,7 @@
     <td class="col-num col-trx">2,142,820</td>
     <td class="col-pct">0.2%</td>
   </tr>
-  <tr class="" onclick="openAddr('TRSyzwXJetDMiXksQf4kgpxPp9hhzJACXU')">
+  <tr class="" onclick="location.href='detail.html?addr=TRSyzwXJetDMiXksQf4kgpxPp9hhzJACXU'">
     <td class="col-rank">20</td>
     <td class="col-addr">
       <span class="addr-short">TRSyzwXJetDMiX...hhzJACXU</span>
@@ -368,7 +338,7 @@
     <td class="col-num col-trx">2,032,467</td>
     <td class="col-pct">0.2%</td>
   </tr>
-  <tr class="" onclick="openAddr('TPUonVCNStJDPbQDqgPjKEiWzzvTc6jNWh')">
+  <tr class="" onclick="location.href='detail.html?addr=TPUonVCNStJDPbQDqgPjKEiWzzvTc6jNWh'">
     <td class="col-rank">21</td>
     <td class="col-addr">
       <span class="addr-short">TPUonVCNStJDPb...vTc6jNWh</span>
@@ -379,7 +349,7 @@
     <td class="col-num col-trx">2,005,780</td>
     <td class="col-pct">0.2%</td>
   </tr>
-  <tr class="" onclick="openAddr('TV5ACXXZYVNALMmr5Kff2QcZChxYBhiamC')">
+  <tr class="" onclick="location.href='detail.html?addr=TV5ACXXZYVNALMmr5Kff2QcZChxYBhiamC'">
     <td class="col-rank">22</td>
     <td class="col-addr">
       <span class="addr-short">TV5ACXXZYVNALM...xYBhiamC</span>
@@ -390,7 +360,7 @@
     <td class="col-num col-trx">1,730,236</td>
     <td class="col-pct">0.2%</td>
   </tr>
-  <tr class="" onclick="openAddr('TG4CnMzYLbhJE5scviTJX6MWnzF1CLDz3r')">
+  <tr class="" onclick="location.href='detail.html?addr=TG4CnMzYLbhJE5scviTJX6MWnzF1CLDz3r'">
     <td class="col-rank">23</td>
     <td class="col-addr">
       <span class="addr-short">TG4CnMzYLbhJE5...F1CLDz3r</span>
@@ -401,7 +371,7 @@
     <td class="col-num col-trx">1,682,112</td>
     <td class="col-pct">0.2%</td>
   </tr>
-  <tr class="" onclick="openAddr('TKFWoAzy5UBwdApuRYaodkT7bTZPHJQoDs')">
+  <tr class="" onclick="location.href='detail.html?addr=TKFWoAzy5UBwdApuRYaodkT7bTZPHJQoDs'">
     <td class="col-rank">24</td>
     <td class="col-addr">
       <span class="addr-short">TKFWoAzy5UBwdA...ZPHJQoDs</span>
@@ -412,7 +382,7 @@
     <td class="col-num col-trx">1,601,783</td>
     <td class="col-pct">0.2%</td>
   </tr>
-  <tr class="" onclick="openAddr('TNkQqTLHw79wrWPNjKiEyyzqPFKjRKaoXw')">
+  <tr class="" onclick="location.href='detail.html?addr=TNkQqTLHw79wrWPNjKiEyyzqPFKjRKaoXw'">
     <td class="col-rank">25</td>
     <td class="col-addr">
       <span class="addr-short">TNkQqTLHw79wrW...KjRKaoXw</span>
@@ -423,7 +393,7 @@
     <td class="col-num col-trx">1,582,478</td>
     <td class="col-pct">0.2%</td>
   </tr>
-  <tr class="" onclick="openAddr('TGPdwY24TyV9TGnfCLygcdapVFNofbFkbj')">
+  <tr class="" onclick="location.href='detail.html?addr=TGPdwY24TyV9TGnfCLygcdapVFNofbFkbj'">
     <td class="col-rank">26</td>
     <td class="col-addr">
       <span class="addr-short">TGPdwY24TyV9TG...NofbFkbj</span>
@@ -434,7 +404,7 @@
     <td class="col-num col-trx">1,577,472</td>
     <td class="col-pct">0.2%</td>
   </tr>
-  <tr class="" onclick="openAddr('TBtySJFhGAFuNAesLdH2Gxc6qLNjyr6fGg')">
+  <tr class="" onclick="location.href='detail.html?addr=TBtySJFhGAFuNAesLdH2Gxc6qLNjyr6fGg'">
     <td class="col-rank">27</td>
     <td class="col-addr">
       <span class="addr-short">TBtySJFhGAFuNA...Njyr6fGg</span>
@@ -445,7 +415,7 @@
     <td class="col-num col-trx">1,317,839</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TEoLh8z4bBswJVj1A4LrPqd1yVtPJN5MEG')">
+  <tr class="" onclick="location.href='detail.html?addr=TEoLh8z4bBswJVj1A4LrPqd1yVtPJN5MEG'">
     <td class="col-rank">28</td>
     <td class="col-addr">
       <span class="addr-short">TEoLh8z4bBswJV...tPJN5MEG</span>
@@ -456,7 +426,7 @@
     <td class="col-num col-trx">1,306,050</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TBHYWEyfEq1Nuw6XMS6kT3kaqfEVTn75Hc')">
+  <tr class="" onclick="location.href='detail.html?addr=TBHYWEyfEq1Nuw6XMS6kT3kaqfEVTn75Hc'">
     <td class="col-rank">29</td>
     <td class="col-addr">
       <span class="addr-short">TBHYWEyfEq1Nuw...EVTn75Hc</span>
@@ -467,7 +437,7 @@
     <td class="col-num col-trx">1,298,429</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TFGhU2en6VYbq5QjoP2pHmaSuZFAQQ6tGe')">
+  <tr class="" onclick="location.href='detail.html?addr=TFGhU2en6VYbq5QjoP2pHmaSuZFAQQ6tGe'">
     <td class="col-rank">30</td>
     <td class="col-addr">
       <span class="addr-short">TFGhU2en6VYbq5...FAQQ6tGe</span>
@@ -478,7 +448,7 @@
     <td class="col-num col-trx">1,265,122</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TDpyNjVqWNmUEqSfyfriWQ9T9BRGAYMwXX')">
+  <tr class="" onclick="location.href='detail.html?addr=TDpyNjVqWNmUEqSfyfriWQ9T9BRGAYMwXX'">
     <td class="col-rank">31</td>
     <td class="col-addr">
       <span class="addr-short">TDpyNjVqWNmUEq...RGAYMwXX</span>
@@ -489,7 +459,7 @@
     <td class="col-num col-trx">1,208,559</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TUyNCpMKng3oDWCRnb7tEGQLhzUwRpE4Sq')">
+  <tr class="" onclick="location.href='detail.html?addr=TUyNCpMKng3oDWCRnb7tEGQLhzUwRpE4Sq'">
     <td class="col-rank">32</td>
     <td class="col-addr">
       <span class="addr-short">TUyNCpMKng3oDW...UwRpE4Sq</span>
@@ -500,7 +470,7 @@
     <td class="col-num col-trx">1,189,228</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TSAdybQc4AY2qUz7q9m8oZ5t81sQB9eVmP')">
+  <tr class="" onclick="location.href='detail.html?addr=TSAdybQc4AY2qUz7q9m8oZ5t81sQB9eVmP'">
     <td class="col-rank">33</td>
     <td class="col-addr">
       <span class="addr-short">TSAdybQc4AY2qU...sQB9eVmP</span>
@@ -511,7 +481,7 @@
     <td class="col-num col-trx">1,155,304</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TBouPNUG7SQHoQzbkHvxQiZsVuypeHEate')">
+  <tr class="" onclick="location.href='detail.html?addr=TBouPNUG7SQHoQzbkHvxQiZsVuypeHEate'">
     <td class="col-rank">34</td>
     <td class="col-addr">
       <span class="addr-short">TBouPNUG7SQHoQ...ypeHEate</span>
@@ -522,7 +492,7 @@
     <td class="col-num col-trx">1,131,786</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TGqPNuvYKuJt2SK1fogYParaSSNTQoZwgh')">
+  <tr class="" onclick="location.href='detail.html?addr=TGqPNuvYKuJt2SK1fogYParaSSNTQoZwgh'">
     <td class="col-rank">35</td>
     <td class="col-addr">
       <span class="addr-short">TGqPNuvYKuJt2S...NTQoZwgh</span>
@@ -533,7 +503,7 @@
     <td class="col-num col-trx">1,116,285</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TKNhp26JfNPLmcDKdWZ72YxjtpBqsAHbEA')">
+  <tr class="" onclick="location.href='detail.html?addr=TKNhp26JfNPLmcDKdWZ72YxjtpBqsAHbEA'">
     <td class="col-rank">36</td>
     <td class="col-addr">
       <span class="addr-short">TKNhp26JfNPLmc...BqsAHbEA</span>
@@ -544,7 +514,7 @@
     <td class="col-num col-trx">1,093,802</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TUVE3KFKJNYoHao2vimQPqZeJapwcRi8YL')">
+  <tr class="" onclick="location.href='detail.html?addr=TUVE3KFKJNYoHao2vimQPqZeJapwcRi8YL'">
     <td class="col-rank">37</td>
     <td class="col-addr">
       <span class="addr-short">TUVE3KFKJNYoHa...pwcRi8YL</span>
@@ -555,7 +525,7 @@
     <td class="col-num col-trx">1,085,274</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TV4NwDvz8bjd9rFBYjCkbSjbcGaJN78HNf')">
+  <tr class="" onclick="location.href='detail.html?addr=TV4NwDvz8bjd9rFBYjCkbSjbcGaJN78HNf'">
     <td class="col-rank">38</td>
     <td class="col-addr">
       <span class="addr-short">TV4NwDvz8bjd9r...aJN78HNf</span>
@@ -566,7 +536,7 @@
     <td class="col-num col-trx">1,051,503</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TDVncTrG3vMFjR4d1t7SntCrvee24evvEt')">
+  <tr class="" onclick="location.href='detail.html?addr=TDVncTrG3vMFjR4d1t7SntCrvee24evvEt'">
     <td class="col-rank">39</td>
     <td class="col-addr">
       <span class="addr-short">TDVncTrG3vMFjR...e24evvEt</span>
@@ -577,7 +547,7 @@
     <td class="col-num col-trx">1,045,350</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TTohhfr3mUC1n7arNthdNLhVQtQvCvEKXN')">
+  <tr class="" onclick="location.href='detail.html?addr=TTohhfr3mUC1n7arNthdNLhVQtQvCvEKXN'">
     <td class="col-rank">40</td>
     <td class="col-addr">
       <span class="addr-short">TTohhfr3mUC1n7...QvCvEKXN</span>
@@ -588,7 +558,7 @@
     <td class="col-num col-trx">1,032,701</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TA7nGNZik22Bk7iaaA5VBaieWd6b8qxKZD')">
+  <tr class="" onclick="location.href='detail.html?addr=TA7nGNZik22Bk7iaaA5VBaieWd6b8qxKZD'">
     <td class="col-rank">41</td>
     <td class="col-addr">
       <span class="addr-short">TA7nGNZik22Bk7...6b8qxKZD</span>
@@ -599,7 +569,7 @@
     <td class="col-num col-trx">1,015,640</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TEArX6ztwYu4ETNydgnrmY6JsCWWcN9BnN')">
+  <tr class="" onclick="location.href='detail.html?addr=TEArX6ztwYu4ETNydgnrmY6JsCWWcN9BnN'">
     <td class="col-rank">42</td>
     <td class="col-addr">
       <span class="addr-short">TEArX6ztwYu4ET...WWcN9BnN</span>
@@ -610,7 +580,7 @@
     <td class="col-num col-trx">1,008,762</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TK7wsqj3XWFvFoKASeEqWY6KgNMKa2Zwbv')">
+  <tr class="" onclick="location.href='detail.html?addr=TK7wsqj3XWFvFoKASeEqWY6KgNMKa2Zwbv'">
     <td class="col-rank">43</td>
     <td class="col-addr">
       <span class="addr-short">TK7wsqj3XWFvFo...MKa2Zwbv</span>
@@ -621,7 +591,7 @@
     <td class="col-num col-trx">933,340</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TVsPgiKXzqmjsUCU6r36uDk5NmiD5tvvDM')">
+  <tr class="" onclick="location.href='detail.html?addr=TVsPgiKXzqmjsUCU6r36uDk5NmiD5tvvDM'">
     <td class="col-rank">44</td>
     <td class="col-addr">
       <span class="addr-short">TVsPgiKXzqmjsU...iD5tvvDM</span>
@@ -632,7 +602,7 @@
     <td class="col-num col-trx">903,957</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TA1rvtVuUShHkGkK2Kt8LPxTK6iVVvMKFR')">
+  <tr class="" onclick="location.href='detail.html?addr=TA1rvtVuUShHkGkK2Kt8LPxTK6iVVvMKFR'">
     <td class="col-rank">45</td>
     <td class="col-addr">
       <span class="addr-short">TA1rvtVuUShHkG...iVVvMKFR</span>
@@ -643,7 +613,7 @@
     <td class="col-num col-trx">900,415</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TWCrFmdtGEECB2mL2nzZF7CXtDqpHa4r5F')">
+  <tr class="" onclick="location.href='detail.html?addr=TWCrFmdtGEECB2mL2nzZF7CXtDqpHa4r5F'">
     <td class="col-rank">46</td>
     <td class="col-addr">
       <span class="addr-short">TWCrFmdtGEECB2...qpHa4r5F</span>
@@ -654,7 +624,7 @@
     <td class="col-num col-trx">862,809</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TLYqfL4gssUr6kGStCUa3DHBHRtK4W35yQ')">
+  <tr class="" onclick="location.href='detail.html?addr=TLYqfL4gssUr6kGStCUa3DHBHRtK4W35yQ'">
     <td class="col-rank">47</td>
     <td class="col-addr">
       <span class="addr-short">TLYqfL4gssUr6k...tK4W35yQ</span>
@@ -665,7 +635,7 @@
     <td class="col-num col-trx">856,980</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TQZYGAeAsL5WM3Nyg7gbFF8UqUYNe8vq2u')">
+  <tr class="" onclick="location.href='detail.html?addr=TQZYGAeAsL5WM3Nyg7gbFF8UqUYNe8vq2u'">
     <td class="col-rank">48</td>
     <td class="col-addr">
       <span class="addr-short">TQZYGAeAsL5WM3...YNe8vq2u</span>
@@ -676,7 +646,7 @@
     <td class="col-num col-trx">853,753</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TGX3KpcQzfPPMviXepsfq57GVdWxwiXF9u')">
+  <tr class="" onclick="location.href='detail.html?addr=TGX3KpcQzfPPMviXepsfq57GVdWxwiXF9u'">
     <td class="col-rank">49</td>
     <td class="col-addr">
       <span class="addr-short">TGX3KpcQzfPPMv...WxwiXF9u</span>
@@ -687,7 +657,7 @@
     <td class="col-num col-trx">738,713</td>
     <td class="col-pct">0.1%</td>
   </tr>
-  <tr class="" onclick="openAddr('TXfaDirEqn6zB3ceKqBCmPhKVBGz5aLW7W')">
+  <tr class="" onclick="location.href='detail.html?addr=TXfaDirEqn6zB3ceKqBCmPhKVBGz5aLW7W'">
     <td class="col-rank">50</td>
     <td class="col-addr">
       <span class="addr-short">TXfaDirEqn6zB3...Gz5aLW7W</span>
@@ -702,16 +672,7 @@
   </table>
 </div>
 
-<!-- Footer -->
-<div class="footer">
-  Data sourced from Nile Testnet · Merkle Root anchored to TRON Mainnet · Generated 7.25 USDT/CNY · 0.3225 TRX/USD
-</div>
-
-<script>
-function openAddr(addr) {
-  window.open('https://nile.tronscan.org/#/address/' + addr, '_blank');
-}
-</script>
+<div class="footer">Click any row to view per-address transaction history · Anchored on TRON Mainnet via Merkle Root</div>
 
 </body>
 </html>
