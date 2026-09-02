@@ -51,43 +51,6 @@
     color: #374151; font-size: 20px; font-weight: 700;
     flex-shrink: 0;
   }
-
-  /* ==================== ANCHOR BANNER ==================== */
-  .anchor {
-    margin: 12px;
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-    border: 1px solid #a7f3d0;
-    border-radius: 14px;
-    padding: 14px 16px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-  }
-  .anchor-ic {
-    width: 36px; height: 36px;
-    flex-shrink: 0;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .anchor-ic svg { width: 100%; height: 100%; }
-  .anchor-body { flex: 1; min-width: 0; }
-  .anchor-title {
-    font-size: 13px; font-weight: 600; color: #065f46;
-    display: flex; align-items: center; gap: 4px;
-  }
-  .anchor-hash {
-    font-size: 12px; color: #047857;
-    font-family: ui-monospace, Menlo, monospace;
-    margin-top: 3px;
-    word-break: break-all;
-    line-height: 1.5;
-  }
-  .anchor-link {
-    font-size: 12px; color: #059669; text-decoration: none; font-weight: 500;
-    display: inline-flex; align-items: center; gap: 3px; margin-top: 6px;
-  }
-  .anchor-link:active { opacity: 0.7; }
-
   /* ==================== TABS ==================== */
   .tabs {
     background: #fff;
@@ -309,17 +272,6 @@
   <div class="nav-title" id="navTitle">f2e81cfeebff1001…</div>
   <div class="more">⋯</div>
 </div>
-
-<!-- ==================== ANCHOR ==================== -->
-<div class="anchor">
-  <div class="anchor-ic"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></div>
-  <div class="anchor-body">
-    <div class="anchor-title">🔒 Anchor Hash · On-chain Attestation</div>
-    <div class="anchor-hash" id="anchorHash">5db16f7146c0aed274e1229bccffea983694357e17bc7c13bec406ed29822928</div>
-    <a class="anchor-link" href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">📎 View Mainnet Anchor →</a>
-  </div>
-</div>
-
 <!-- ==================== TABS ==================== -->
 <div class="tabs">
   <button class="tab active">Overview</button>
@@ -475,23 +427,6 @@ if (txParam) {
 
 function updatePage(tx) {
   document.getElementById('navTitle').textContent = tx.txID.slice(0, 16) + '…';
-  document.getElementById('anchorHash').textContent = tx.anchor_hash;
-  document.getElementById('ownerAddr').textContent = tx.from;
-  document.getElementById('ownerAddr').title = tx.from;
-  document.getElementById('fromAddr').textContent = tx.from;
-  document.getElementById('fromAddr').title = tx.from;
-  document.getElementById('toAddr').textContent = tx.to;
-  document.getElementById('toAddr').title = tx.to;
-  document.getElementById('txHash').textContent = tx.txID;
-  document.getElementById('txHash').title = tx.txID;
-  document.getElementById('blockNum').textContent = tx.block || '—';
-  document.getElementById('txTime').textContent = tx.datetime || '—';
-  document.getElementById('paramTo').textContent = tx.to;
-  document.getElementById('paramTo').title = tx.to;
-  const raw = Math.round(Number(tx.amount_usdt) * 1e6);
-  document.getElementById('paramVal').textContent = raw;
-  document.getElementById('paramVal').title = raw;
-  document.getElementById('amtDisplay').innerHTML = '- ' + Number(tx.amount_usdt).toLocaleString('en-US', {minimumFractionDigits:2}) + '<span class="unit"> USDT</span>';
 }
 </script>
 <script src="addr-data.js"></script>

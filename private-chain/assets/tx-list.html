@@ -8,37 +8,6 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif; background: #f8f9fb; color: #101010; font-size: 14px; overflow-x: hidden; }
 
-  /* ===== Top Bar — 精确修复 LOGO 尺寸 ===== */
-  .top-bar { background: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f0f2f3; position: sticky; top: 0; z-index: 100; }
-  .back { display: flex; align-items: center; justify-content: center; color: #101010; text-decoration: none; width: 32px; height: 32px; font-size: 22px; flex-shrink: 0; }
-  .brand { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
-  /* 🔑 关键：给 LOGO 固定尺寸，不让它撑爆 */
-  .brand > svg { width: 24px !important; height: 24px !important; flex-shrink: 0; }
-  .brand-name { font-size: 16px; font-weight: 700; color: #101010; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .more-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #101010; flex-shrink: 0; }
-
-  /* ===== Tabs ===== */
-  .tabs { background: #fff; padding: 10px 16px; display: flex; gap: 6px; border-bottom: 1px solid #f0f2f3; }
-  .tab { padding: 8px 14px; font-size: 13px; color: #6b7280; border-radius: 20px; cursor: pointer; background: transparent; border: none; font-weight: 500; }
-  .tab.active { background: #f0f2f3; color: #101010; font-weight: 600; }
-
-  /* ===== Token Header ===== */
-  .token-header { background: #fff; margin: 12px; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
-  /* 🔑 Token Header 图标也固定尺寸 */
-  .token-header > svg { width: 40px !important; height: 40px !important; flex-shrink: 0; }
-  .token-info { flex: 1; min-width: 0; }
-  .token-name { font-size: 15px; font-weight: 700; color: #101010; }
-  .token-sub { font-size: 11px; color: #6b7280; font-family: ui-monospace, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .token-count { padding: 4px 10px; background: #f0f2f3; border-radius: 12px; font-size: 12px; font-weight: 600; color: #101010; flex-shrink: 0; white-space: nowrap; }
-
-  /* ===== Anchor Banner ===== */
-  .anchor-banner { margin: 0 12px 12px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; }
-  .anchor-banner .ic { width: 28px; height: 28px; flex-shrink: 0; }
-  .anchor-banner .ic svg { width: 100%; height: 100%; }
-  .anchor-banner .title { font-size: 12px; font-weight: 600; color: #065f46; }
-  .anchor-banner .sub { font-size: 11px; color: #047857; font-family: ui-monospace, monospace; word-break: break-all; margin-top: 2px; }
-  .anchor-banner a { font-size: 11px; color: #059669; text-decoration: none; font-weight: 500; display: inline-block; margin-top: 4px; }
-
   /* ===== 表格 — 关键修复列宽 ===== */
   .table-wrap { background: #fff; margin: 0 12px 20px; border-radius: 12px; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.03); -webkit-overflow-scrolling: touch; }
   
@@ -92,43 +61,7 @@
 </style>
 </head>
 <body>
-
-<!-- Top Bar -->
-<div class="top-bar">
-  <a class="back" href="ledger.html">‹</a>
-  <div class="brand">
-    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><rect width="32" height="32" rx="6" fill="#ef4444"/><rect x="6" y="7" width="20" height="2.5" rx="1" fill="#fff"/><rect x="6" y="14.75" width="20" height="2.5" rx="1" fill="#fff"/><rect x="6" y="22.5" width="20" height="2.5" rx="1" fill="#fff"/></svg>
-    <span class="brand-name">Transfer History</span>
-  </div>
-  <div class="more-btn">⋯</div>
-</div>
-
-<!-- Tabs -->
-<div class="tabs">
-  <button class="tab active">All</button>
-  <button class="tab">In</button>
-  <button class="tab">Out</button>
-  <button class="tab">Self</button>
-</div>
-
-<!-- Token Header -->
-<div class="token-header">
-  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg>
-  <div class="token-info">
-    <div class="token-name">Tether USD</div>
-    <div class="token-sub">TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</div>
-  </div>
-  <div class="token-count">1156 transfers</div>
-</div>
-
-<!-- Anchor Banner -->
-<div class="anchor-banner">
-  <div class="ic"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></div>
-  <div style="flex:1;min-width:0;">
-    <div class="title">🔒 On-chain Anchor · Each tx has 64-char attestation hash</div>
-    <div class="sub">e.g. c200b7364c66279193ee068a844042...</div>
-    <a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">📎 Mainnet Anchor →</a>
-  </div>
+<div style="flex:1;min-width:0;">
 </div>
 
 <!-- Table -->

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TRON · USDT Transfer Ledger · On-chain Attestation</title>
+<title>TRON · USDT Transfer Ledger</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif; background: #f8f9fb; color: #1f2937; font-size: 13px; }
@@ -13,8 +13,7 @@
   .brand-name { font-size: 15px; font-weight: 600; color: #111827; }
   .brand-sub { font-size: 12px; color: #9ca3af; margin-left: 8px; }
   .network-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; background: #dbeafe; color: #2563eb; }
-  .attestation-bar { margin: 20px 24px 0; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; }
-  .att-icon { width: 36px; height: 36px; border-radius: 8px; background: #0ea5e9; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; flex-shrink: 0; }
+.att-icon { width: 36px; height: 36px; border-radius: 8px; background: #0ea5e9; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; flex-shrink: 0; }
   .att-content { flex: 1; }
   .att-title { font-size: 12px; font-weight: 600; color: #0c4a6e; margin-bottom: 2px; }
   .att-value { font-size: 11px; color: #0369a1; font-family: ui-monospace, monospace; word-break: break-all; }
@@ -52,8 +51,8 @@
   .hint { padding: 0 24px 12px; font-size: 11px; color: #9ca3af; }
   @media (max-width: 768px) {
     .summary-bar { grid-template-columns: repeat(2, 1fr); margin: 12px; }
-    .table-wrap, .attestation-bar { margin: 12px; }
-    th, td { padding: 10px 12px; font-size: 12px; }
+    .table-wrap,
+th, td { padding: 10px 12px; font-size: 12px; }
     .col-cny, .col-pct { display: none; }
   }
 </style>
@@ -66,15 +65,9 @@
     <span class="brand-name">TRON <span style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:3px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;"><circle cx="50" cy="50" r="50" fill="#26a17b"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="3"/><rect x="18" y="30" width="64" height="8" rx="2" fill="#fff"/><rect x="46" y="36" width="8" height="38" rx="2" fill="#fff"/><rect x="30" y="50" width="40" height="5" rx="1.5" fill="#fff"/><rect x="34" y="58" width="32" height="4" rx="1.5" fill="#fff"/></svg></span> Ledger</span>
     <span class="brand-sub">Chain-Attested Transfer Record</span>
   </div>
-  <span class="network-badge">Nile Testnet → Mainnet Anchored</span>
+  <span class="network-badge">Nile Testnet</span>
 </div>
-
-<div class="attestation-bar">
-  <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;width:100%;height:100%;"><rect width="32" height="32" rx="6" fill="#ef4444"/><rect x="6" y="7" width="20" height="2.5" rx="1" fill="#fff"/><rect x="6" y="14.75" width="20" height="2.5" rx="1" fill="#fff"/><rect x="6" y="22.5" width="20" height="2.5" rx="1" fill="#fff"/></svg>
-  <div class="att-content">
-    <div class="att-title">On-chain Attestation · Merkle Root Anchor</div>
-    <div class="att-value">Mainnet txID: 0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc</div>
-    <a class="att-link" href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">📎 View on TRON Mainnet Tronscan →</a>
+<a class="att-link" href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank">📎 View on TRON Mainnet Tronscan →</a>
   </div>
 </div>
 
@@ -672,7 +665,7 @@
   </table>
 </div>
 
-<div class="footer">Click any row → address detail · tx-list.html → all transactions · Anchored on TRON Mainnet via Merkle Root</div>
+<div class="footer">Click any row → address detail · tx-list.html → all transactions · </div>
 
 </body>
 </html>
