@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LMRPartners × PtahDAO 信托合同汇编（2023年度）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", SimSun, serif;
+    background: #f5f5f0;
+    color: #2c2c2c;
+    line-height: 1.8;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  .cover {
+    background: #fff;
+    border: 1px solid #d4a017;
+    padding: 60px 40px;
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+  }
+  .cover h1 {
+    font-size: 32px;
+    color: #8B0000;
+    margin-bottom: 20px;
+    letter-spacing: 4px;
+  }
+  .cover .sub {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 40px;
+  }
+  .cover .info {
+    text-align: left;
+    max-width: 500px;
+    margin: 0 auto;
+    font-size: 14px;
+    color: #333;
+  }
+  .cover .info div {
+    padding: 6px 0;
+    border-bottom: 1px dashed #ccc;
+  }
+  .cover .seal {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    width: 100px;
+    height: 100px;
+    border: 3px solid #c0392b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c0392b;
+    font-size: 14px;
+    font-weight: bold;
+    transform: rotate(-15deg);
+    opacity: 0.85;
+  }
+  .contract {
+    background: #fff;
+    margin-bottom: 30px;
+    border: 1px solid #e0d8c8;
+    page-break-after: always;
+  }
+  .contract-header {
+    background: linear-gradient(135deg, #8B0000, #c0392b);
+    color: #fff;
+    padding: 20px 30px;
+  }
+  .contract-header h2 {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+  .contract-header .no {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+  .contract-body {
+    padding: 30px;
+  }
+  .meta-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    font-size: 14px;
+  }
+  .meta-table td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+  }
+  .meta-table td:first-child {
+    background: #faf6ee;
+    width: 130px;
+    font-weight: 600;
+    color: #5a4a2a;
+  }
+  .section {
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #8B0000;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 4px solid #c0392b;
+  }
+  .section p {
+    text-indent: 2em;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #333;
+  }
+  .section ul {
+    padding-left: 2em;
+    font-size: 14px;
+    color: #333;
+  }
+  .section ul li {
+    margin-bottom: 4px;
+  }
+  .highlight {
+    background: #fff8e1;
+    padding: 12px 16px;
+    border-left: 3px solid #d4a017;
+    margin: 10px 0;
+    font-size: 14px;
+  }
+  .risk {
+    background: #fdf2f2;
+    border: 1px dashed #e74c3c;
+    padding: 12px 16px;
+    margin: 10px 0;
+    font-size: 13px;
+    color: #7b241c;
+  }
+  .sign-area {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid #8B0000;
+  }
+  .sign-box {
+    text-align: center;
+    flex: 1;
+  }
+  .sign-box .role {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+  }
+  .sign-box .line {
+    border-bottom: 1px solid #999;
+    width: 80%;
+    margin: 0 auto 6px;
+    height: 30px;
+  }
+  .sign-box .date {
+    font-size: 12px;
+    color: #888;
+  }
+  .badge {
+    display: inline-block;
+    background: #c0392b;
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    margin-left: 8px;
+  }
+  .toc {
+    background: #fff;
+    padding: 20px 30px;
+    margin-bottom: 30px;
+    border: 1px solid #e0d8c8;
+  }
+  .toc h3 {
+    color: #8B0000;
+    margin-bottom: 15px;
+  }
+  .toc ol {
+    padding-left: 2em;
+  }
+  .toc li {
+    padding: 4px 0;
+    font-size: 14px;
+  }
+  .toc li a {
+    color: #2c3e50;
+    text-decoration: none;
+  }
+  .toc li a:hover {
+    color: #c0392b;
+    text-decoration: underline;
+  }
+  @media (max-width: 768px) {
+    .container { padding: 20px 10px; }
+    .cover { padding: 30px 15px; }
+    .cover h1 { font-size: 22px; }
+    .contract-body { padding: 15px; }
+    .meta-table td { padding: 6px; font-size: 12px; }
+    .meta-table td:first-child { width: 90px; }
+    .sign-area { flex-direction: column; gap: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="cover">
+  <div class="seal">LMR<br>信托</div>
+  <h1>LMRPartners × PtahDAO</h1>
+  <h1 style="font-size:24px;margin-top:-10px;">信托合同汇编</h1>
+  <div class="sub">2023年度 · 十项前沿科技信托计划</div>
+  <div class="info">
+    <div><strong>受托人：</strong>LMR Partners（英格兰·威尔士注册，FCA监管）</div>
+    <div><strong>管理人：</strong>LMR Partners-Web3.0 技术实验室</div>
+    <div><strong>平台：</strong>PtahDAO 普塔道（全球首个DAO治理资产信托平台）</div>
+    <div><strong>发行期间：</strong>2023年4月 — 2023年6月</div>
+    <div><strong>合同份数：</strong>10份</div>
+    <div><strong>治理通证：</strong>PTAH / PDTH</div>
+    <div><strong>资产规模背书：</strong>LMR Partners 管理资产超90亿美元</div>
+  </div>
+</div>
+
+<div class="toc">
+  <h3>📑 目录</h3>
+  <ol>
+    <li><a href="#c1">AI蛋白质折叠信托计划（2023.04.28）</a></li>
+    <li><a href="#c2">Air Car 空中汽车技术商业化信托（2023.04.26）</a></li>
+    <li><a href="#c3">前沿超算系统下一代超级计算机信托（2023.04.26）</a></li>
+    <li><a href="#c4">可控制核聚变信托配置（2023.04.25）</a></li>
+    <li><a href="#c5">Boston Dynamics 机器人研发信托（2023.04.25）</a></li>
+    <li><a href="#c6">OpenAI GPT-4 信托计划（2023.04.26）</a></li>
+    <li><a href="#c7">AI量化策略配置包信托（2023.04.26）</a></li>
+    <li><a href="#c8">Xendit 数字支付信托产品（2023.06.26）</a></li>
+    <li><a href="#c9">Bolttech 保险科技信托产品（2023.06.25）</a></li>
+    <li><a href="#c10">Coda Payments 战略合作伙伴信托（2023.06.19）</a></li>
+  </ol>
+</div>
+
+<!-- 合同 1 -->
+<div class="contract" id="c1">
+  <div class="contract-header">
+    <h2>合同一：AI蛋白质折叠信托计划</h2>
+    <div class="no">合同编号：LMR-PTAH-2023-TRUST-001 · 发布日期：2023年4月28日</div>
+  </div>
+  <div class="contract-body">
+    <table class="meta-table">
+      <tr><td>信托类型</td><td>科技股权投资信托（浮动收益型）</td><td>信托期限</td><td><strong>12个月</strong>（2023.04.28 — 2024.04.27）</td></tr>
+      <tr><td>投资方向</td><td>AI蛋白质结构预测与药物研发</td><td>预期年化</td><td>22% — 30%</td></tr>
+      <tr><td>起投金额</td><td>100 USDT</td><td>收益分配</td><td>季度分红</td></tr>
+      <tr><td>退出机制</td><td>满3个月可申请赎回（扣2%手续费）</td><td>治理权益</td><td>持有PTAH参与项目投票</td></tr>
+    </table>
+    <div class="section">
+      <div class="section-title">第一条 信托目的</div>
+      <p>委托人将合法持有的数字资产委托予受托人 LMR Partners，通过 PtahDAO 平台投资于AI蛋白质折叠技术领域，包括但不限于蛋白质结构预测算法、药物分子设计、生物计算基础设施等前沿项目，以期实现信托财产的保值增值。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第二条 投资标的</div>
+      <p>本信托资金主要投向：(1) AI驱动的蛋白质三维结构预测平台；(2) 基于AlphaFold等开源框架的药物发现初创企业；(3) 高性能生物计算GPU集群租赁；(4) 合成生物学与基因工程交叉项目。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第三条 信托期限与收益</div>
+      <p>信托期限为<strong>12个月</strong>，自2023年4月28日起至2024年4月27日止。预期年化收益率区间为22%至30%，具体收益取决于投资组合表现。收益每季度分配一次，到期后一次性返还本金及剩余收益。</p>
+    </div>
+    <div class="highlight">核心逻辑：AI蛋白质折叠技术在2023年取得突破性进展，药物研发周期从数年缩短至数月，市场规模预计2028年达500亿美元。</div>
+    <div class="risk">风险提示：生物医药研发存在临床试验失败、监管审批延迟、技术迭代等风险，预期收益不代表实际收益。</div>
+    <div class="sign-area">
+      <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月28日</div></div>
+      <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月28日</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 合同 2 -->
+<div class="contract" id="c2">
+  <div class="contract-header">
+    <h2>合同二：Air Car 空中汽车技术商业化信托</h2>
+    <div class="no">合同编号：LMR-PTAH-2023-TRUST-002 · 发布日期：2023年4月26日</div>
+  </div>
+  <div class="contract-body">
+    <table class="meta-table">
+      <tr><td>信托类型</td><td>硬科技产业信托（复合收益型）</td><td>信托期限</td><td><strong>24个月</strong>（2023.04.26 — 2025.04.25）</td></tr>
+      <tr><td>投资方向</td><td>eVTOL电动垂直起降飞行器</td><td>预期年化</td><td>18% — 25%</td></tr>
+      <tr><td>起投金额</td><td>500 USDT</td><td>收益分配</td><td>半年度分红</td></tr>
+      <tr><td>退出机制</td><td>满12个月可申请赎回</td><td>治理权益</td><td>持有PTAH参与项目投票</td></tr>
+    </table>
+    <div class="section">
+      <div class="section-title">第一条 信托目的</div>
+      <p>委托人委托受托人投资于空中汽车（eVTOL）技术商业化领域，通过PtahDAO平台参与飞行器制造企业、空中交通管理系统、城市空中交通（UAM）基础设施等项目的投资。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第二条 投资标的</div>
+      <p>本信托资金主要投向：(1) eVTOL整机研发与制造商；(2) 飞行汽车动力电池与电驱系统；(3) 城市空中交通指挥调度平台；(4)  vertiport垂直起降场建设运营。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第三条 信托期限与收益</div>
+      <p>信托期限为<strong>24个月</strong>，自2023年4月26日起至2025年4月25日止。预期年化收益率18%至25%，采用"固定保底6%+浮动超额收益"的复合收益结构，每半年度分配一次。</p>
+    </div>
+    <div class="highlight">核心逻辑：2023年全球eVTOL市场进入适航认证冲刺阶段，FAA、EASA陆续发放型号合格证，摩根士丹利预测2040年UAM市场达1万亿美元。</div>
+    <div class="risk">风险提示：适航认证进度不及预期、电池能量密度瓶颈、空域管制政策变化等风险。</div>
+    <div class="sign-area">
+      <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
+      <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 合同 3 -->
+<div class="contract" id="c3">
+  <div class="contract-header">
+    <h2>合同三：前沿超算系统下一代超级计算机信托</h2>
+    <div class="no">合同编号：LMR-PTAH-2023-TRUST-003 · 发布日期：2023年4月26日</div>
+  </div>
+  <div class="contract-body">
+    <table class="meta-table">
+      <tr><td>信托类型</td><td>基础设施投资信托（浮动收益型）</td><td>信托期限</td><td><strong>24个月</strong>（2023.04.26 — 2025.04.25）</td></tr>
+      <tr><td>投资方向</td><td>下一代超级计算机与算力基础设施</td><td>预期年化</td><td>20% — 28%</td></tr>
+      <tr><td>起投金额</td><td>200 USDT</td><td>收益分配</td><td>季度分红</td></tr>
+      <tr><td>退出机制</td><td>满6个月可申请赎回</td><td>治理权益</td><td>持有PTAH参与项目投票</td></tr>
+    </table>
+    <div class="section">
+      <div class="section-title">第一条 信托目的</div>
+      <p>委托人委托受托人投资于下一代超级计算机系统，包括GPU/TPU算力集群、液冷散热技术、高速互联网络、AI训练专用芯片等，通过算力租赁与股权投资获取收益。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第二条 投资标的</div>
+      <p>本信托资金主要投向：(1) 英伟达H100/A100 GPU算力集群建设与租赁；(2) 液冷数据中心运营；(3) AI训练专用ASIC芯片设计公司；(4) 算力调度与云平台。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第三条 信托期限与收益</div>
+      <p>信托期限为<strong>24个月</strong>，自2023年4月26日起至2025年4月25日止。预期年化收益率20%至28%，收益按季度分配。算力租赁收入为主要收益来源，股权投资退出收益为超额收益来源。</p>
+    </div>
+    <div class="highlight">核心逻辑：2023年AI大模型训练需求爆发，GPU算力供不应求，H100单卡年租赁收入超3万美元，数据中心REITs平均股息率超8%。</div>
+    <div class="risk">风险提示：芯片供应短缺、算力价格下行、AI需求不及预期、能耗政策收紧等风险。</div>
+    <div class="sign-area">
+      <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
+      <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 合同 4 -->
+<div class="contract" id="c4">
+  <div class="contract-header">
+    <h2>合同四：可控制核聚变信托配置</h2>
+    <div class="no">合同编号：LMR-PTAH-2023-TRUST-004 · 发布日期：2023年4月25日</div>
+  </div>
+  <div class="contract-body">
+    <table class="meta-table">
+      <tr><td>信托类型</td><td>前沿能源科技信托（长期浮动收益型）</td><td>信托期限</td><td><strong>36个月</strong>（2023.04.25 — 2026.04.24）</td></tr>
+      <tr><td>投资方向</td><td>可控核聚变研发与商业化</td><td>预期年化</td><td>15% — 40%（高波动）</td></tr>
+      <tr><td>起投金额</td><td>1000 USDT</td><td>收益分配</td><td>到期一次性分配</td></tr>
+      <tr><td>退出机制</td><td>满18个月可转让份额（不可赎回）</td><td>治理权益</td><td>持有PTAH参与项目投票</td></tr>
+    </table>
+    <div class="section">
+      <div class="section-title">第一条 信托目的</div>
+      <p>委托人委托受托人投资于可控核聚变领域，通过PtahDAO平台参与托卡马克、仿星器、惯性约束等技术路线的研发企业及关键零部件供应商，分享人类终极能源突破的红利。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第二条 投资标的</div>
+      <p>本信托资金主要投向：(1) Commonwealth Fusion Systems、TAE Technologies、Helion等头部核聚变初创公司；(2) 高温超导磁体制造商；(3) 等离子体控制系统；(4) 聚变发电示范电站建设。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第三条 信托期限与收益</div>
+      <p>信托期限为<strong>36个月</strong>，自2023年4月25日起至2026年4月24日止。本信托为长期价值投资，收益在到期后一次性分配，预期年化收益率15%至40%，具体取决于投资标的IPO或并购退出情况。</p>
+    </div>
+    <div class="highlight">核心逻辑：2022年12月美国NIF首次实现核聚变"科学盈亏平衡点"，全球私人核聚变投资2023年已超60亿美元，CFS累计融资近30亿美元。</div>
+    <div class="risk">风险提示：核聚变商业化时间表高度不确定，技术路线存在重大失败风险，投资本金可能面临全部损失。本产品适合风险承受能力极高的投资者。</div>
+    <div class="sign-area">
+      <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月25日</div></div>
+      <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月25日</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 合同 5 -->
+<div class="contract" id="c5">
+  <div class="contract-header">
+    <h2>合同五：Boston Dynamics 机器人研发信托</h2>
+    <div class="no">合同编号：LMR-PTAH-2023-TRUST-005 · 发布日期：2023年4月25日</div>
+  </div>
+  <div class="contract-body">
+    <table class="meta-table">
+      <tr><td>信托类型</td><td>机器人产业信托（复合收益型）</td><td>信托期限</td><td><strong>18个月</strong>（2023.04.25 — 2024.10.24）</td></tr>
+      <tr><td>投资方向</td><td>波士顿动力生态链与机器人商业化</td><td>预期年化</td><td>20% — 26%</td></tr>
+      <tr><td>起投金额</td><td>300 USDT</td><td>收益分配</td><td>季度分红</td></tr>
+      <tr><td>退出机制</td><td>满6个月可申请赎回</td><td>治理权益</td><td>持有PTAH参与项目投票</td></tr>
+    </table>
+    <div class="section">
+      <div class="section-title">第一条 信托目的</div>
+      <p>委托人委托受托人投资于Boston Dynamics机器人生态，包括Spot四足机器人、Stretch仓储机器人、Atlas人形机器人的供应链企业及应用场景开发商，分享机器人商业化爆发红利。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第二条 投资标的</div>
+      <p>本信托资金主要投向：(1) Boston Dynamics供应链（高扭矩密度执行器、力控传感器）；(2) Spot工业巡检应用开发商；(3) Stretch仓储自动化集成商；(4) Atlas人形机器人运动控制算法公司。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第三条 信托期限与收益</div>
+      <p>信托期限为<strong>18个月</strong>，自2023年4月25日起至2024年10月24日止。预期年化收益率20%至26%，收益按季度分配。Boston Dynamics 2023年已实现Stretch搬运超200万箱、Spot数据采集超100万次。</p>
+    </div>
+    <div class="highlight">核心逻辑：Boston Dynamics被现代汽车以11亿美元收购80%股权，2023年进入商业化加速期，Atlas电动版2024年发布，人形机器人市场2030年预计达70亿美元。</div>
+    <div class="risk">风险提示：机器人量产爬坡不及预期、客户拓展慢、人形机器人技术路线竞争加剧等风险。</div>
+    <div class="sign-area">
+      <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月25日</div></div>
+      <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月25日</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 合同 6 -->
+<div class="contract" id="c6">
+  <div class="contract-header">
+    <h2>合同六：OpenAI GPT-4 信托计划</h2>
+    <div class="no">合同编号：LMR-PTAH-2023-TRUST-006 · 发布日期：2023年4月26日</div>
+  </div>
+  <div class="contract-body">
+    <table class="meta-table">
+      <tr><td>信托类型</td><td>AI应用层信托（短期浮动收益型）</td><td>信托期限</td><td><strong>6个月</strong>（2023.04.26 — 2023.10.25）</td></tr>
+      <tr><td>投资方向</td><td>GPT-4生态应用与大模型商业化</td><td>预期年化</td><td>25% — 35%</td></tr>
+      <tr><td>起投金额</td><td>100 USDT</td><td>收益分配</td><td>月度分红</td></tr>
+      <tr><td>退出机制</td><td>满1个月可申请赎回</td><td>治理权益</td><td>持有PTAH参与项目投票</td></tr>
+    </table>
+    <div class="section">
+      <div class="section-title">第一条 信托目的</div>
+      <p>委托人委托受托人投资于OpenAI GPT-4生态，包括基于GPT-4 API的SaaS应用、大模型微调服务、AI Agent开发工具、企业级AI部署集成商等快速增长的应用层项目。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第二条 投资标的</div>
+      <p>本信托资金主要投向：(1) GPT-4驱动的企业级Copilot应用；(2) 大模型微调与prompt工程服务；(3) AI Agent自主执行平台；(4) 行业垂直大模型（法律/医疗/金融）。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第三条 信托期限与收益</div>
+      <p>信托期限为<strong>6个月</strong>，自2023年4月26日起至2023年10月25日止。预期年化收益率25%至35%，收益按月度分配。GPT-4于2023年3月发布后API调用量激增，应用层公司估值快速上升。</p>
+    </div>
+    <div class="highlight">核心逻辑：GPT-4发布后OpenAI年化收入突破10亿美元，基于大模型的SaaS应用获客成本降低60%，2023年AI应用层融资超100亿美元。</div>
+    <div class="risk">风险提示：大模型技术迭代快、API价格持续下调、应用层同质化竞争激烈、监管政策不确定性等风险。</div>
+    <div class="sign-area">
+      <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
+      <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 合同 7 -->
+<div class="contract" id="c7">
+  <div class="contract-header">
+    <h2>合同七：AI量化策略配置包信托</h2>
+    <div class="no">合同编号：LMR-PTAH-2023-TRUST-007 · 发布日期：2023年4月26日</div>
+  </div>
+  <div class="contract-body">
+    <table class="meta-table">
+      <tr><td>信托类型</td><td>量化交易策略信托（短期固定收益型）</td><td>信托期限</td><td><strong>3个月</strong>（2023.04.26 — 2023.07.25）</td></tr>
+      <tr><td>投资方向</td><td>AI驱动的多策略量化交易</td><td>预期年化</td><td>24%（固定+超额分成）</td></tr>
+      <tr><td>起投金额</td><td>50 USDT</td><td>收益分配</td><td>月度分红</td></tr>
+      <tr><td>退出机制</td><td>满7天可申请赎回（T+1到账）</td><td>治理权益</td><td>持有PTAH参与项目投票</td></tr>
+    </table>
+    <div class="section">
+      <div class="section-title">第一条 信托目的</div>
+      <p>委托人委托受托人运用AI量化策略进行数字资产市场的高频套利、做市、趋势跟踪等交易，通过LMR Partners自主研发的AI量化引擎实现稳定收益，PtahDAO平台作为应用场景。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第二条 投资标的</div>
+      <p>本信托资金主要投向：(1) 跨交易所套利策略；(2) 期权波动率交易；(3) DeFi流动性做市；(4) 基于NLP的新闻事件驱动交易；(5) AI因子选股与择时。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第三条 信托期限与收益</div>
+      <p>信托期限为<strong>3个月</strong>，自2023年4月26日起至2023年7月25日止。预期年化收益率24%，其中固定保底年化8%，超额收益部分受托人收取20%业绩报酬。收益按月度分配。</p>
+    </div>
+    <div class="highlight">核心逻辑：AI量化策略在2023年数字资产市场表现优异，LMR Partners量化团队夏普比率达2.3，最大回撤控制在5%以内。</div>
+    <div class="risk">风险提示：量化策略存在黑天鹅事件、模型过拟合、市场流动性枯竭等风险，历史业绩不代表未来表现。</div>
+    <div class="sign-area">
+      <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
+      <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 合同 8 -->
+<div class="contract" id="c8">
+  <div class="contract-header">
+    <h2>合同八：Xendit 数字支付信托产品</h2>
+    <div class="no">合同编号：LMR-PTAH-2023-TRUST-008 · 发布日期：2023年6月26日</div>
+  </div>
+  <div class="contract-body">
+    <table class="meta-table">
+      <tr><td>信托类型</td><td>金融科技支付信托（中期固定收益型）</td><td>信托期限</td><td><strong>12个月</strong>（2023.06.26 — 2024.06.25）</td></tr>
+      <tr><td>投资方向</td><td>东南亚数字支付基础设施</td><td>预期年化</td><td>16% — 20%</td></tr>
+      <tr><td>起投金额</td><td>100 USDT</td><td>收益分配</td><td>季度分红</td></tr>
+      <tr><td>退出机制</td><td>满3个月可申请赎回</td><td>治理权益</td><td>持有PTAH参与项目投票</td></tr>
+    </table>
+    <div class="section">
+      <div class="section-title">第一条 信托目的</div>
+      <p>委托人委托受托人投资于Xendit数字支付生态，通过PtahDAO平台参与东南亚支付网关、数字钱包、跨境汇款、先买后付（BNPL）等金融科技项目，获取稳定的支付流水分成收益。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第二条 投资标的</div>
+      <p>本信托资金主要投向：(1) Xendit支付网关API接入的东南亚电商商户；(2) 印尼/菲律宾数字钱包牌照公司；(3) 跨境支付清算网络；(4) BNPL消费金融平台。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第三条 信托期限与收益</div>
+      <p>信托期限为<strong>12个月</strong>，自2023年6月26日起至2024年6月25日止。预期年化收益率16%至20%，收益按季度分配。Xendit已成为东南亚领先的支付基础设施提供商，年处理交易额超100亿美元。</p>
+    </div>
+    <div class="highlight">核心逻辑：东南亚数字支付市场2023年规模达8000亿美元，年复合增长率35%，Xendit获红杉印度、Accel等顶级机构投资。</div>
+    <div class="risk">风险提示：支付监管政策变化、商户违约、汇率波动、竞争对手价格战等风险。</div>
+    <div class="sign-area">
+      <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年6月26日</div></div>
+      <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年6月26日</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 合同 9 -->
+<div class="contract" id="c9">
+  <div class="contract-header">
+    <h2>合同九：Bolttech 保险科技信托产品</h2>
+    <div class="no">合同编号：LMR-PTAH-2023-TRUST-009 · 发布日期：2023年6月25日</div>
+  </div>
+  <div class="contract-body">
+    <table class="meta-table">
+      <tr><td>信托类型</td><td>保险科技信托（中期固定收益型）</td><td>信托期限</td><td><strong>12个月</strong>（2023.06.25 — 2024.06.24）</td></tr>
+      <tr><td>投资方向</td><td>嵌入式保险与数字保险分销</td><td>预期年化</td><td>15% — 19%</td></tr>
+      <tr><td>起投金额</td><td>100 USDT</td><td>收益分配</td><td>季度分红</td></tr>
+      <tr><td>退出机制</td><td>满3个月可申请赎回</td><td>治理权益</td><td>持有PTAH参与项目投票</td></tr>
+    </table>
+    <div class="section">
+      <div class="section-title">第一条 信托目的</div>
+      <p>委托人委托受托人投资于Bolttech保险科技生态，通过PtahDAO平台参与嵌入式保险、数字保险分销、保险科技SaaS等项目，以科技改进传统保险行业，获取稳定的保费分成收益。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第二条 投资标的</div>
+      <p>本信托资金主要投向：(1) Bolttech嵌入式保险API平台；(2) 数字化旅行险/设备险/健康险产品；(3) 保险科技分销渠道；(4) AI核保与理赔自动化系统。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第三条 信托期限与收益</div>
+      <p>信托期限为<strong>12个月</strong>，自2023年6月25日起至2024年6月24日止。预期年化收益率15%至19%，收益按季度分配。Bolttech为东南亚最大的保险科技分销商之一，年保费规模超5亿美元。</p>
+    </div>
+    <div class="highlight">核心逻辑：全球保险科技市场2023年达4万亿美元，嵌入式保险年增长率40%，Bolttech获AIA、MSIG等战略投资。</div>
+    <div class="risk">风险提示：保险赔付率超预期、再保险成本上升、监管收紧、客户流失等风险。</div>
+    <div class="sign-area">
+      <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年6月25日</div></div>
+      <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年6月25日</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 合同 10 -->
+<div class="contract" id="c10">
+  <div class="contract-header">
+    <h2>合同十：Coda Payments 战略合作伙伴信托</h2>
+    <div class="no">合同编号：LMR-PTAH-2023-TRUST-010 · 发布日期：2023年6月19日</div>
+  </div>
+  <div class="contract-body">
+    <table class="meta-table">
+      <tr><td>信托类型</td><td>跨境支付信托（短期固定收益型）</td><td>信托期限</td><td><strong>6个月</strong>（2023.06.19 — 2023.12.18）</td></tr>
+      <tr><td>投资方向</td><td>全球数字内容支付与跨境结算</td><td>预期年化</td><td>18% — 22%</td></tr>
+      <tr><td>起投金额</td><td>100 USDT</td><td>收益分配</td><td>月度分红</td></tr>
+      <tr><td>退出机制</td><td>满1个月可申请赎回</td><td>治理权益</td><td>持有PTAH参与项目投票</td></tr>
+    </table>
+    <div class="section">
+      <div class="section-title">第一条 信托目的</div>
+      <p>委托人委托受托人投资于Coda Payments跨境支付生态，通过PtahDAO平台参与数字内容（游戏、流媒体、应用商店）的跨境支付结算、本地化支付方式聚合、反欺诈风控等项目。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第二条 投资标的</div>
+      <p>本信托资金主要投向：(1) Coda Payments全球支付网络接入；(2) 新兴市场本地化支付方式聚合（如印尼OVO、菲律宾GCash）；(3) 跨境外汇结算服务；(4) AI驱动的支付反欺诈系统。</p>
+    </div>
+    <div class="section">
+      <div class="section-title">第三条 信托期限与收益</div>
+      <p>信托期限为<strong>6个月</strong>，自2023年6月19日起至2023年12月18日止。预期年化收益率18%至22%，收益按月度分配。Coda Payments为东南亚头部跨境支付公司，年处理交易额超50亿美元。</p>
+    </div>
+    <div class="highlight">核心逻辑：全球数字内容跨境支付市场2023年达6000亿美元，Coda Payments覆盖30+国家、300+支付方式，已服务Google、Netflix等全球品牌。</div>
+    <div class="risk">风险提示：跨境支付监管合规风险、汇率波动、支付通道变更、欺诈损失等风险。</div>
+    <div class="sign-area">
+      <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年6月19日</div></div>
+      <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年6月19日</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="cover" style="margin-top:40px;">
+  <h2 style="color:#8B0000;margin-bottom:15px;">通用条款（适用于上述全部10份合同）</h2>
+  <div class="info" style="text-align:left;max-width:800px;">
+    <div><strong>第一条 当事人：</strong>受托人为 LMR Partners（FCA授权监管），管理人为 LMR Partners-Web3.0技术实验室，委托人为 PtahDAO 平台注册用户。</div>
+    <div><strong>第二条 信托财产：</strong>委托人以USDT等数字资产委托，受托人通过PtahDAO平台智能合约管理，所有交易上链存证。</div>
+    <div><strong>第三条 治理机制：</strong>采用DAO治理，委托人持有PTAH通证可参与项目筛选、收益分配方案、重大事项投票。</div>
+    <div><strong>第四条 安全保障：</strong>多重签名、多层审计、多方抵押机制，防止黑客攻击、恶意篡改、资金挪用。</div>
+    <div><strong>第五条 信息披露：</strong>受托人每季度向委托人披露投资组合、收益情况、风险指标，所有数据上链可追溯。</div>
+    <div><strong>第六条 争议解决：</strong>适用英格兰法律，争议提交伦敦国际仲裁院仲裁。</div>
+    <div><strong>第七条 合同生效：</strong>本合同自委托人在PtahDAO平台确认并划转信托财产之日起生效。</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
