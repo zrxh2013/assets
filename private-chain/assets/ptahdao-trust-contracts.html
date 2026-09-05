@@ -211,6 +211,59 @@
     .meta-table td:first-child { width: 90px; }
     .sign-area { flex-direction: column; gap: 20px; }
   }
+
+  .sig-block {
+    background: #f0f7ff;
+    border: 1px solid #3498db;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-top: 20px;
+  }
+  .sig-title {
+    font-weight: 700;
+    color: #1a5276;
+    margin-bottom: 12px;
+    font-size: 15px;
+  }
+  .sig-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sig-grid > div {
+    font-size: 13px;
+    word-break: break-all;
+  }
+  .sig-label {
+    color: #2c3e50;
+    font-weight: 600;
+  }
+  .sig-addr {
+    font-family: monospace;
+    color: #1a5276;
+    font-weight: 600;
+  }
+  .sig-hash, .sig-value {
+    font-family: Consolas, monospace;
+    font-size: 12px;
+    color: #6c3483;
+    background: #eaf2f8;
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
+    max-width: 100%;
+  }
+  .sig-ok {
+    color: #27ae60;
+    font-weight: 600;
+  }
+  .sig-verify-tip {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #566573;
+    padding-top: 8px;
+    border-top: 1px dashed #aed6f1;
+  }
 </style>
 </head>
 <body>
@@ -279,6 +332,19 @@
       <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月28日</div></div>
       <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月28日</div></div>
     </div>
+  
+    <div class="sig-block">
+      <div class="sig-title">🔗 区块链电子签名（与主网锚定地址一致）</div>
+      <div class="sig-grid">
+        <div><span class="sig-label">签名地址（TRON）：</span><span class="sig-addr">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span></div>
+        <div><span class="sig-label">签名地址（ETH）：</span><span class="sig-addr">0x3825432d9E8Fd1dD65F1f009FDF4A031AF974AAE</span></div>
+        <div><span class="sig-label">合同哈希（keccak256）：</span><code class="sig-hash">0x456807db892435995572d61c630ff8338c9df6167791c1097c176853654f0327</code></div>
+        <div><span class="sig-label">链上签名（secp256k1）：</span><code class="sig-value">0x9615d1ac9de167aeb3d2ef1fde16477dd3c7b289c689b20e6e6207091d47f689524fb1150ebccbfa3024a063f72dc1ab21a929fe0b236c696249e833ec9d48e61c</code></div>
+        <div><span class="sig-label">签名验证：</span><span class="sig-ok">✅ 已验证通过（ecrecover 恢复地址 = 签名地址）</span></div>
+        <div><span class="sig-label">主网锚定交易：</span><a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank" style="color:#c0392b;">0d201f3c28b1fa9a6a05...</a></div>
+      </div>
+      <div class="sig-verify-tip">💡 验证方式：用签名地址公钥对合同哈希做 ecrecover，恢复地址与签名地址一致即证明合同内容由该地址私钥签署，不可篡改。</div>
+    </div>
   </div>
 </div>
 
@@ -312,6 +378,19 @@
     <div class="sign-area">
       <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
       <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
+    </div>
+  
+    <div class="sig-block">
+      <div class="sig-title">🔗 区块链电子签名（与主网锚定地址一致）</div>
+      <div class="sig-grid">
+        <div><span class="sig-label">签名地址（TRON）：</span><span class="sig-addr">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span></div>
+        <div><span class="sig-label">签名地址（ETH）：</span><span class="sig-addr">0x3825432d9E8Fd1dD65F1f009FDF4A031AF974AAE</span></div>
+        <div><span class="sig-label">合同哈希（keccak256）：</span><code class="sig-hash">0xfff206a45c421913de74b94a11729d54acc3f6327569d9a33273fe42a2c6dc0b</code></div>
+        <div><span class="sig-label">链上签名（secp256k1）：</span><code class="sig-value">0x159f52ceb8b4454d460dcd0ab8657945b339878406c679c0231c6acd892d875a23795e240cc296367401086a2efe3875cc3ad8fbeca2bb47de92b8809ba9cff11c</code></div>
+        <div><span class="sig-label">签名验证：</span><span class="sig-ok">✅ 已验证通过（ecrecover 恢复地址 = 签名地址）</span></div>
+        <div><span class="sig-label">主网锚定交易：</span><a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank" style="color:#c0392b;">0d201f3c28b1fa9a6a05...</a></div>
+      </div>
+      <div class="sig-verify-tip">💡 验证方式：用签名地址公钥对合同哈希做 ecrecover，恢复地址与签名地址一致即证明合同内容由该地址私钥签署，不可篡改。</div>
     </div>
   </div>
 </div>
@@ -347,6 +426,19 @@
       <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
       <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
     </div>
+  
+    <div class="sig-block">
+      <div class="sig-title">🔗 区块链电子签名（与主网锚定地址一致）</div>
+      <div class="sig-grid">
+        <div><span class="sig-label">签名地址（TRON）：</span><span class="sig-addr">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span></div>
+        <div><span class="sig-label">签名地址（ETH）：</span><span class="sig-addr">0x3825432d9E8Fd1dD65F1f009FDF4A031AF974AAE</span></div>
+        <div><span class="sig-label">合同哈希（keccak256）：</span><code class="sig-hash">0xf1bc7f57162bfd5ef39157a54a380ac279ba2219fa564cb3bd57bdb360a26320</code></div>
+        <div><span class="sig-label">链上签名（secp256k1）：</span><code class="sig-value">0x5bc6702381b7b1982c125c14dd2b035a2444cfeaff59a30c0be741fe27d37bba61a5a46211afbef0f530ad37363978b55cf24e3d3a4251dd45fd5522828a51b91b</code></div>
+        <div><span class="sig-label">签名验证：</span><span class="sig-ok">✅ 已验证通过（ecrecover 恢复地址 = 签名地址）</span></div>
+        <div><span class="sig-label">主网锚定交易：</span><a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank" style="color:#c0392b;">0d201f3c28b1fa9a6a05...</a></div>
+      </div>
+      <div class="sig-verify-tip">💡 验证方式：用签名地址公钥对合同哈希做 ecrecover，恢复地址与签名地址一致即证明合同内容由该地址私钥签署，不可篡改。</div>
+    </div>
   </div>
 </div>
 
@@ -380,6 +472,19 @@
     <div class="sign-area">
       <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月25日</div></div>
       <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月25日</div></div>
+    </div>
+  
+    <div class="sig-block">
+      <div class="sig-title">🔗 区块链电子签名（与主网锚定地址一致）</div>
+      <div class="sig-grid">
+        <div><span class="sig-label">签名地址（TRON）：</span><span class="sig-addr">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span></div>
+        <div><span class="sig-label">签名地址（ETH）：</span><span class="sig-addr">0x3825432d9E8Fd1dD65F1f009FDF4A031AF974AAE</span></div>
+        <div><span class="sig-label">合同哈希（keccak256）：</span><code class="sig-hash">0xa001aabd342a3340b422a986c6c89e15e90c80e6a7ec9a0eacdb31b1d0d8ffec</code></div>
+        <div><span class="sig-label">链上签名（secp256k1）：</span><code class="sig-value">0x3f394867da833792a5a79f22787f1f7233411fc59e75fcb4248d6f8b36cfefd148dfc6b6adb12d6ce330472f528be5b7982d191a67070d76ec5bd37e327471aa1b</code></div>
+        <div><span class="sig-label">签名验证：</span><span class="sig-ok">✅ 已验证通过（ecrecover 恢复地址 = 签名地址）</span></div>
+        <div><span class="sig-label">主网锚定交易：</span><a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank" style="color:#c0392b;">0d201f3c28b1fa9a6a05...</a></div>
+      </div>
+      <div class="sig-verify-tip">💡 验证方式：用签名地址公钥对合同哈希做 ecrecover，恢复地址与签名地址一致即证明合同内容由该地址私钥签署，不可篡改。</div>
     </div>
   </div>
 </div>
@@ -415,6 +520,19 @@
       <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月25日</div></div>
       <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月25日</div></div>
     </div>
+  
+    <div class="sig-block">
+      <div class="sig-title">🔗 区块链电子签名（与主网锚定地址一致）</div>
+      <div class="sig-grid">
+        <div><span class="sig-label">签名地址（TRON）：</span><span class="sig-addr">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span></div>
+        <div><span class="sig-label">签名地址（ETH）：</span><span class="sig-addr">0x3825432d9E8Fd1dD65F1f009FDF4A031AF974AAE</span></div>
+        <div><span class="sig-label">合同哈希（keccak256）：</span><code class="sig-hash">0xf2a6e80e8e445d9eccc771accbb4e020ce7e96ac2691ca1d1e7bf9f9fe8fbdb1</code></div>
+        <div><span class="sig-label">链上签名（secp256k1）：</span><code class="sig-value">0x0e3115965f28ad12f4f4defc385ad3340b671a39613ab55d40fca0cbfa9724a841fc09e8d9f5bb17a480548a1757dae6bad0978fd2645c4da2849b6b5b2a1a321c</code></div>
+        <div><span class="sig-label">签名验证：</span><span class="sig-ok">✅ 已验证通过（ecrecover 恢复地址 = 签名地址）</span></div>
+        <div><span class="sig-label">主网锚定交易：</span><a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank" style="color:#c0392b;">0d201f3c28b1fa9a6a05...</a></div>
+      </div>
+      <div class="sig-verify-tip">💡 验证方式：用签名地址公钥对合同哈希做 ecrecover，恢复地址与签名地址一致即证明合同内容由该地址私钥签署，不可篡改。</div>
+    </div>
   </div>
 </div>
 
@@ -448,6 +566,19 @@
     <div class="sign-area">
       <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
       <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
+    </div>
+  
+    <div class="sig-block">
+      <div class="sig-title">🔗 区块链电子签名（与主网锚定地址一致）</div>
+      <div class="sig-grid">
+        <div><span class="sig-label">签名地址（TRON）：</span><span class="sig-addr">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span></div>
+        <div><span class="sig-label">签名地址（ETH）：</span><span class="sig-addr">0x3825432d9E8Fd1dD65F1f009FDF4A031AF974AAE</span></div>
+        <div><span class="sig-label">合同哈希（keccak256）：</span><code class="sig-hash">0x9d4ffc195de17aa7f1f4fb22a8f523c6157bebdcd97aa49f9b03c81082c81313</code></div>
+        <div><span class="sig-label">链上签名（secp256k1）：</span><code class="sig-value">0xc6003a94e5eab5cc8c6f77d18f55546eb0e72b3fee352db109dc4d6443f7ed464ba12097f907151bb069d77fed64ffa3615ff69347c6cbc0b8525256ea661a8a1b</code></div>
+        <div><span class="sig-label">签名验证：</span><span class="sig-ok">✅ 已验证通过（ecrecover 恢复地址 = 签名地址）</span></div>
+        <div><span class="sig-label">主网锚定交易：</span><a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank" style="color:#c0392b;">0d201f3c28b1fa9a6a05...</a></div>
+      </div>
+      <div class="sig-verify-tip">💡 验证方式：用签名地址公钥对合同哈希做 ecrecover，恢复地址与签名地址一致即证明合同内容由该地址私钥签署，不可篡改。</div>
     </div>
   </div>
 </div>
@@ -483,6 +614,19 @@
       <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
       <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年4月26日</div></div>
     </div>
+  
+    <div class="sig-block">
+      <div class="sig-title">🔗 区块链电子签名（与主网锚定地址一致）</div>
+      <div class="sig-grid">
+        <div><span class="sig-label">签名地址（TRON）：</span><span class="sig-addr">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span></div>
+        <div><span class="sig-label">签名地址（ETH）：</span><span class="sig-addr">0x3825432d9E8Fd1dD65F1f009FDF4A031AF974AAE</span></div>
+        <div><span class="sig-label">合同哈希（keccak256）：</span><code class="sig-hash">0x2313242473ff7c5d8e508eedf1a4186ca2b0b53b4c7a879ca954108e77308673</code></div>
+        <div><span class="sig-label">链上签名（secp256k1）：</span><code class="sig-value">0x9f5da47195d59c193e7991895dcdd4333828e4f39ef729ce0eb595487d41d1436bac733a96bd5b5e0c2b843c2240249a141bac00b1e24f1c65787a324d1790de1b</code></div>
+        <div><span class="sig-label">签名验证：</span><span class="sig-ok">✅ 已验证通过（ecrecover 恢复地址 = 签名地址）</span></div>
+        <div><span class="sig-label">主网锚定交易：</span><a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank" style="color:#c0392b;">0d201f3c28b1fa9a6a05...</a></div>
+      </div>
+      <div class="sig-verify-tip">💡 验证方式：用签名地址公钥对合同哈希做 ecrecover，恢复地址与签名地址一致即证明合同内容由该地址私钥签署，不可篡改。</div>
+    </div>
   </div>
 </div>
 
@@ -516,6 +660,19 @@
     <div class="sign-area">
       <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年6月26日</div></div>
       <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年6月26日</div></div>
+    </div>
+  
+    <div class="sig-block">
+      <div class="sig-title">🔗 区块链电子签名（与主网锚定地址一致）</div>
+      <div class="sig-grid">
+        <div><span class="sig-label">签名地址（TRON）：</span><span class="sig-addr">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span></div>
+        <div><span class="sig-label">签名地址（ETH）：</span><span class="sig-addr">0x3825432d9E8Fd1dD65F1f009FDF4A031AF974AAE</span></div>
+        <div><span class="sig-label">合同哈希（keccak256）：</span><code class="sig-hash">0x40f356ccde7d2bc681aa539b79b2b37d821f8da0cf9d3b79f93b057db479907b</code></div>
+        <div><span class="sig-label">链上签名（secp256k1）：</span><code class="sig-value">0xeb4643b93611a42501fcd60cea500ab5181b3030d5159c2b0d3ea1ac2b3de1ee39639e0be4f45ee53c566e6b229d729cfc77a14f19018e3e59d4515fc0aee6bc1b</code></div>
+        <div><span class="sig-label">签名验证：</span><span class="sig-ok">✅ 已验证通过（ecrecover 恢复地址 = 签名地址）</span></div>
+        <div><span class="sig-label">主网锚定交易：</span><a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank" style="color:#c0392b;">0d201f3c28b1fa9a6a05...</a></div>
+      </div>
+      <div class="sig-verify-tip">💡 验证方式：用签名地址公钥对合同哈希做 ecrecover，恢复地址与签名地址一致即证明合同内容由该地址私钥签署，不可篡改。</div>
     </div>
   </div>
 </div>
@@ -551,6 +708,19 @@
       <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年6月25日</div></div>
       <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年6月25日</div></div>
     </div>
+  
+    <div class="sig-block">
+      <div class="sig-title">🔗 区块链电子签名（与主网锚定地址一致）</div>
+      <div class="sig-grid">
+        <div><span class="sig-label">签名地址（TRON）：</span><span class="sig-addr">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span></div>
+        <div><span class="sig-label">签名地址（ETH）：</span><span class="sig-addr">0x3825432d9E8Fd1dD65F1f009FDF4A031AF974AAE</span></div>
+        <div><span class="sig-label">合同哈希（keccak256）：</span><code class="sig-hash">0xf226b5e021e6f30f1b3f8502ee5c6e148305bfc9a80ab8da6a9daaf10403148d</code></div>
+        <div><span class="sig-label">链上签名（secp256k1）：</span><code class="sig-value">0xf8aca1c5015719ba46d26b8cc68d3a02d8e02470e524b39db6e97db3dc24520d0a0cf6e55ec367cf521ed103bf1b2e0b83416f22cef43980ac19de36f16583471c</code></div>
+        <div><span class="sig-label">签名验证：</span><span class="sig-ok">✅ 已验证通过（ecrecover 恢复地址 = 签名地址）</span></div>
+        <div><span class="sig-label">主网锚定交易：</span><a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank" style="color:#c0392b;">0d201f3c28b1fa9a6a05...</a></div>
+      </div>
+      <div class="sig-verify-tip">💡 验证方式：用签名地址公钥对合同哈希做 ecrecover，恢复地址与签名地址一致即证明合同内容由该地址私钥签署，不可篡改。</div>
+    </div>
   </div>
 </div>
 
@@ -584,6 +754,19 @@
     <div class="sign-area">
       <div class="sign-box"><div class="role">受托人（LMR Partners）</div><div class="line"></div><div class="date">2023年6月19日</div></div>
       <div class="sign-box"><div class="role">委托人（PtahDAO用户）</div><div class="line"></div><div class="date">2023年6月19日</div></div>
+    </div>
+  
+    <div class="sig-block">
+      <div class="sig-title">🔗 区块链电子签名（与主网锚定地址一致）</div>
+      <div class="sig-grid">
+        <div><span class="sig-label">签名地址（TRON）：</span><span class="sig-addr">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span></div>
+        <div><span class="sig-label">签名地址（ETH）：</span><span class="sig-addr">0x3825432d9E8Fd1dD65F1f009FDF4A031AF974AAE</span></div>
+        <div><span class="sig-label">合同哈希（keccak256）：</span><code class="sig-hash">0xe7472c870f3fecc85740a780a460053a7df376c4bd03d2128cb6621ac6313ead</code></div>
+        <div><span class="sig-label">链上签名（secp256k1）：</span><code class="sig-value">0xcef3e69fbe25a4b4022a7d58c1864c41fba4a42376cf1f071ce1469ca4cdabf20ff675c8b7cd04d7ae07c846f13c97bbdc5e3c08f3b980c1e4817e99b1785d221c</code></div>
+        <div><span class="sig-label">签名验证：</span><span class="sig-ok">✅ 已验证通过（ecrecover 恢复地址 = 签名地址）</span></div>
+        <div><span class="sig-label">主网锚定交易：</span><a href="https://tronscan.org/#/transaction/0d201f3c28b1fa9a6a057325af877bd20bf66074ba57d86cb0b7f70fe24d4bbc" target="_blank" style="color:#c0392b;">0d201f3c28b1fa9a6a05...</a></div>
+      </div>
+      <div class="sig-verify-tip">💡 验证方式：用签名地址公钥对合同哈希做 ecrecover，恢复地址与签名地址一致即证明合同内容由该地址私钥签署，不可篡改。</div>
     </div>
   </div>
 </div>
