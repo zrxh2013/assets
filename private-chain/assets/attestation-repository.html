@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PtahDAO 信托合同存证仓库</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #faf8f3;
+    color: #2c2c2c;
+    line-height: 1.6;
+  }
+  .container { max-width: 720px; margin: 0 auto; padding-bottom: 40px; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #fff9ed 0%, #fff 100%);
+    padding: 20px;
+    border-bottom: 1px solid #e8e0cc;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header-row { display: flex; align-items: center; justify-content: space-between; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #d4a017, #b8860b);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: bold; font-size: 20px;
+  }
+  .logo-text { font-size: 20px; font-weight: bold; color: #2c2c2c; letter-spacing: 1px; }
+  .refresh { color: #b8860b; cursor: pointer; font-size: 22px; }
+
+  .page-title { padding: 16px 20px 8px; }
+  .page-title h1 { font-size: 18px; color: #8B6914; margin-bottom: 4px; }
+  .page-title .sub { font-size: 12px; color: #999; }
+
+  /* Search */
+  .search-box { padding: 12px 20px; }
+  .search-box input {
+    width: 100%; padding: 12px 16px;
+    border: 1px solid #e8e0cc; border-radius: 24px;
+    background: #fff; font-size: 14px; outline: none;
+  }
+  .search-box input:focus { border-color: #d4a017; }
+
+  /* Filter tabs */
+  .filters { padding: 0 20px 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-tab {
+    padding: 6px 14px; border-radius: 16px;
+    background: #fff; border: 1px solid #e8e0cc;
+    font-size: 12px; color: #666; cursor: pointer;
+  }
+  .filter-tab.active { background: #d4a017; color: #fff; border-color: #d4a017; }
+
+  /* Contract cards */
+  .card-list { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
+  .contract-card {
+    background: #fff; border: 1px solid #f0e8d0; border-radius: 16px;
+    padding: 16px; position: relative;
+    box-shadow: 0 2px 8px rgba(180,140,20,0.06);
+    transition: box-shadow 0.2s;
+  }
+  .contract-card:hover { box-shadow: 0 4px 16px rgba(180,140,20,0.12); }
+
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .card-id {
+    display: inline-block; padding: 4px 10px;
+    background: linear-gradient(135deg, #d4a017, #b8860b);
+    color: #fff; border-radius: 6px; font-size: 12px; font-weight: bold;
+    font-family: "SF Mono", Consolas, monospace;
+  }
+  .card-status {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 11px; color: #27ae60; font-weight: 500;
+  }
+  .dot-green { width: 6px; height: 6px; background: #27ae60; border-radius: 50%; }
+
+  .card-title { font-size: 15px; font-weight: 600; color: #2c2c2c; margin-bottom: 8px; }
+
+  .card-meta { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  .meta-item { font-size: 12px; color: #888; }
+  .meta-item .label { color: #aaa; }
+  .meta-item .val { color: #555; font-weight: 500; }
+
+  .card-hash-row {
+    background: #faf8f3; border-radius: 8px; padding: 10px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .hash-label { font-size: 11px; color: #b8860b; font-weight: 500; min-width: 70px; }
+  .hash-value {
+    font-family: "SF Mono", Consolas, monospace; font-size: 12px;
+    color: #666; flex: 1; margin: 0 8px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .copy-btn {
+    background: none; border: 1px solid #e8e0cc; border-radius: 4px;
+    padding: 2px 8px; font-size: 11px; color: #999; cursor: pointer;
+  }
+  .copy-btn:hover { color: #d4a017; border-color: #d4a017; }
+
+  .card-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .btn {
+    flex: 1; padding: 8px 12px; border-radius: 8px;
+    font-size: 12px; text-decoration: none; text-align: center;
+    cursor: pointer; border: none; transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-primary {
+    background: linear-gradient(135deg, #d4a017, #b8860b); color: #fff;
+  }
+  .btn-secondary {
+    background: #f5f0e0; color: #8B6914; border: 1px solid #e8e0cc;
+  }
+
+  /* Notary verification card */
+  .notary-card {
+    margin: 20px 16px 0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 16px; padding: 20px; color: #fff;
+    position: relative; overflow: hidden;
+  }
+  .notary-card::before {
+    content: ''; position: absolute; top: -50px; right: -50px;
+    width: 150px; height: 150px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,160,23,0.15) 0%, transparent 70%);
+  }
+  .notary-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px; position: relative;
+  }
+  .notary-title { display: flex; align-items: center; gap: 10px; }
+  .notary-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(212,160,23,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .notary-title h3 { font-size: 15px; font-weight: 600; }
+  .badge-active {
+    background: rgba(39,174,96,0.2); color: #2ecc71;
+    padding: 4px 10px; border-radius: 12px; font-size: 11px;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .notary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .notary-row:last-of-type { border-bottom: none; }
+  .notary-label { font-size: 12px; color: rgba(255,255,255,0.5); }
+  .notary-value {
+    font-size: 13px; color: #fff; font-weight: 500;
+    text-align: right; max-width: 60%;
+  }
+  .notary-value.hash {
+    font-family: "SF Mono", Consolas, monospace; font-size: 11px;
+  }
+  .notary-value.green { color: #2ecc71; }
+
+  .notary-footer { margin-top: 16px; position: relative; }
+  .btn-tronscan {
+    display: block; width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #d4a017, #b8860b);
+    color: #fff; border: none; border-radius: 12px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    text-decoration: none; text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-tronscan:hover { opacity: 0.9; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px;
+    border-radius: 8px; font-size: 13px; opacity: 0;
+    transition: opacity 0.3s; pointer-events: none; z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 480px) {
+    .card-meta { gap: 10px; }
+    .hash-value { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <div class="logo">
+        <div class="logo-icon">P</div>
+        <div class="logo-text">PTAHDAO</div>
+      </div>
+      <div class="refresh" onclick="location.reload()">⟳</div>
+    </div>
+  </div>
+
+  <div class="page-title">
+    <h1>PtahDAO 信托合同存证仓库</h1>
+    <div class="sub">公开透明 · 链上存证 · 司法公证</div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="搜索合同编号 / 标题 / 哈希" oninput="filterCards()">
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-tab active" onclick="setFilter(this,'all')">全部合同</div>
+    <div class="filter-tab" onclick="setFilter(this,'2023.04')">2023.04 批次</div>
+    <div class="filter-tab" onclick="setFilter(this,'2023.06')">2023.06 批次</div>
+  </div>
+
+  <!-- Contract cards -->
+  <div class="card-list" id="cardList"></div>
+
+  <!-- Notary verification card -->
+  <div class="notary-card">
+    <div class="notary-header">
+      <div class="notary-title">
+        <div class="notary-icon">🛡️</div>
+        <h3>链上存证与司法公证核验</h3>
+      </div>
+      <div class="badge-active"><span class="dot-green"></span> 司法公证已生效</div>
+    </div>
+
+    <div class="notary-row">
+      <span class="notary-label">存证哈希 (Attestation)</span>
+      <span class="notary-value hash">42c2d6fde018032cc20cb71954a03b1e3265d0cc27b3f7d2f209bf4bce28ac4c</span>
+    </div>
+    <div class="notary-row">
+      <span class="notary-label">公证机构</span>
+      <span class="notary-value">葉謝鄧律師行 · 中国委托公证人 邓达明</span>
+    </div>
+    <div class="notary-row">
+      <span class="notary-label">执业证号</span>
+      <span class="notary-value">14413202200495450</span>
+    </div>
+    <div class="notary-row">
+      <span class="notary-label">转递编号</span>
+      <span class="notary-value">深办第2026-0484号</span>
+    </div>
+    <div class="notary-row">
+      <span class="notary-label">签名地址</span>
+      <span class="notary-value hash">TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9</span>
+    </div>
+    <div class="notary-row">
+      <span class="notary-label">Merkle 仓库归属</span>
+      <span class="notary-value green">100% 完整包含证明</span>
+    </div>
+
+    <div class="notary-footer">
+      <a href="https://tronscan.org/#/transaction/7506790e8dedc4052747b55241e45a9ff89415d81d3f3e1acbaa5784c888f407" target="_blank" class="btn-tronscan">
+        <span>↗</span> 在 TronScan 官方区块链浏览器查看原始交易
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">已复制到剪贴板</div>
+
+<script>
+const contracts = [
+  { id:"001", block:"85978527", title:"AI蛋白质折叠信托计划", date:"2023.04.28", period:"12个月", yield:"22%-30%",
+    msgHash:"0x456807db892435995572d61c630ff8338c9df6167791c1097c176853654f0327",
+    txID:"b22a2fc7d9d971d0092182e950f8fe226a8256d6ce133130f5128a4a39c3bbc2" },
+  { id:"002", block:"85978528", title:"Air Car 空中汽车技术商业化信托", date:"2023.04.26", period:"24个月", yield:"18%-25%",
+    msgHash:"0xfff206a45c421913de74b94a11729d54acc3f6327569d9a33273fe42a2c6dc0b",
+    txID:"f7ab349a160c2b35f31d281f2bf0f4cc5d92536a08193b7c574ef1cb98a850aa" },
+  { id:"003", block:"85978531", title:"前沿超算系统下一代超级计算机信托", date:"2023.04.26", period:"24个月", yield:"20%-28%",
+    msgHash:"0xf1bc7f57162bfd5ef39157a54a380ac279ba2219fa564cb3bd57bdb360a26320",
+    txID:"62362617d931c2db173e2100f444ac91f0ba85e6479a70a017e0236c2d2c0581" },
+  { id:"004", block:"85978533", title:"可控制核聚变信托配置", date:"2023.04.25", period:"36个月", yield:"15%-40%",
+    msgHash:"0xa001aabd342a3340b422a986c6c89e15e90c80e6a7ec9a0eacdb31b1d0d8ffec",
+    txID:"51b103e44e60c7bfd80514292aaad756686690444cb35677e4686236519fb91b" },
+  { id:"005", block:"85978552", title:"Boston Dynamics 机器人研发信托", date:"2023.04.25", period:"18个月", yield:"20%-26%",
+    msgHash:"0xf2a6e80e8e445d9eccc771accbb4e020ce7e96ac2691ca1d1e7bf9f9fe8fbdb1",
+    txID:"7575cf9c6742e35f0061cf571e62795c65cf7c13275d6e548fc6e820e1abe554" },
+  { id:"006", block:"85978538", title:"OpenAI GPT-4 信托计划", date:"2023.04.26", period:"6个月", yield:"25%-35%",
+    msgHash:"0x9d4ffc195de17aa7f1f4fb22a8f523c6157bebdcd97aa49f9b03c81082c81313",
+    txID:"f80a4a689bfd16dc36f22a0d53e6ec128280c17785400ff57c63efbc735519a8" },
+  { id:"007", block:"85978554", title:"AI量化策略配置包信托", date:"2023.04.26", period:"3个月", yield:"24%",
+    msgHash:"0x2313242473ff7c5d8e508eedf1a4186ca2b0b53b4c7a879ca954108e77308673",
+    txID:"a7c5728ddd99bb984fc5c5f62c9ef98247e393adf93a2c97ca50af6b8490918a" },
+  { id:"008", block:"85978542", title:"Xendit 数字支付信托产品", date:"2023.06.26", period:"12个月", yield:"16%-20%",
+    msgHash:"0x40f356ccde7d2bc681aa539b79b2b37d821f8da0cf9d3b79f93b057db479907b",
+    txID:"9dab9c7d79120a498e2e00be8abfefe00a1ef4b74ef4c74fe598ecdd0ff69bbd" },
+  { id:"009", block:"85978543", title:"Bolttech 保险科技信托产品", date:"2023.06.25", period:"12个月", yield:"15%-19%",
+    msgHash:"0xf226b5e021e6f30f1b3f8502ee5c6e148305bfc9a80ab8da6a9daaf10403148d",
+    txID:"1e709b94c68a66378345c17e15f9ced09acf79c13b7fc429e5aa5b7b3d2b7397" },
+  { id:"010", block:"85978546", title:"Coda Payments 战略合作伙伴信托", date:"2023.06.19", period:"6个月", yield:"18%-22%",
+    msgHash:"0xe7472c870f3fecc85740a780a460053a7df376c4bd03d2128cb6621ac6313ead",
+    txID:"10d42ee3168a0926eb8be2677b051e43a72dee249c0ee095a3a5a7e516dd6e46" }
+];
+
+const SIGNER = "TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9";
+let currentFilter = 'all';
+
+function renderCards(list) {
+  const container = document.getElementById('cardList');
+  container.innerHTML = list.map(c => `
+    <div class="contract-card" data-id="${c.id}" data-date="${c.date}">
+      <div class="card-top">
+        <span class="card-id">P.${c.block}</span>
+        <span class="card-status"><span class="dot-green"></span>已上链</span>
+      </div>
+      <div class="card-title">${c.title}</div>
+      <div class="card-meta">
+        <div class="meta-item"><span class="label">签署日期 </span><span class="val">${c.date}</span></div>
+        <div class="meta-item"><span class="label">期限 </span><span class="val">${c.period}</span></div>
+        <div class="meta-item"><span class="label">收益 </span><span class="val">${c.yield}</span></div>
+      </div>
+      <div class="card-hash-row">
+        <span class="hash-label">存证哈希</span>
+        <span class="hash-value">${c.msgHash}</span>
+        <button class="copy-btn" onclick="copyText('${c.msgHash}')">复制</button>
+      </div>
+      <div class="card-hash-row">
+        <span class="hash-label">交易哈希</span>
+        <span class="hash-value">${c.txID}</span>
+        <button class="copy-btn" onclick="copyText('${c.txID}')">复制</button>
+      </div>
+      <div class="card-hash-row">
+        <span class="hash-label">签名地址</span>
+        <span class="hash-value">${SIGNER}</span>
+        <button class="copy-btn" onclick="copyText('${SIGNER}')">复制</button>
+      </div>
+      <div class="card-actions">
+        <a href="https://tronscan.org/#/transaction/${c.txID}" target="_blank" class="btn btn-primary">在 TronScan 查看</a>
+        <a href="ptahdao-trust-contracts.html#${c.id}" class="btn btn-secondary">查看合同</a>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCards() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let list = contracts;
+  if (currentFilter !== 'all') {
+    list = list.filter(c => c.date.startsWith(currentFilter));
+  }
+  if (q) {
+    list = list.filter(c =>
+      c.id.toLowerCase().includes(q) ||
+      c.title.toLowerCase().includes(q) ||
+      c.block.includes(q) ||
+      c.msgHash.toLowerCase().includes(q) ||
+      c.txID.toLowerCase().includes(q)
+    );
+  }
+  renderCards(list);
+}
+
+function setFilter(el, type) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = type;
+  filterCards();
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1500);
+  });
+}
+
+renderCards(contracts);
+</script>
+
+</body>
+</html>
