@@ -394,7 +394,7 @@
 </style>
 
 <!-- TronWeb 浏览器端库（用于链上交易广播） -->
-<script src="https://cdn.jsdelivr.net/npm/tronweb@5.3.2/dist/TronWeb.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tronweb@6.5.1/dist/TronWeb.min.js"></script>
 </head>
 <body>
 
@@ -855,12 +855,16 @@ async function broadcastAnchor() {
   resultDiv.innerHTML = '<span style="color:#f39c12;">步骤1: 初始化 TronWeb…</span>';
 
   try {
-    if (typeof TronWeb === 'undefined') {
+    // TronWeb 5.x UMD: window.TronWeb 即构造函数
+    // TronWeb 6.x UMD: window.TronWeb 是导出对象，构造函数在 window.TronWeb.TronWeb
+    const tw = window.TronWeb;
+    const TronWebCtor = (tw && typeof tw.TronWeb === 'function' && tw.TronWeb) || tw || window.tronweb;
+    if (typeof TronWebCtor !== 'function') {
       throw new Error('TronWeb 库未加载，请检查网络连接');
     }
 
     // 初始化 TronWeb（主网）
-    const tronWeb = new TronWeb({
+    const tronWeb = new TronWebCtor({
       fullHost: 'https://api.trongrid.io',
       privateKey: privKey,
     });
@@ -878,47 +882,32 @@ async function broadcastAnchor() {
     const memoStr = JSON.stringify(memoObj);
 
     // 构建带 memo 的 TRX 转账交易
-    resultDiv.innerHTML = '<span style="color:#f39c12;">步骤2: 构建交易（带 memo）…</span>';
+    // 方式: sendTrx 构建 + addUpdateData 添加 memo（TronWeb 6.x）
+    const tx = await tronWeb.transactionBuilder.sendTrx(toAddr, amountSun, from);
 
-    // 尝试多种方式添加 memo
-    let tx;
     let memoAdded = false;
-
-    // 方式1: sendTrx with memo option
     try {
-      tx = await tronWeb.transactionBuilder.sendTrx(toAddr, amountSun, { memo: memoStr });
-      if (tx.raw_data && tx.raw_data.data) memoAdded = true;
-    } catch(e) {}
-
-    // 方式2: sendTrx with data option (hex)
-    if (!memoAdded) {
-      try {
-        const encoder = new TextEncoder();
-        const bytes = encoder.encode(memoStr);
-        let memoHex = '';
-        for (const b of bytes) memoHex += b.toString(16).padStart(2, '0');
-        tx = await tronWeb.transactionBuilder.sendTrx(toAddr, amountSun, { data: memoHex });
-        if (tx.raw_data && tx.raw_data.data) memoAdded = true;
-      } catch(e) {}
-    }
-
-    // 方式3: addUpdateData (带超时)
-    if (!memoAdded) {
-      try {
-        tx = await tronWeb.transactionBuilder.sendTrx(toAddr, amountSun);
-        const addPromise = tronWeb.transactionBuilder.addUpdateData(tx, memoStr, 'utf8');
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
-        const txWithMemo = await Promise.race([addPromise, timeoutPromise]);
-        Object.assign(tx, txWithMemo);
-        if (tx.raw_data && tx.raw_data.data) memoAdded = true;
-      } catch(e) {
-        // addUpdateData 失败，用无 memo 交易
+      const txWithMemo = await tronWeb.transactionBuilder.addUpdateData(tx, memoStr, 'utf8');
+      Object.assign(tx, txWithMemo);
+      memoAdded = !!(tx.raw_data && tx.raw_data.data);
+    } catch (e) {
+      // addUpdateData 失败时回退到手动 protobuf 编码
+      const encoder = new TextEncoder();
+      const bytes = encoder.encode(memoStr);
+      let memoHex = '';
+      for (const b of bytes) memoHex += b.toString(16).padStart(2, '0');
+      // protobuf: data 字段 tag=0x52 (field 10, wire type 2)
+      let len = bytes.length;
+      let lenVarint = '';
+      while (len > 0) {
+        let b = len & 0x7f;
+        len >>= 7;
+        if (len > 0) b |= 0x80;
+        lenVarint += b.toString(16).padStart(2, '0');
       }
-    }
-
-    // 如果还没有 memo，用无 memo 交易
-    if (!tx) {
-      tx = await tronWeb.transactionBuilder.sendTrx(toAddr, amountSun);
+      tx.raw_data.data = memoHex;
+      tx.raw_data_hex = tx.raw_data_hex + '52' + lenVarint + memoHex;
+      memoAdded = true;
     }
 
     resultDiv.innerHTML = '<span style="color:#f39c12;">步骤4: 签名交易…</span>' + (memoAdded ? ' (memo已添加)' : ' (无memo)');
@@ -928,8 +917,10 @@ async function broadcastAnchor() {
 
     const result = await tronWeb.trx.sendRawTransaction(signed);
 
-    if (result.result) {
-      const txid = signed.txID;
+    // TronWeb 6.x: 成功返回 {result:true} 或 {txid:...}；失败返回 {code, message(hex)}
+    const isSuccess = result.result === true || (result.txid && !result.code);
+    if (isSuccess) {
+      const txid = signed.txID || result.txid;
       resultDiv.innerHTML =
         '<div class="ok">✅ 广播成功！交易已写入波场主网</div>' +
         '<div>发送方: ' + from + '</div>' +
@@ -940,7 +931,15 @@ async function broadcastAnchor() {
         '<div><a href="https://tronscan.org/#/transaction/' + txid + '" target="_blank" style="color:#d4a017;">在 TronScan 查看交易 ↗</a></div>';
       showToast('上链成功！');
     } else {
-      throw new Error('广播失败: ' + JSON.stringify(result));
+      // 解码十六进制错误消息（TRON 错误消息是 hex 编码的 UTF-8）
+      let msg = result.message || JSON.stringify(result);
+      if (msg && /^[0-9a-fA-F]+$/.test(msg) && msg.length % 2 === 0) {
+        try {
+          const bytes = new Uint8Array(msg.match(/.{1,2}/g).map(h => parseInt(h, 16)));
+          msg = new TextDecoder().decode(bytes);
+        } catch(e2) {}
+      }
+      throw new Error('广播失败: ' + (result.code || '') + ' ' + msg);
     }
   } catch (e) {
     console.error(e);
