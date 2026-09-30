@@ -254,6 +254,130 @@
   }
   .balance-footer a:hover { text-decoration: underline; }
 
+  /* 上链存证广播卡片 */
+  .anchor-card {
+    margin: 16px 16px 0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 16px; padding: 20px; color: #fff;
+    position: relative; overflow: hidden;
+    border: 1px solid rgba(212,160,23,0.2);
+  }
+  .anchor-card::before {
+    content: ''; position: absolute; top: -50px; right: -50px;
+    width: 150px; height: 150px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,160,23,0.12) 0%, transparent 70%);
+  }
+  .anchor-form { position: relative; }
+  .anchor-form label {
+    display: block; font-size: 12px; color: rgba(255,255,255,0.6);
+    margin-bottom: 6px; margin-top: 14px;
+  }
+  .anchor-form label:first-child { margin-top: 0; }
+  .anchor-form input, .anchor-form textarea {
+    width: 100%; padding: 10px 14px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.25); color: #fff;
+    font-size: 13px; outline: none; font-family: inherit;
+  }
+  .anchor-form input:focus, .anchor-form textarea:focus { border-color: #d4a017; }
+  .anchor-form textarea { resize: vertical; min-height: 70px; font-family: "SF Mono", Consolas, monospace; font-size: 12px; }
+  .anchor-form .row { display: flex; gap: 10px; }
+  .anchor-form .row > div { flex: 1; }
+  .anchor-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .anchor-btn {
+    flex: 1; padding: 12px; border-radius: 10px; border: none;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .anchor-btn:hover { opacity: 0.9; }
+  .anchor-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .anchor-btn.primary {
+    background: linear-gradient(135deg, #d4a017, #b8860b); color: #fff;
+  }
+  .anchor-btn.secondary {
+    background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+  }
+  .anchor-result {
+    margin-top: 16px; padding: 14px; border-radius: 10px;
+    background: rgba(0,0,0,0.3); font-size: 12px;
+    display: none;
+  }
+  .anchor-result.show { display: block; }
+  .anchor-result .ok { color: #2ecc71; font-weight: 600; margin-bottom: 8px; }
+  .anchor-result .err { color: #e74c3c; font-weight: 600; margin-bottom: 8px; }
+  .anchor-result .txid {
+    font-family: "SF Mono", Consolas, monospace; word-break: break-all;
+    color: #d4a017; margin: 6px 0;
+  }
+  .anchor-tip {
+    font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 10px;
+  }
+
+  /* 交易记录查询卡片 */
+  .txquery-card {
+    margin: 16px 16px 0;
+    background: #fff; border: 1px solid #f0e8d0; border-radius: 16px;
+    padding: 20px;
+  }
+  .txquery-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  }
+  .txquery-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, #d4a017, #b8860b);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 16px;
+  }
+  .txquery-header h3 { font-size: 15px; font-weight: 600; color: #2c2c2c; }
+  .txquery-form { display: flex; gap: 8px; margin-bottom: 16px; }
+  .txquery-form input {
+    flex: 1; padding: 10px 14px; border-radius: 10px;
+    border: 1px solid #e8e0cc; background: #faf8f3;
+    font-size: 13px; outline: none;
+  }
+  .txquery-form input:focus { border-color: #d4a017; }
+  .txquery-form button {
+    padding: 10px 18px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, #d4a017, #b8860b);
+    color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .txquery-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .txquery-filter {
+    display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+  }
+  .txquery-filter input {
+    flex: 1; min-width: 120px; padding: 8px 12px; border-radius: 8px;
+    border: 1px solid #e8e0cc; font-size: 12px; outline: none;
+  }
+  .txquery-list { max-height: 500px; overflow-y: auto; }
+  .tx-item {
+    padding: 12px; border: 1px solid #f0e8d0; border-radius: 10px;
+    margin-bottom: 8px; background: #faf8f3;
+  }
+  .tx-item-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 6px;
+  }
+  .tx-item-type {
+    display: inline-block; padding: 2px 8px; border-radius: 6px;
+    font-size: 10px; font-weight: 600;
+  }
+  .tx-item-type.trx { background: #e8f5e9; color: #27ae60; }
+  .tx-item-type.usdt { background: #e3f2fd; color: #1976d2; }
+  .tx-item-type.other { background: #f5f5f5; color: #666; }
+  .tx-item-time { font-size: 11px; color: #999; }
+  .tx-item-hash {
+    font-family: "SF Mono", Consolas, monospace; font-size: 11px;
+    color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    margin-bottom: 4px;
+  }
+  .tx-item-memo {
+    font-size: 11px; color: #8B6914; background: #fff9ed;
+    padding: 6px 8px; border-radius: 6px; word-break: break-all;
+    max-height: 60px; overflow-y: auto;
+  }
+  .tx-empty { text-align: center; padding: 30px; color: #999; font-size: 13px; }
+
   /* Toast */
   .toast {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
@@ -268,6 +392,9 @@
     .hash-value { font-size: 11px; }
   }
 </style>
+
+<!-- TronWeb 浏览器端库（用于链上交易广播） -->
+<script src="https://cdn.jsdelivr.net/npm/tronweb@5.3.2/dist/TronWeb.js"></script>
 </head>
 <body>
 
@@ -343,6 +470,50 @@
     </div>
   </div>
 
+  <!-- 上链存证广播卡片 -->
+  <div class="anchor-card">
+    <div class="balance-header">
+      <div class="balance-title">
+        <div class="balance-icon" style="background:#d4a017;">📤</div>
+        <h3>上链存证 · 广播交易</h3>
+      </div>
+      <span class="balance-network">波场主网</span>
+    </div>
+
+    <div class="anchor-form">
+      <label>存证标题</label>
+      <input type="text" id="anchorTitle" placeholder="例如：合同存证 / 数据哈希 / 证明文件">
+
+      <label>存证内容（将写入交易 memo，永久上链）</label>
+      <textarea id="anchorData" placeholder="输入需要存证的数据，支持文本、JSON、哈希等..."></textarea>
+
+      <div class="row">
+        <div>
+          <label>接收地址（存证目标地址）</label>
+          <input type="text" id="anchorTo" value="T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb">
+        </div>
+        <div>
+          <label>转账金额 (TRX)</label>
+          <input type="number" id="anchorAmount" value="1" step="0.000001" min="0">
+        </div>
+      </div>
+
+      <label>发送方私钥（仅本地使用，不上传服务器）</label>
+      <input type="password" id="anchorKey" placeholder="输入私钥 (64位 hex)">
+
+      <div class="anchor-actions">
+        <button class="anchor-btn primary" id="anchorBtn" onclick="broadcastAnchor()">广播上链</button>
+        <button class="anchor-btn secondary" onclick="clearAnchorForm()">清空</button>
+      </div>
+
+      <div class="anchor-result" id="anchorResult"></div>
+
+      <div class="anchor-tip">
+        ⚠️ 私钥仅在浏览器本地用于签名，不会上传任何服务器。数据将写入 TRON 主网交易 memo，永久可查。
+      </div>
+    </div>
+  </div>
+
   <!-- Contract cards -->
   <div class="card-list" id="cardList"></div>
 
@@ -387,6 +558,34 @@
       </a>
     </div>
   </div>
+
+  <!-- 交易记录查询卡片 -->
+  <div class="txquery-card">
+    <div class="txquery-header">
+      <div class="txquery-icon">🔍</div>
+      <h3>链上交易记录查询</h3>
+    </div>
+
+    <div class="txquery-form">
+      <input type="text" id="txQueryAddr" placeholder="输入 TRON 地址查询交易记录"
+             value="TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9">
+      <button id="txQueryBtn" onclick="queryTransactions()">查询</button>
+    </div>
+
+    <div class="txquery-filter" id="txQueryFilter" style="display:none;">
+      <input type="text" id="txKeyword" placeholder="关键字筛选（标题/哈希/memo）" oninput="filterTxList()">
+      <select id="txTypeFilter" onchange="filterTxList()" style="padding:8px 12px;border-radius:8px;border:1px solid #e8e0cc;font-size:12px;outline:none;">
+        <option value="all">全部类型</option>
+        <option value="trx">TRX 转账</option>
+        <option value="usdt">USDT 转账</option>
+        <option value="other">其他</option>
+      </select>
+    </div>
+
+    <div class="txquery-list" id="txList">
+      <div class="tx-empty">输入地址后点击「查询」获取链上交易记录</div>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast">已复制到剪贴板</div>
@@ -427,6 +626,11 @@ const contracts = [
 
 const SIGNER = "TF65UqeFNN5YN75GeDfs9Nfc7LekL8eik9";
 let currentFilter = 'all';
+
+// 全局错误捕获（调试用）
+window.addEventListener('error', function(e) {
+  console.error('全局错误:', e.message);
+});
 
 function renderCards(list) {
   const container = document.getElementById('cardList');
@@ -491,11 +695,31 @@ function setFilter(el, type) {
 }
 
 function copyText(text) {
-  navigator.clipboard.writeText(text).then(() => {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1500);
+    }).catch(() => {
+      // 降级方案
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
     const toast = document.getElementById('toast');
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 1500);
-  });
+  }
 }
 
 // ============================================================
@@ -603,6 +827,314 @@ async function syncUsdtBalance() {
 window.addEventListener('load', () => {
   syncUsdtBalance();
 });
+
+// ============================================================
+// 上链存证广播 —— 浏览器端用 TronWeb 构建并广播交易
+// ============================================================
+const USDT_CONTRACT_BROADCAST = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+
+async function broadcastAnchor() {
+  const title = document.getElementById('anchorTitle').value.trim();
+  const data = document.getElementById('anchorData').value.trim();
+  const toAddr = document.getElementById('anchorTo').value.trim();
+  const amount = parseFloat(document.getElementById('anchorAmount').value) || 0;
+  const privKey = document.getElementById('anchorKey').value.trim();
+  const btn = document.getElementById('anchorBtn');
+  const resultDiv = document.getElementById('anchorResult');
+
+  if (!data) { showToast('请输入存证内容'); return; }
+  if (!toAddr) { showToast('请输入接收地址'); return; }
+  if (!privKey) { showToast('请输入私钥'); return; }
+  if (!/^[0-9a-fA-F]{64}$/.test(privKey)) {
+    showToast('私钥格式无效（需 64 位 hex）'); return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '广播中…';
+  resultDiv.className = 'anchor-result show';
+  resultDiv.innerHTML = '<span style="color:#f39c12;">步骤1: 初始化 TronWeb…</span>';
+
+  try {
+    if (typeof TronWeb === 'undefined') {
+      throw new Error('TronWeb 库未加载，请检查网络连接');
+    }
+
+    // 初始化 TronWeb（主网）
+    const tronWeb = new TronWeb({
+      fullHost: 'https://api.trongrid.io',
+      privateKey: privKey,
+    });
+    resultDiv.innerHTML = '<span style="color:#f39c12;">步骤2: 构建交易（带 memo）…</span>';
+
+    const from = tronWeb.defaultAddress.base58;
+    const amountSun = Math.floor(amount * 1e6);
+
+    // 构造 memo
+    const memoObj = {
+      title: title || '未命名存证',
+      data: data,
+      ts: Math.floor(Date.now() / 1000),
+    };
+    const memoStr = JSON.stringify(memoObj);
+
+    // 构建带 memo 的 TRX 转账交易
+    resultDiv.innerHTML = '<span style="color:#f39c12;">步骤2: 构建交易（带 memo）…</span>';
+
+    // 尝试多种方式添加 memo
+    let tx;
+    let memoAdded = false;
+
+    // 方式1: sendTrx with memo option
+    try {
+      tx = await tronWeb.transactionBuilder.sendTrx(toAddr, amountSun, { memo: memoStr });
+      if (tx.raw_data && tx.raw_data.data) memoAdded = true;
+    } catch(e) {}
+
+    // 方式2: sendTrx with data option (hex)
+    if (!memoAdded) {
+      try {
+        const encoder = new TextEncoder();
+        const bytes = encoder.encode(memoStr);
+        let memoHex = '';
+        for (const b of bytes) memoHex += b.toString(16).padStart(2, '0');
+        tx = await tronWeb.transactionBuilder.sendTrx(toAddr, amountSun, { data: memoHex });
+        if (tx.raw_data && tx.raw_data.data) memoAdded = true;
+      } catch(e) {}
+    }
+
+    // 方式3: addUpdateData (带超时)
+    if (!memoAdded) {
+      try {
+        tx = await tronWeb.transactionBuilder.sendTrx(toAddr, amountSun);
+        const addPromise = tronWeb.transactionBuilder.addUpdateData(tx, memoStr, 'utf8');
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
+        const txWithMemo = await Promise.race([addPromise, timeoutPromise]);
+        Object.assign(tx, txWithMemo);
+        if (tx.raw_data && tx.raw_data.data) memoAdded = true;
+      } catch(e) {
+        // addUpdateData 失败，用无 memo 交易
+      }
+    }
+
+    // 如果还没有 memo，用无 memo 交易
+    if (!tx) {
+      tx = await tronWeb.transactionBuilder.sendTrx(toAddr, amountSun);
+    }
+
+    resultDiv.innerHTML = '<span style="color:#f39c12;">步骤4: 签名交易…</span>' + (memoAdded ? ' (memo已添加)' : ' (无memo)');
+
+    const signed = await tronWeb.trx.sign(tx);
+    resultDiv.innerHTML = '<span style="color:#f39c12;">步骤5: 广播到波场主网…</span>';
+
+    const result = await tronWeb.trx.sendRawTransaction(signed);
+
+    if (result.result) {
+      const txid = signed.txID;
+      resultDiv.innerHTML =
+        '<div class="ok">✅ 广播成功！交易已写入波场主网</div>' +
+        '<div>发送方: ' + from + '</div>' +
+        '<div>接收方: ' + toAddr + '</div>' +
+        '<div>转账金额: ' + amount + ' TRX</div>' +
+        '<div>存证数据长度: ' + memoStr.length + ' 字节</div>' +
+        '<div class="txid">' + txid + '</div>' +
+        '<div><a href="https://tronscan.org/#/transaction/' + txid + '" target="_blank" style="color:#d4a017;">在 TronScan 查看交易 ↗</a></div>';
+      showToast('上链成功！');
+    } else {
+      throw new Error('广播失败: ' + JSON.stringify(result));
+    }
+  } catch (e) {
+    console.error(e);
+    const errMsg = e.message || e.toString() || JSON.stringify(e);
+    resultDiv.innerHTML = '<div class="err">❌ 广播失败</div><div style="color:#fff;word-break:break-all;font-size:11px;">' + escapeHtml(errMsg) + '</div>';
+    showToast('广播失败');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '广播上链';
+  }
+}
+
+function clearAnchorForm() {
+  document.getElementById('anchorTitle').value = '';
+  document.getElementById('anchorData').value = '';
+  document.getElementById('anchorKey').value = '';
+  document.getElementById('anchorResult').className = 'anchor-result';
+  document.getElementById('anchorResult').innerHTML = '';
+}
+
+// ============================================================
+// 交易记录查询 —— 从 TronGrid 拉取地址交易并解析 memo
+// ============================================================
+let allTxList = [];
+
+async function queryTransactions() {
+  const addr = document.getElementById('txQueryAddr').value.trim();
+  const btn = document.getElementById('txQueryBtn');
+  const listDiv = document.getElementById('txList');
+  const filterDiv = document.getElementById('txQueryFilter');
+
+  listDiv.innerHTML = '<div class="tx-empty">步骤1: 验证地址...</div>';
+
+  if (!addr) { showToast('请输入地址'); return; }
+  if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(addr)) {
+    showToast('地址格式无效'); return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '查询中…';
+  listDiv.innerHTML = '<div class="tx-empty">步骤2: 从波场主网拉取交易...</div>';
+
+  try {
+    const url = 'https://api.trongrid.io/v1/accounts/' + encodeURIComponent(addr) + '/transactions?limit=200&order_by=block_timestamp,desc';
+    const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    listDiv.innerHTML = '<div class="tx-empty">步骤3: 解析响应数据...</div>';
+    const data = await resp.json();
+
+    if (!data.success || !data.data) {
+      listDiv.innerHTML = '<div class="tx-empty">查询失败：' + (data.error || '未知错误') + '</div>';
+      return;
+    }
+
+    listDiv.innerHTML = '<div class="tx-empty">步骤4: 解析 ' + data.data.length + ' 条交易...</div>';
+    allTxList = data.data.map(tx => parseTransaction(tx, addr));
+    filterDiv.style.display = 'flex';
+    renderTxList(allTxList);
+
+    if (allTxList.length === 0) {
+      listDiv.innerHTML = '<div class="tx-empty">该地址暂无交易记录</div>';
+      filterDiv.style.display = 'none';
+    }
+  } catch (e) {
+    listDiv.innerHTML = '<div class="tx-empty">查询失败：' + e.message + '<br>' + e.stack + '</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '查询';
+  }
+}
+
+function parseTransaction(tx, ownerAddr) {
+  const raw = tx.raw_data || {};
+  const contracts = raw.contract || [];
+  let type = 'other';
+  let typeLabel = '其他';
+  let amount = '';
+  let fromAddr = '';
+  let toAddr = '';
+  let memo = '';
+
+  for (const c of contracts) {
+    const param = c.parameter.value || {};
+    if (c.type === 'TransferContract') {
+      type = 'trx'; typeLabel = 'TRX 转账';
+      amount = (param.amount / 1e6).toFixed(6) + ' TRX';
+      fromAddr = param.owner_address;
+      toAddr = param.to_address;
+    } else if (c.type === 'TriggerSmartContract') {
+      const ca = param.contract_address || '';
+      // 判断是否 USDT 合约 (TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t -> 41a614f803b6fd780986a42c78ec9c7f77e6a64335)
+      if (ca === '41a614f803b6fd780986a42c78ec9c7f77e6a64335' ||
+          ca.toLowerCase().includes('a614f803b6fd780986a42c78ec9c7f77e6a64335')) {
+        type = 'usdt'; typeLabel = 'USDT 转账';
+        const callData = param.data || '';
+        if (callData.startsWith('a9059cbb')) { // transfer(address,uint256)
+          toAddr = '41' + callData.slice(32, 72);
+          try {
+            amount = (BigInt('0x' + callData.slice(72, 136)) / BigInt(1e6)).toString() + ' USDT';
+          } catch(e) { amount = '解析失败'; }
+        } else if (callData.startsWith('095ea7b3')) {
+          typeLabel = 'USDT 授权';
+        }
+      }
+      fromAddr = param.owner_address;
+    }
+  }
+
+  // 解析 memo：memo 存储在 raw_data.data 中，hex 编码
+  if (raw.data) {
+    try {
+      let hexStr = String(raw.data);
+      if (hexStr.startsWith('0x')) hexStr = hexStr.slice(2);
+      // 移除可能的 0x 前缀并确保偶数长度
+      if (hexStr.length % 2 !== 0) hexStr = '0' + hexStr;
+      const bytes = [];
+      for (let i = 0; i < hexStr.length; i += 2) {
+        bytes.push(parseInt(hexStr.substr(i, 2), 16));
+      }
+      // 用 TextDecoder 解码 UTF-8
+      memo = new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+    } catch(e) {
+      memo = '(二进制数据: ' + String(raw.data).slice(0, 40) + ')';
+    }
+  }
+
+  // 解析时间
+  const ts = tx.block_timestamp || raw.timestamp;
+  const time = ts ? new Date(ts).toLocaleString('zh-CN') : '待确认';
+
+  // hex 地址转 base58
+  const toBase58 = (h) => { try { return TronWeb ? TronWeb.address.fromHex(h) : h; } catch(e) { return h; } };
+
+  return {
+    txID: tx.txID,
+    type, typeLabel,
+    amount,
+    from: fromAddr ? toBase58(fromAddr) : '',
+    to: toAddr ? toBase58(toAddr) : '',
+    time,
+    memo,
+    block: tx.blockNumber || '待确认',
+    status: (tx.ret && tx.ret[0] && tx.ret[0].contractRet) || '未知',
+  };
+}
+
+function renderTxList(list) {
+  const listDiv = document.getElementById('txList');
+  if (list.length === 0) {
+    listDiv.innerHTML = '<div class="tx-empty">没有匹配的交易记录</div>';
+    return;
+  }
+  listDiv.innerHTML = list.map(tx => {
+    const memoDisplay = tx.memo ? escapeHtml(tx.memo).slice(0, 300) : '<span style="color:#aaa;">(无 memo)</span>';
+    return `
+    <div class="tx-item" data-type="${tx.type}">
+      <div class="tx-item-top">
+        <span class="tx-item-type ${tx.type}">${tx.typeLabel}</span>
+        <span class="tx-item-time">${tx.time}</span>
+      </div>
+      ${tx.amount ? '<div style="font-size:12px;color:#2c2c2c;font-weight:600;margin-bottom:4px;">' + tx.amount + '</div>' : ''}
+      <div class="tx-item-hash">${tx.txID.slice(0,40)}…</div>
+      <div class="tx-item-memo">📝 ${memoDisplay}</div>
+      <div style="margin-top:6px;">
+        <a href="https://tronscan.org/#/transaction/${tx.txID}" target="_blank" style="font-size:11px;color:#b8860b;text-decoration:none;">在 TronScan 查看 ↗</a>
+        <button class="copy-btn" style="margin-left:8px;" onclick="copyText('${tx.txID}')">复制哈希</button>
+      </div>
+    </div>
+  `}).join('');
+}
+
+function filterTxList() {
+  const kw = document.getElementById('txKeyword').value.toLowerCase();
+  const typeFilter = document.getElementById('txTypeFilter').value;
+  let filtered = allTxList;
+  if (typeFilter !== 'all') {
+    filtered = filtered.filter(t => t.type === typeFilter);
+  }
+  if (kw) {
+    filtered = filtered.filter(t =>
+      t.txID.toLowerCase().includes(kw) ||
+      t.memo.toLowerCase().includes(kw) ||
+      t.typeLabel.toLowerCase().includes(kw) ||
+      (t.from && t.from.toLowerCase().includes(kw)) ||
+      (t.to && t.to.toLowerCase().includes(kw))
+    );
+  }
+  renderTxList(filtered);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
 
 renderCards(contracts);
 </script>
