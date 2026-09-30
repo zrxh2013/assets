@@ -132,6 +132,8 @@
             <div>支付方式：<span id="successMethod">—</span></div>
             <div>支付时间：<span id="successTime">—</span></div>
           </div>
+          <a class="alipay-btn" id="viewReceiptBtn" href="#" style="display:block; text-decoration:none; margin-top:16px;">查看电子凭证</a>
+          <button class="alipay-btn alipay-btn-ghost" id="doneBtn" style="margin-top:8px;">完成</button>
         </div>
       </div>
     {% else %}
@@ -268,6 +270,7 @@ document.getElementById('confirmPayBtn').addEventListener('click', async () => {
       document.getElementById('successAlipayNo').textContent = data.alipay_trade_no;
       document.getElementById('successMethod').textContent = PAY_METHOD_NAMES[payMethod] || payMethod;
       document.getElementById('successTime').textContent = data.paid_at;
+      document.getElementById('viewReceiptBtn').href = '/pay/' + token + '/receipt?trade_no=' + encodeURIComponent(data.trade_no);
     } else {
       alert(data.msg || '支付失败');
       document.getElementById('payingWrap').style.display = 'none';
@@ -280,6 +283,11 @@ document.getElementById('confirmPayBtn').addEventListener('click', async () => {
   }
   btn.disabled = false;
   btn.textContent = '确认支付';
+});
+
+// 完成按钮：回到付款页（可继续付款）
+document.getElementById('doneBtn').addEventListener('click', () => {
+  location.reload();
 });
 </script>
 {% endblock %}

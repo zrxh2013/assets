@@ -65,11 +65,14 @@
                   <span class="badge orange">待支付</span>
                 {% elif r.status == 'refunded' %}
                   <span class="badge gray">已退款</span>
+                {% elif r.status == 'closed' %}
+                  <span class="badge gray">已关闭</span>
                 {% else %}
                   <span class="badge red">{{ order_status.get(r.status, r.status) }}</span>
                 {% endif %}
               </td>
               <td>
+                <button class="btn btn-sm detail-btn" data-trade-no="{{ r.trade_no }}">详情</button>
                 {% if r.status == 'paid' %}
                   <button class="btn btn-sm btn-danger refund-btn" data-trade-no="{{ r.trade_no }}">退款</button>
                 {% elif r.status == 'refunded' %}
@@ -89,7 +92,97 @@
     </div>
   </div>
 </div>
+
+<!-- 订单详情弹窗 -->
+<div class="modal-mask" id="detailModal">
+  <div class="modal" style="max-width:520px;">
+    <h3>订单详情</h3>
+    <div id="detailBody" style="font-size:13px; line-height:1.8;">
+      <div style="text-align:center; color:var(--text-mute); padding:20px;">加载中...</div>
+    </div>
+    <button class="btn" onclick="document.getElementById('detailModal').classList.remove('show')" style="width:100%; margin-top:14px;">关闭</button>
+  </div>
+</div>
+
 <script>
+// 订单详情
+document.querySelectorAll('.detail-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const tradeNo = btn.dataset.tradeNo;
+    const modal = document.getElementById('detailModal');
+    const body = document.getElementById('detailBody');
+    modal.classList.add('show');
+    body.innerHTML = '<div style="text-align:center; color:var(--text-mute); padding:20px;">加载中...</div>';
+    try {
+      const res = await fetch('/merchant/order/' + tradeNo);
+      const data = await res.json();
+      if (data.ok) {
+        const d = data.data;
+        const statusBadge = {
+          'paid': '<span class="badge green">已支付</span>',
+          'pending': '<span class="badge orange">待支付</span>',
+          'refunded': '<span class="badge gray">已退款</span>',
+          'closed': '<span class="badge gray">已关闭</span>',
+          'failed': '<span class="badge red">支付失败</span>',
+        }[d.status] || d.status_text;
+        body.innerHTML = `
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+            <span style="color:var(--text-mute);">交易单号</span>
+            <span style="font-family:monospace; font-size:12px;">${d.trade_no}</span>
+          </div>
+          ${d.alipay_trade_no ? `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;"><span style="color:var(--text-mute);">支付宝交易号</span><span style="font-family:monospace; font-size:12px;">${d.alipay_trade_no}</span></div>` : ''}
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+            <span style="color:var(--text-mute);">金额</span><span style="font-weight:600; color:var(--red);">¥${parseFloat(d.amount).toFixed(2)}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+            <span style="color:var(--text-mute);">付款人</span><span>${d.buyer}</span>
+          </div>
+          ${d.buyer_contact ? `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;"><span style="color:var(--text-mute);">联系电话</span><span>${d.buyer_contact}</span></div>` : ''}
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+            <span style="color:var(--text-mute);">支付方式</span><span>${d.pay_method_text || '—'}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+            <span style="color:var(--text-mute);">留言</span><span>${d.note || '—'}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+            <span style="color:var(--text-mute);">码备注</span><span>${d.code_note || '—'}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+            <span style="color:var(--text-mute);">下单时间</span><span>${d.created_at}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+            <span style="color:var(--text-mute);">支付时间</span><span>${d.paid_at || '—'}</span>
+          </div>
+          ${d.status === 'refunded' ? `
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0; color:var(--red);">
+              <span>退款金额</span><span>¥${parseFloat(d.refund_amount).toFixed(2)}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0; color:var(--red);">
+              <span>退款时间</span><span>${d.refund_at}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+              <span style="color:var(--text-mute);">退款原因</span><span>${d.refund_reason || '—'}</span>
+            </div>` : ''}
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+            <span style="color:var(--text-mute);">客户端IP</span><span style="font-family:monospace; font-size:12px;">${d.client_ip || '—'}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0;">
+            <span style="color:var(--text-mute);">订单状态</span><span>${statusBadge}</span>
+          </div>
+        `;
+      } else {
+        body.innerHTML = '<div style="text-align:center; color:var(--red); padding:20px;">' + (data.msg || '加载失败') + '</div>';
+      }
+    } catch (e) {
+      body.innerHTML = '<div style="text-align:center; color:var(--red); padding:20px;">网络错误</div>';
+    }
+  });
+});
+
+document.getElementById('detailModal').addEventListener('click', (e) => {
+  if (e.target.id === 'detailModal') e.target.classList.remove('show');
+});
+
 document.querySelectorAll('.refund-btn').forEach(btn => {
   btn.addEventListener('click', async () => {
     const tradeNo = btn.dataset.tradeNo;

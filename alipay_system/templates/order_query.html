@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}订单查询 - 支付宝收款码系统{% endblock %}
+{% block body %}
+<div class="pay-page">
+  <div class="pay-card" style="max-width:520px;">
+    <div style="text-align:center; margin-bottom:18px;">
+      <div style="font-size:22px; font-weight:600;">订单查询</div>
+      <div style="font-size:13px; color:var(--text-mute); margin-top:4px;">输入交易单号查询支付状态</div>
+    </div>
+
+    <form method="post" style="display:flex; gap:8px;">
+      <input class="form-control" type="text" name="trade_no" value="{{ trade_no }}"
+             placeholder="请输入交易单号（如 20260807...）" style="flex:1;">
+      <button class="alipay-btn" type="submit">查询</button>
+    </form>
+
+    {% if request.method == 'POST' and trade_no %}
+      <div style="margin-top:18px;">
+        {% if not payment %}
+          <div class="pay-error" style="padding:16px; text-align:center;">
+            <div class="x">✕</div>
+            <p class="tip">未找到该交易单号的订单</p>
+          </div>
+        {% else %}
+          <div class="receipt-detail">
+            <div class="field-line" style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:13px;">
+              <span style="color:var(--text-mute);">交易单号</span>
+              <span style="font-family:monospace; font-size:12px;">{{ payment.trade_no }}</span>
+            </div>
+            <div class="field-line" style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:13px;">
+              <span style="color:var(--text-mute);">商户</span>
+              <span>{{ merchant.merchant_name if merchant else '—' }}</span>
+            </div>
+            <div class="field-line" style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:13px;">
+              <span style="color:var(--text-mute);">金额</span>
+              <span style="font-weight:600; color:var(--red);">{{ payment.amount|money }}</span>
+            </div>
+            <div class="field-line" style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:13px;">
+              <span style="color:var(--text-mute);">支付方式</span>
+              <span>{{ pay_methods.get(payment.pay_method, '—') if payment.pay_method else '—' }}</span>
+            </div>
+            <div class="field-line" style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:13px;">
+              <span style="color:var(--text-mute);">下单时间</span>
+              <span>{{ payment.created_at }}</span>
+            </div>
+            {% if payment.paid_at %}
+            <div class="field-line" style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:13px;">
+              <span style="color:var(--text-mute);">支付时间</span>
+              <span>{{ payment.paid_at }}</span>
+            </div>
+            {% endif %}
+            <div class="field-line" style="display:flex; justify-content:space-between; padding:8px 0; font-size:13px;">
+              <span style="color:var(--text-mute);">状态</span>
+              <span>
+                {% if payment.status == 'paid' %}<span class="badge green">已支付</span>
+                {% elif payment.status == 'pending' %}<span class="badge orange">待支付</span>
+                {% elif payment.status == 'refunded' %}<span class="badge gray">已退款</span>
+                {% elif payment.status == 'closed' %}<span class="badge gray">已关闭</span>
+                {% else %}<span class="badge red">{{ order_status.get(payment.status, payment.status) }}</span>{% endif %}
+              </span>
+            </div>
+          </div>
+          {% if payment.status == 'paid' and payment.code_token %}
+          <a class="alipay-btn" style="display:block; text-align:center; margin-top:14px; text-decoration:none;"
+             href="{{ url_for('pay_receipt', token=payment.code_token, trade_no=payment.trade_no) }}">查看电子凭证</a>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div style="margin-top:20px; text-align:center; font-size:12px; color:var(--text-mute);">
+      <a href="{{ url_for('index') }}" style="color:var(--blue); text-decoration:none;">返回首页</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

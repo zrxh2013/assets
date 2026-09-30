@@ -278,7 +278,11 @@ ORDER_STATUS = {
     "paid": "已支付",
     "failed": "支付失败",
     "refunded": "已退款",
+    "closed": "已关闭",
 }
+
+# 订单超时时间（秒）：pending 订单超过该时间未支付则自动关闭
+ORDER_TIMEOUT_SECONDS = 15 * 60  # 15 分钟
 
 
 def now() -> str:
@@ -287,6 +291,19 @@ def now() -> str:
 
 def today() -> str:
     return datetime.now().strftime("%Y-%m-%d")
+
+
+def close_expired_orders(db) -> int:
+    """将超过 ORDER_TIMEOUT_SECONDS 仍为 pending 的订单关闭，返回关闭数量。"""
+    cutoff = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cur = db.execute(
+        "UPDATE payments SET status='closed' "
+        "WHERE status='pending' "
+        "AND datetime(created_at, '+' || ? || ' seconds') < ?",
+        (ORDER_TIMEOUT_SECONDS, cutoff),
+    )
+    db.commit()
+    return cur.rowcount
 
 
 def login_required(f):
@@ -567,6 +584,7 @@ def codes_qr(cid):
 def records():
     db = get_db()
     m = current_merchant()
+    close_expired_orders(db)
     q = (request.args.get("q") or "").strip()
     date_from = (request.args.get("from") or "").strip()
     date_to = (request.args.get("to") or "").strip()
@@ -620,6 +638,8 @@ def pay(token):
 def pay_create_order(token):
     """买家下单：生成待支付订单，返回 trade_no 供收银台使用。"""
     db = get_db()
+    # 触发超时订单清理
+    close_expired_orders(db)
     c = db.execute("SELECT * FROM codes WHERE token = ?", (token,)).fetchone()
     if not c or c["status"] != "active":
         return jsonify({"ok": False, "msg": "收款码无效"}), 404
@@ -656,6 +676,7 @@ def pay_create_order(token):
 def pay_confirm(token):
     """买家在收银台确认支付：模拟网关扣款，幂等处理（同订单重复支付返回原结果）。"""
     db = get_db()
+    close_expired_orders(db)
     trade_no = (request.form.get("trade_no") or "").strip()
     pay_method = (request.form.get("pay_method") or "balance").strip()
     if pay_method not in PAY_METHODS:
@@ -671,7 +692,7 @@ def pay_confirm(token):
         return jsonify({"ok": True, "trade_no": trade_no,
                         "alipay_trade_no": p["alipay_trade_no"],
                         "amount": p["amount"], "paid_at": p["paid_at"]})
-    if p["status"] in ("failed", "refunded"):
+    if p["status"] in ("failed", "refunded", "closed"):
         return jsonify({"ok": False, "msg": f"订单状态为 {ORDER_STATUS[p['status']]}，无法支付"}), 400
 
     # 模拟网关扣款（真实场景此处调用支付宝 alipay.trade.pay）
@@ -691,13 +712,102 @@ def pay_confirm(token):
 def pay_query(token):
     """查询订单状态（收银台前端轮询用）。"""
     trade_no = (request.args.get("trade_no") or "").strip()
-    p = get_db().execute(
+    db = get_db()
+    close_expired_orders(db)
+    p = db.execute(
         "SELECT trade_no, amount, status, pay_method, paid_at, alipay_trade_no "
         "FROM payments WHERE trade_no = ?", (trade_no,)
     ).fetchone()
     if not p:
         return jsonify({"ok": False, "msg": "订单不存在"}), 404
     return jsonify({"ok": True, "data": dict(p)})
+
+
+@app.route("/pay/<token>/receipt")
+def pay_receipt(token):
+    """买家电子凭证页：展示订单完整信息（支付后可查看）。"""
+    db = get_db()
+    close_expired_orders(db)
+    trade_no = (request.args.get("trade_no") or "").strip()
+    c = db.execute("SELECT * FROM codes WHERE token = ?", (token,)).fetchone()
+    if not c:
+        return render_template("receipt.html", error="收款码不存在",
+                               payment=None, merchant=None, code=None), 404
+    m = db.execute("SELECT * FROM merchants WHERE id = ?", (c["merchant_id"],)).fetchone()
+    p = db.execute(
+        "SELECT * FROM payments WHERE trade_no = ? AND code_id = ?",
+        (trade_no, c["id"]),
+    ).fetchone()
+    if not p:
+        return render_template("receipt.html", error="订单不存在",
+                               payment=None, merchant=m, code=c), 404
+    return render_template("receipt.html", payment=p, merchant=m, code=c,
+                           pay_methods=PAY_METHODS, order_status=ORDER_STATUS, error=None)
+
+
+@app.route("/order/query", methods=["GET", "POST"])
+def order_query():
+    """买家订单查询页：凭交易单号查询支付状态（无需登录）。"""
+    db = get_db()
+    close_expired_orders(db)
+    trade_no = ""
+    p = None
+    merchant = None
+    if request.method == "POST":
+        trade_no = (request.form.get("trade_no") or "").strip()
+        if trade_no:
+            p = db.execute(
+                "SELECT p.*, c.token AS code_token FROM payments p "
+                "LEFT JOIN codes c ON c.id = p.code_id WHERE p.trade_no = ?",
+                (trade_no,),
+            ).fetchone()
+            if p:
+                merchant = db.execute(
+                    "SELECT merchant_name, alipay_account FROM merchants WHERE id = ?",
+                    (p["merchant_id"],),
+                ).fetchone()
+    return render_template("order_query.html", payment=p, merchant=merchant,
+                           trade_no=trade_no, pay_methods=PAY_METHODS,
+                           order_status=ORDER_STATUS)
+
+
+@app.route("/merchant/order/<trade_no>", methods=["GET"])
+@login_required
+def order_detail(trade_no):
+    """商户查看订单详情（JSON）。"""
+    m = current_merchant()
+    db = get_db()
+    p = db.execute(
+        "SELECT p.*, c.note AS code_note, c.amount AS code_amount FROM payments p "
+        "LEFT JOIN codes c ON c.id = p.code_id "
+        "WHERE p.trade_no = ? AND p.merchant_id = ?",
+        (trade_no, m["id"]),
+    ).fetchone()
+    if not p:
+        return jsonify({"ok": False, "msg": "订单不存在"}), 404
+    return jsonify({
+        "ok": True,
+        "data": {
+            "trade_no": p["trade_no"],
+            "alipay_trade_no": p["alipay_trade_no"],
+            "amount": p["amount"],
+            "note": p["note"],
+            "buyer": p["buyer"],
+            "buyer_contact": p["buyer_contact"],
+            "pay_method": p["pay_method"],
+            "pay_method_text": PAY_METHODS.get(p["pay_method"], p["pay_method"]) if p["pay_method"] else "",
+            "status": p["status"],
+            "status_text": ORDER_STATUS.get(p["status"], p["status"]),
+            "created_at": p["created_at"],
+            "paid_at": p["paid_at"],
+            "refund_amount": p["refund_amount"],
+            "refund_at": p["refund_at"],
+            "refund_reason": p["refund_reason"],
+            "client_ip": p["client_ip"],
+            "user_agent": p["user_agent"],
+            "code_note": p["code_note"],
+        }
+    })
 
 
 @app.route("/merchant/order/<trade_no>/refund", methods=["POST"])

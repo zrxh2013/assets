@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}电子凭证 - 支付宝收款码系统{% endblock %}
+{% block body %}
+<div class="pay-page">
+  <div class="pay-card" style="max-width:460px;">
+    {% if error %}
+      <div class="pay-error">
+        <div class="x">✕</div>
+        <h3 style="font-size:18px; margin-bottom:8px;">无法查看</h3>
+        <p class="tip">{{ error }}</p>
+      </div>
+    {% elif payment %}
+      <div class="receipt">
+        <div class="receipt-header">
+          <div class="mer-head" style="margin-bottom:14px;">
+            <div class="av" style="background:{{ merchant.avatar_color }}">{{ merchant.merchant_name|initial }}</div>
+            <div>
+              <div class="name">{{ merchant.merchant_name }}</div>
+              <div class="acc">支付宝账号：{{ merchant.alipay_account }}</div>
+            </div>
+          </div>
+          <div style="text-align:center;">
+            {% if payment.status == 'paid' %}
+              <div class="pay-success" style="padding:0;">
+                <div class="check" style="margin:0 auto 10px;">✓</div>
+                <div class="amt">{{ payment.amount|money }}</div>
+                <p class="tip">支付成功</p>
+              </div>
+            {% elif payment.status == 'refunded' %}
+              <div class="pay-success" style="padding:0;">
+                <div class="check" style="background:#faad14; margin:0 auto 10px;">↺</div>
+                <div class="amt">{{ payment.amount|money }}</div>
+                <p class="tip">已退款</p>
+              </div>
+            {% elif payment.status == 'pending' %}
+              <div style="padding:10px 0;">
+                <div style="font-size:32px; color:#faad14;">⏳</div>
+                <div class="amt" style="margin-top:6px;">{{ payment.amount|money }}</div>
+                <p class="tip">等待支付</p>
+              </div>
+            {% elif payment.status == 'closed' %}
+              <div style="padding:10px 0;">
+                <div style="font-size:32px; color:#8c8c8c;">⊘</div>
+                <div class="amt" style="margin-top:6px; color:#8c8c8c;">{{ payment.amount|money }}</div>
+                <p class="tip">订单已关闭</p>
+              </div>
+            {% else %}
+              <div style="padding:10px 0;">
+                <div style="font-size:32px; color:var(--red);">✕</div>
+                <div class="amt" style="margin-top:6px; color:var(--red);">{{ payment.amount|money }}</div>
+                <p class="tip">{{ order_status.get(payment.status, payment.status) }}</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="receipt-detail">
+          <div class="field-line"><span class="k">交易单号</span><span class="v" style="font-family:monospace; font-size:12px;">{{ payment.trade_no }}</span></div>
+          {% if payment.alipay_trade_no %}
+          <div class="field-line"><span class="k">支付宝交易号</span><span class="v" style="font-family:monospace; font-size:12px;">{{ payment.alipay_trade_no }}</span></div>
+          {% endif %}
+          <div class="field-line"><span class="k">商户名称</span><span class="v">{{ merchant.merchant_name }}</span></div>
+          <div class="field-line"><span class="k">收款备注</span><span class="v">{{ code.note or '—' }}</span></div>
+          <div class="field-line"><span class="k">付款人</span><span class="v">{{ payment.buyer }}</span></div>
+          {% if payment.note %}
+          <div class="field-line"><span class="k">留言</span><span class="v">{{ payment.note }}</span></div>
+          {% endif %}
+          {% if payment.pay_method %}
+          <div class="field-line"><span class="k">支付方式</span><span class="v">{{ pay_methods.get(payment.pay_method, payment.pay_method) }}</span></div>
+          {% endif %}
+          <div class="field-line"><span class="k">下单时间</span><span class="v">{{ payment.created_at }}</span></div>
+          {% if payment.paid_at %}
+          <div class="field-line"><span class="k">支付时间</span><span class="v">{{ payment.paid_at }}</span></div>
+          {% endif %}
+          {% if payment.status == 'refunded' %}
+          <div class="field-line" style="color:var(--red);"><span class="k">退款金额</span><span class="v">{{ payment.refund_amount|money }}</span></div>
+          <div class="field-line" style="color:var(--red);"><span class="k">退款时间</span><span class="v">{{ payment.refund_at }}</span></div>
+          <div class="field-line"><span class="k">退款原因</span><span class="v">{{ payment.refund_reason or '—' }}</span></div>
+          {% endif %}
+          <div class="field-line"><span class="k">订单状态</span><span class="v">
+            {% if payment.status == 'paid' %}<span class="badge green">已支付</span>
+            {% elif payment.status == 'pending' %}<span class="badge orange">待支付</span>
+            {% elif payment.status == 'refunded' %}<span class="badge gray">已退款</span>
+            {% elif payment.status == 'closed' %}<span class="badge gray">已关闭</span>
+            {% else %}<span class="badge red">{{ order_status.get(payment.status, payment.status) }}</span>{% endif %}
+          </span></div>
+        </div>
+
+        <div style="margin-top:16px; text-align:center; font-size:11px; color:var(--text-mute);">
+          本凭证由系统生成，仅供参考
+        </div>
+        <button class="alipay-btn" onclick="window.print()" style="margin-top:12px;">打印 / 保存凭证</button>
+        <button class="alipay-btn alipay-btn-ghost" onclick="location.href='{{ url_for('pay', token=code.token) }}'" style="margin-top:8px;">返回付款页</button>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<style>
+.receipt-detail{ margin-top:14px; border-top:1px dashed #e8e8e8; padding-top:14px; }
+.receipt-detail .field-line{ display:flex; justify-content:space-between; padding:7px 0; font-size:13px; border-bottom:1px solid #f5f5f5; }
+.receipt-detail .field-line .k{ color:var(--text-mute); }
+.receipt-detail .field-line .v{ color:var(--text); text-align:right; max-width:60%; word-break:break-all; }
+@media print{
+  .alipay-btn{ display:none !important; }
+  .pay-card{ box-shadow:none !important; }
+}
+</style>
+{% endblock %}
