@@ -172,6 +172,88 @@
   }
   .btn-tronscan:hover { opacity: 0.9; }
 
+  /* USDT Balance card */
+  .balance-card {
+    margin: 16px 16px 0;
+    background: linear-gradient(135deg, #0d2818 0%, #1a3d2e 100%);
+    border-radius: 16px; padding: 20px; color: #fff;
+    position: relative; overflow: hidden;
+    border: 1px solid rgba(46,204,113,0.2);
+  }
+  .balance-card::before {
+    content: ''; position: absolute; top: -50px; right: -50px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(46,204,113,0.18) 0%, transparent 70%);
+  }
+  .balance-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; position: relative;
+  }
+  .balance-title { display: flex; align-items: center; gap: 10px; }
+  .balance-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #26a17b;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: bold; color: #fff;
+  }
+  .balance-title h3 { font-size: 15px; font-weight: 600; }
+  .balance-network {
+    font-size: 11px; color: #2ecc71; background: rgba(46,204,113,0.15);
+    padding: 3px 10px; border-radius: 10px;
+  }
+  .balance-amount {
+    display: flex; align-items: baseline; gap: 8px; margin: 12px 0 6px;
+    position: relative;
+  }
+  .balance-amount .num {
+    font-size: 36px; font-weight: 700; color: #2ecc71;
+    font-family: "SF Mono", Consolas, monospace;
+  }
+  .balance-amount .unit { font-size: 16px; color: rgba(255,255,255,0.6); }
+  .balance-sub {
+    font-size: 12px; color: rgba(255,255,255,0.5); position: relative;
+  }
+  .balance-rows { margin-top: 16px; position: relative; }
+  .balance-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .balance-row:last-of-type { border-bottom: none; }
+  .balance-label { font-size: 12px; color: rgba(255,255,255,0.5); }
+  .balance-val { font-size: 13px; color: #fff; font-weight: 500; text-align: right; }
+  .balance-val.hash { font-family: "SF Mono", Consolas, monospace; font-size: 11px; }
+  .balance-val.green { color: #2ecc71; }
+
+  .balance-addr-input {
+    display: flex; gap: 8px; margin-top: 16px; position: relative;
+  }
+  .balance-addr-input input {
+    flex: 1; padding: 10px 14px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.25); color: #fff;
+    font-size: 12px; font-family: "SF Mono", Consolas, monospace;
+    outline: none;
+  }
+  .balance-addr-input input:focus { border-color: #2ecc71; }
+  .balance-addr-input button {
+    padding: 10px 18px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .balance-addr-input button:hover { opacity: 0.9; }
+  .balance-addr-input button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .balance-footer {
+    margin-top: 14px; display: flex; justify-content: space-between;
+    align-items: center; position: relative;
+  }
+  .balance-sync-info { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .balance-sync-info .syncing { color: #f39c12; }
+  .balance-footer a {
+    font-size: 12px; color: #2ecc71; text-decoration: none;
+  }
+  .balance-footer a:hover { text-decoration: underline; }
+
   /* Toast */
   .toast {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
@@ -216,6 +298,49 @@
     <div class="filter-tab active" onclick="setFilter(this,'all')">全部合同</div>
     <div class="filter-tab" onclick="setFilter(this,'2023.04')">2023.04 批次</div>
     <div class="filter-tab" onclick="setFilter(this,'2023.06')">2023.06 批次</div>
+  </div>
+
+  <!-- USDT Balance Sync Card (TRON Mainnet) -->
+  <div class="balance-card">
+    <div class="balance-header">
+      <div class="balance-title">
+        <div class="balance-icon">₮</div>
+        <h3>USDT 资产余额 · 波场主网</h3>
+      </div>
+      <span class="balance-network">TRON Mainnet</span>
+    </div>
+
+    <div class="balance-amount">
+      <span class="num" id="usdtAmount">--</span>
+      <span class="unit">USDT</span>
+    </div>
+    <div class="balance-sub" id="usdtSub">正在从波场主网同步余额…</div>
+
+    <div class="balance-rows">
+      <div class="balance-row">
+        <span class="balance-label">TRX 余额</span>
+        <span class="balance-val" id="trxAmount">--</span>
+      </div>
+      <div class="balance-row">
+        <span class="balance-label">USDT 合约</span>
+        <span class="balance-val hash" id="usdtContract">TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</span>
+      </div>
+      <div class="balance-row">
+        <span class="balance-label">查询地址</span>
+        <span class="balance-val hash" id="queryAddr">--</span>
+      </div>
+    </div>
+
+    <div class="balance-addr-input">
+      <input type="text" id="addrInput" placeholder="输入 TRON 地址查询余额"
+             value="TRGLk7snkeWuVDvH6vQHVGuhP7716uWpHv">
+      <button id="syncBtn" onclick="syncUsdtBalance()">同步余额</button>
+    </div>
+
+    <div class="balance-footer">
+      <span class="balance-sync-info" id="syncInfo">数据来源：TronGrid 官方主网节点</span>
+      <a href="#" id="tronscanLink" target="_blank">在 TronScan 查看 ↗</a>
+    </div>
   </div>
 
   <!-- Contract cards -->
@@ -372,6 +497,112 @@ function copyText(text) {
     setTimeout(() => toast.classList.remove('show'), 1500);
   });
 }
+
+// ============================================================
+// USDT 余额同步 —— 直接调用波场主网 TronGrid 官方节点 API
+// ============================================================
+const USDT_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"; // 官方 USDT (TRC20) 合约地址
+const TRONGRID_API = "https://api.trongrid.io/v1/accounts/";
+
+function formatNumber(n, decimals = 6) {
+  if (n === null || n === undefined || isNaN(n)) return '0.000000';
+  return Number(n).toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+async function syncUsdtBalance() {
+  const addrInput = document.getElementById('addrInput');
+  const btn = document.getElementById('syncBtn');
+  const addr = addrInput.value.trim();
+
+  if (!addr) {
+    showToast('请输入 TRON 地址');
+    return;
+  }
+  // 简单校验：TRON 主网地址以 T 开头，长度 34
+  if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(addr)) {
+    showToast('地址格式无效（需 T 开头的 34 位 TRON 地址）');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '同步中…';
+  document.getElementById('usdtSub').innerHTML = '<span class="syncing">正在从波场主网同步余额…</span>';
+  document.getElementById('usdtAmount').textContent = '...';
+  document.getElementById('trxAmount').textContent = '...';
+
+  try {
+    const resp = await fetch(TRONGRID_API + encodeURIComponent(addr), {
+      headers: { 'Accept': 'application/json' }
+    });
+    const data = await resp.json();
+
+    if (data.success && data.data && data.data.length > 0) {
+      const acc = data.data[0];
+
+      // TRX 余额 (sun → TRX)
+      const trxBalance = (acc.balance || 0) / 1_000_000;
+
+      // USDT 余额 (从 trc20 数组中找到官方 USDT 合约)
+      let usdtRaw = 0;
+      if (Array.isArray(acc.trc20)) {
+        for (const token of acc.trc20) {
+          if (token[USDT_CONTRACT] !== undefined) {
+            usdtRaw = Number(token[USDT_CONTRACT]);
+            break;
+          }
+        }
+      }
+      const usdtBalance = usdtRaw / 1_000_000;
+
+      // 更新 UI
+      document.getElementById('usdtAmount').textContent = formatNumber(usdtBalance);
+      document.getElementById('trxAmount').textContent = formatNumber(trxBalance) + ' TRX';
+      document.getElementById('queryAddr').textContent = addr;
+      document.getElementById('usdtSub').textContent =
+        usdtBalance > 0 ? '已同步波场主网链上真实余额' : '该地址当前无 USDT 持仓';
+
+      const now = new Date().toLocaleTimeString('zh-CN');
+      document.getElementById('syncInfo').textContent =
+        `已同步 · ${now} · TronGrid 官方主网节点`;
+
+      const link = document.getElementById('tronscanLink');
+      link.href = `https://tronscan.org/#/address/${addr}`;
+    } else {
+      // 地址未激活或不存在
+      document.getElementById('usdtAmount').textContent = '0.000000';
+      document.getElementById('trxAmount').textContent = '0.000000 TRX';
+      document.getElementById('queryAddr').textContent = addr;
+      document.getElementById('usdtSub').textContent = '地址未激活（链上无记录）';
+      const now = new Date().toLocaleTimeString('zh-CN');
+      document.getElementById('syncInfo').textContent = `已同步 · ${now}`;
+      document.getElementById('tronscanLink').href = `https://tronscan.org/#/address/${addr}`;
+    }
+  } catch (e) {
+    console.error('USDT 同步失败:', e);
+    document.getElementById('usdtSub').textContent = '同步失败：' + e.message;
+    document.getElementById('usdtAmount').textContent = '--';
+    document.getElementById('trxAmount').textContent = '--';
+    showToast('余额同步失败，请稍后重试');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '同步余额';
+  }
+}
+
+// 页面加载后自动同步默认地址的余额
+window.addEventListener('load', () => {
+  syncUsdtBalance();
+});
 
 renderCards(contracts);
 </script>
