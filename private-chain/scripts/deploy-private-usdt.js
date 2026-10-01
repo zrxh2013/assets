@@ -52,7 +52,7 @@ const artifact = require('../artifacts/contracts/TetherToken.sol/TetherToken.jso
   console.log('name:', name);
   console.log('symbol:', symbol);
   console.log('decimals:', decimals);
-  console.log('totalSupply:', totalSupply.toString(), '(' + (totalSupply / 1e6) + ' USDT)');
+  console.log('totalSupply:', totalSupply.toString(), '(' + (Number(totalSupply.toString()) / 1e6) + ' USDT)');
   console.log('owner:', owner);
 
   // 铸造 10 亿 USDT
@@ -68,8 +68,8 @@ const artifact = require('../artifacts/contracts/TetherToken.sol/TetherToken.jso
   const bal = await contract.balanceOf(FROM).call();
   const ts = await contract.totalSupply().call();
   console.log('\n=== 铸造后 ===');
-  console.log('balanceOf(owner):', bal.toString(), '(' + (bal / 1e6) + ' USDT)');
-  console.log('totalSupply:', ts.toString(), '(' + (ts / 1e6) + ' USDT)');
+  console.log('balanceOf(owner):', bal.toString(), '(' + (Number(bal.toString()) / 1e6) + ' USDT)');
+  console.log('totalSupply:', ts.toString(), '(' + (Number(ts.toString()) / 1e6) + ' USDT)');
 
   // 保存合约信息
   fs.writeFileSync('/tmp/private-usdt-contract.json', JSON.stringify({

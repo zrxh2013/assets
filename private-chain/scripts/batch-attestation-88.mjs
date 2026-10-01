@@ -1,8 +1,10 @@
 // 批量存证广播 - 88受益人确权清算清单
 import { TronWeb } from 'tronweb';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 
 const SENDER_PRIV = '54f1337ee3587d817cd231ab106dbc8c406afdd6106dd942b7024f30b933afa1';
 const tw = new TronWeb({ fullHost: 'https://api.trongrid.io', privateKey: SENDER_PRIV });
+const RESULTS_FILE = '/tmp/attestation-88-results.json';
 
 const beneficiaries = [
   { name: "杨王兴", addr: "TLaGjwhvA8XQYSxFAcAXy7Dvuue9eGYitv", amount: "87455.20", receipt: "REC-0001" },
@@ -115,29 +117,48 @@ async function main() {
   console.log("信托确权清算批量存证广播 — TRON 主网");
   console.log("=".repeat(70));
 
+  // 加载已完成的结果（断点续传）
+  let results = [];
+  const doneSet = new Set();
+  if (existsSync(RESULTS_FILE)) {
+    try {
+      results = JSON.parse(readFileSync(RESULTS_FILE, 'utf8'));
+      results.forEach(r => { if (r.status === 'ok') doneSet.add(r.receipt); });
+      console.log(`📂 已加载历史记录: ${doneSet.size} 条已完成`);
+    } catch (e) {
+      console.log(`⚠️ 历史记录解析失败，重新开始`);
+    }
+  }
+
+  // 过滤已完成的受益人
+  const pending = beneficiaries.filter(b => !doneSet.has(b.receipt));
+
   let bal = await getBalance();
   console.log(`发送方: ${tw.defaultAddress.base58}`);
   console.log(`TRX 余额: ${bal.toFixed(6)}`);
-  console.log(`待存证: ${beneficiaries.length} 条`);
+  console.log(`待存证: ${pending.length} 条 (总 ${beneficiaries.length} 条)`);
   console.log("");
 
-  let ok = 0, fail = 0;
-  const results = [];
+  let ok = doneSet.size, fail = 0;
 
-  for (let i = 0; i < beneficiaries.length; i++) {
-    const b = beneficiaries[i];
-    bal = await getBalance();
+  for (let i = 0; i < pending.length; i++) {
+    const b = pending[i];
+    // 每 10 笔或余额接近下限时检查一次余额
+    if (i % 10 === 0 || bal < 5) {
+      bal = await getBalance();
+    }
     if (bal < 1.2) {
-      console.log(`\n⚠️ TRX 余额不足 (${bal.toFixed(4)} TRX)，停止广播。剩余 ${beneficiaries.length - i} 条未处理。`);
+      console.log(`\n⚠️ TRX 余额不足 (${bal.toFixed(4)} TRX)，停止广播。剩余 ${pending.length - i} 条未处理。`);
       break;
     }
 
-    process.stdout.write(`[${i + 1}/${beneficiaries.length}] ${b.name} (${b.amount} USDT)... `);
+    process.stdout.write(`[${i + 1}/${pending.length}] ${b.name} (${b.amount} USDT)... `);
     try {
       const r = await broadcastAttestation(b);
       if (r.success) {
         console.log(`✅ ${r.txid.slice(0, 16)}...`);
         ok++;
+        bal -= 0.05; // 预估消耗
         results.push({ ...b, txid: r.txid, status: 'ok' });
       } else {
         console.log(`❌ ${r.error.slice(0, 60)}`);
@@ -150,6 +171,8 @@ async function main() {
       fail++;
       results.push({ ...b, error: e.message, status: 'fail' });
     }
+    // 保存进度（每笔）
+    writeFileSync(RESULTS_FILE, JSON.stringify(results, null, 2));
     // 避免触发 rate limit
     await new Promise(r => setTimeout(r, 800));
   }
@@ -157,6 +180,7 @@ async function main() {
   console.log("\n" + "=".repeat(70));
   console.log(`汇总: 成功 ${ok} | 失败 ${fail} | 剩余 ${beneficiaries.length - ok - fail}`);
   console.log(`TRX 余额: ${(await getBalance()).toFixed(6)}`);
+  console.log(`结果已保存: ${RESULTS_FILE}`);
   console.log("=".repeat(70));
 }
 
