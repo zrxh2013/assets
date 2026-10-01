@@ -50,15 +50,12 @@ for (let i = 0; i < remaining.length; i++) {
   const b = remaining[i];
   console.log(`\n[${i + 1}/${remaining.length}] ${b.name} → ${b.address}`);
 
+  // 精简 memo 到 256 字节以内，降低数据存储费
   const memoObj = {
-    title: `${b.name} 信托结算存证`,
-    beneficiary: b.name,
-    amount: b.amount,
-    contractNo: b.contractNo,
-    receiptNo: b.receiptNo,
-    caseNo: b.caseNo,
-    address: b.address,
-    ts: Math.floor(Date.now() / 1000),
+    t: b.name,
+    a: b.amount,
+    c: b.contractNo,
+    r: b.receiptNo,
   };
   const memoStr = JSON.stringify(memoObj);
 
