@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}支付结果{% endblock %}
+{% block body %}
+<div class="pay-page">
+  <div class="pay-card">
+    {% if payment and payment.status == 'paid' %}
+      <div class="pay-success">
+        <div class="check">✓</div>
+        <div class="amt">¥{{ '%.2f'|format(payment.amount) }}</div>
+        <p class="tip">支付成功</p>
+        <p class="tip" style="margin-top:8px;">您已成功完成付款</p>
+        <div style="margin-top:14px; padding:10px 12px; background:#fafafa; border-radius:8px; font-size:11px; color:var(--text-mute); line-height:1.7; text-align:left;">
+          <div>交易单号：{{ payment.trade_no }}</div>
+          <div>支付宝交易号：{{ payment.alipay_trade_no or '—' }}</div>
+          <div>支付时间：{{ payment.paid_at or '—' }}</div>
+        </div>
+        {% if payment.code_id %}
+        <a class="alipay-btn" href="/pay/{{ request.args.get('out_trade_no', '') }}" style="display:block; text-decoration:none; margin-top:16px;">返回付款页</a>
+        {% endif %}
+        <button class="alipay-btn alipay-btn-ghost" onclick="window.close()" style="margin-top:8px;">关闭</button>
+      </div>
+    {% else %}
+      <div style="text-align:center; padding:40px 20px;">
+        <div style="font-size:48px; color:var(--text-mute);">⏳</div>
+        <h3 style="font-size:18px; margin:12px 0 8px;">支付结果确认中</h3>
+        <p class="tip" style="color:var(--text-mute); line-height:1.6;">
+          如果您已完成支付，请稍等片刻。<br>
+          系统正在等待支付宝确认付款结果。
+        </p>
+        {% if trade_no %}
+        <div style="margin-top:14px; padding:10px 12px; background:#fafafa; border-radius:8px; font-size:11px; color:var(--text-mute); line-height:1.6; text-align:left;">
+          <div>交易单号：{{ trade_no }}</div>
+        </div>
+        {% endif %}
+        <a class="alipay-btn" href="/order/query" style="display:block; text-decoration:none; margin-top:16px;">查询订单状态</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<script>
+// 支付成功后 5 秒自动关闭（若是从新窗口打开的）
+{% if payment and payment.status == 'paid' %}
+setTimeout(() => {
+  if (window.opener) {
+    try { window.opener.location.reload(); } catch(e) {}
+    window.close();
+  }
+}, 5000);
+{% endif %}
+</script>
+{% endblock %}

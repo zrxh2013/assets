@@ -26,6 +26,12 @@ from flask import (
     jsonify, send_file, abort, g, Response
 )
 
+# 支付宝 SDK 封装层（模拟模式/真实模式自动切换）
+from alipay_client import (
+    is_real_pay, create_precreate, verify_notify,
+    create_refund, query_trade, get_return_url,
+)
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "alipay.db")
 
@@ -113,9 +119,20 @@ def init_db():
             FOREIGN KEY (merchant_id) REFERENCES merchants(id) ON DELETE CASCADE
         );
 
+        CREATE TABLE IF NOT EXISTS refunds (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            trade_no        TEXT NOT NULL,
+            refund_id       TEXT DEFAULT '',                  -- 支付宝退款流水号
+            refund_amount   REAL NOT NULL,
+            refund_reason   TEXT DEFAULT '',
+            refunded_at     TEXT NOT NULL,
+            FOREIGN KEY (trade_no) REFERENCES payments(trade_no)
+        );
+
         CREATE INDEX IF NOT EXISTS idx_payments_merchant ON payments(merchant_id);
         CREATE INDEX IF NOT EXISTS idx_payments_paid_at ON payments(paid_at);
         CREATE INDEX IF NOT EXISTS idx_codes_merchant ON codes(merchant_id);
+        CREATE INDEX IF NOT EXISTS idx_refunds_trade ON refunds(trade_no);
         """
     )
     # 兼容旧表：补充新增字段（CREATE TABLE IF NOT EXISTS 不会更新已有表结构）
@@ -640,12 +657,13 @@ def pay(token):
     m = db.execute(
         "SELECT * FROM merchants WHERE id = ?", (c["merchant_id"],)
     ).fetchone()
-    return render_template("pay.html", code=c, merchant=m, error=None)
+    return render_template("pay.html", code=c, merchant=m, error=None,
+                           real_pay=is_real_pay())
 
 
 @app.route("/pay/<token>/order", methods=["POST"])
 def pay_create_order(token):
-    """买家下单：生成待支付订单，返回 trade_no 供收银台使用。"""
+    """买家下单：生成待支付订单，返回 trade_no（真实模式额外返回支付宝二维码链接）。"""
     db = get_db()
     # 触发超时订单清理
     close_expired_orders(db)
@@ -678,6 +696,17 @@ def pay_create_order(token):
          request.headers.get("User-Agent", "")[:200]),
     )
     db.commit()
+
+    # 真实支付宝模式：调预下单生成扫码链接
+    if is_real_pay():
+        subject = note or c["note"] or "收款码支付"
+        pre = create_precreate(trade_no, amount, subject)
+        if not pre["ok"]:
+            return jsonify({"ok": False, "msg": f"支付宝下单失败: {pre['msg']}"}), 500
+        return jsonify({"ok": True, "trade_no": trade_no, "amount": amount,
+                        "qr_url": pre["qr_url"], "real_pay": True})
+
+    # 模拟模式：仅返回订单号，前端走本地收银台
     return jsonify({"ok": True, "trade_no": trade_no, "amount": amount})
 
 
@@ -730,6 +759,60 @@ def pay_query(token):
     if not p:
         return jsonify({"ok": False, "msg": "订单不存在"}), 404
     return jsonify({"ok": True, "data": dict(p)})
+
+
+@app.route("/pay/notify", methods=["POST"])
+def pay_notify():
+    """支付宝异步通知回调 —— 真实支付模式下的核心安全环节。
+
+    支付宝在买家支付成功后异步 POST 到此地址，服务端验签后更新订单状态。
+    必须返回 "success"（非 200 状态码），否则支付宝会重试。
+    """
+    if not is_real_pay():
+        return "fail"
+
+    data = request.form.to_dict()
+    signature = data.pop("sign", "")
+    data.pop("sign_type", "")
+
+    # 验签：确认请求确实来自支付宝
+    if not verify_notify(data, signature):
+        return "fail"
+
+    trade_no = data.get("out_trade_no", "")
+    trade_status = data.get("trade_status", "")
+    alipay_trade_no = data.get("trade_no", "")
+
+    # 只处理交易成功的通知
+    if trade_status in ("TRADE_SUCCESS", "TRADE_FINISHED"):
+        db = get_db()
+        p = db.execute(
+            "SELECT * FROM payments WHERE trade_no=?", (trade_no,)
+        ).fetchone()
+        if p and p["status"] == "pending":
+            db.execute(
+                "UPDATE payments SET status='paid', alipay_trade_no=?, "
+                "paid_at=?, pay_method='alipay' WHERE trade_no=? AND status='pending'",
+                (alipay_trade_no, now(), trade_no),
+            )
+            db.commit()
+
+    return "success"
+
+
+@app.route("/pay/return")
+def pay_return():
+    """支付宝同步回跳 —— 买家支付后浏览器跳回，展示结果页面。
+
+    注意：此处不做状态更新（以异步 notify 为准），仅渲染结果页。
+    """
+    trade_no = request.args.get("out_trade_no", "")
+    db = get_db()
+    close_expired_orders(db)
+    p = db.execute(
+        "SELECT * FROM payments WHERE trade_no=?", (trade_no,)
+    ).fetchone() if trade_no else None
+    return render_template("pay_success.html", payment=p, trade_no=trade_no)
 
 
 @app.route("/pay/<token>/verify_pwd", methods=["POST"])
@@ -892,11 +975,26 @@ def order_refund(trade_no):
         return jsonify({"ok": False, "msg": f"退款金额超过实付金额，最多可退 ¥{p['amount'] - (p['refund_amount'] or 0):.2f}"}), 400
 
     reason = (request.form.get("reason") or "商户主动退款").strip()
+
+    # 真实支付宝模式：先调支付宝退款 API
+    refund_id = ""
+    if is_real_pay():
+        r = create_refund(trade_no, refund_amount, reason)
+        if not r["ok"]:
+            return jsonify({"ok": False, "msg": f"支付宝退款失败: {r['msg']}"}), 500
+        refund_id = r.get("refund_id", "")
+
     new_status = "refunded" if total_refund >= p["amount"] - 0.001 else "paid"
     db.execute(
         "UPDATE payments SET status=?, refund_amount=?, refund_at=?, refund_reason=? "
         "WHERE trade_no=?",
         (new_status, total_refund, now(), reason, trade_no),
+    )
+    # 记录退款流水到独立 refunds 表
+    db.execute(
+        "INSERT INTO refunds (trade_no, refund_id, refund_amount, refund_reason, refunded_at) "
+        "VALUES (?, ?, ?, ?, ?)",
+        (trade_no, refund_id, refund_amount, reason, now()),
     )
     db.commit()
     return jsonify({"ok": True, "refund_amount": refund_amount,
@@ -970,6 +1068,16 @@ def pay_qr(token):
         abort(404)
     pay_url = url_for("pay", token=c["token"], _external=True)
     png = make_qr(pay_url)
+    return send_file(io.BytesIO(png), mimetype="image/png")
+
+
+@app.route("/pay/alipay_qr.png")
+def alipay_qr_img():
+    """生成支付宝扫码二维码图片（从 qr_url 参数生成）。"""
+    url = request.args.get("url", "")
+    if not url:
+        abort(400)
+    png = make_qr(url)
     return send_file(io.BytesIO(png), mimetype="image/png")
 
 

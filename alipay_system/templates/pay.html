@@ -156,6 +156,26 @@
           <button class="alipay-btn alipay-btn-ghost" id="doneBtn" style="margin-top:8px;">完成</button>
         </div>
       </div>
+
+      <!-- 真实支付宝：扫码支付 -->
+      <div id="alipayQrWrap" style="display:none;">
+        <div style="text-align:center; padding:8px 0 4px;">
+          <div style="font-size:12px; color:var(--text-mute);">付款给</div>
+          <div style="font-size:16px; font-weight:600; margin-top:2px;">{{ merchant.merchant_name }}</div>
+        </div>
+        <div class="pay-amount-display" style="margin:12px 0 16px;">
+          <span class="cur">¥</span><span class="num" id="alipayAmt">0.00</span>
+        </div>
+        <div style="text-align:center;">
+          <img id="alipayQrImg" src="" alt="支付宝二维码" style="width:200px; height:200px; border:1px solid #e8e8e8; border-radius:8px;">
+          <div style="font-size:13px; color:var(--text-sub); margin-top:10px;">请用支付宝扫码支付</div>
+          <div id="alipayWaiting" style="font-size:12px; color:var(--text-mute); margin-top:6px;">等待买家支付...</div>
+        </div>
+        <div style="margin-top:16px; padding:10px 12px; background:#fafafa; border-radius:8px; font-size:11px; color:var(--text-mute); line-height:1.6;">
+          <div>交易单号：<span id="alipayTradeNoDisplay">—</span></div>
+        </div>
+        <button class="alipay-btn alipay-btn-ghost" id="alipayCancelBtn" style="margin-top:10px;">取消支付</button>
+      </div>
     {% else %}
       <div class="pay-error">
         <div class="x">✕</div>
@@ -193,6 +213,7 @@
 <script>
 const token = "{{ code.token if code else '' }}";
 const fixedAmount = {{ code.amount if code and code.amount else 'null' }};
+const realPay = {{ 'true' if real_pay else 'false' }};
 const PAY_METHOD_NAMES = {balance:'支付宝余额', bank_card:'银行卡', huabei:'花呗'};
 
 let currentTradeNo = null;
@@ -239,15 +260,20 @@ document.getElementById('toCashierBtn').addEventListener('click', async () => {
     if (data.ok) {
       currentTradeNo = data.trade_no;
       currentAmount = data.amount;
-      document.getElementById('cashierAmt').textContent = parseFloat(data.amount).toFixed(2);
-      document.getElementById('tradeNoDisplay').textContent = data.trade_no;
-      const now = new Date();
-      document.getElementById('orderTimeDisplay').textContent =
-        now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+
-        String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
-      // 切换到收银台
-      document.getElementById('payFormWrap').style.display = 'none';
-      document.getElementById('cashierWrap').style.display = 'block';
+      if (data.real_pay && data.qr_url) {
+        // 真实支付宝模式：显示扫码二维码 + 轮询状态
+        showAlipayQR(data.qr_url, data.amount, data.trade_no);
+      } else {
+        // 模拟模式：显示本地收银台
+        document.getElementById('cashierAmt').textContent = parseFloat(data.amount).toFixed(2);
+        document.getElementById('tradeNoDisplay').textContent = data.trade_no;
+        const now = new Date();
+        document.getElementById('orderTimeDisplay').textContent =
+          now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+
+          String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+        document.getElementById('payFormWrap').style.display = 'none';
+        document.getElementById('cashierWrap').style.display = 'block';
+      }
     } else {
       alert(data.msg || '下单失败');
     }
@@ -390,6 +416,49 @@ async function doPay(payMethod) {
 // 完成按钮：回到付款页（可继续付款）
 document.getElementById('doneBtn').addEventListener('click', () => {
   location.reload();
+});
+
+// === 真实支付宝扫码支付 ===
+let pollTimer = null;
+
+function showAlipayQR(qrUrl, amount, tradeNo) {
+  document.getElementById('payFormWrap').style.display = 'none';
+  document.getElementById('alipayQrWrap').style.display = 'block';
+  document.getElementById('alipayAmt').textContent = parseFloat(amount).toFixed(2);
+  document.getElementById('alipayTradeNoDisplay').textContent = tradeNo;
+  // 用服务端生成二维码图片
+  const qrSrc = '/pay/alipay_qr.png?url=' + encodeURIComponent(qrUrl);
+  document.getElementById('alipayQrImg').src = qrSrc;
+  // 开始轮询订单状态
+  startPolling(tradeNo);
+}
+
+function startPolling(tradeNo) {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    try {
+      const res = await fetch('/pay/' + token + '/query?trade_no=' + encodeURIComponent(tradeNo));
+      const data = await res.json();
+      if (data.ok && data.data.status === 'paid') {
+        clearInterval(pollTimer);
+        pollTimer = null;
+        document.getElementById('alipayQrWrap').style.display = 'none';
+        document.getElementById('paySuccess').style.display = 'block';
+        document.getElementById('successAmt').textContent = '¥' + parseFloat(data.data.amount).toFixed(2);
+        document.getElementById('successTradeNo').textContent = tradeNo;
+        document.getElementById('successAlipayNo').textContent = data.data.alipay_trade_no || '—';
+        document.getElementById('successMethod').textContent = '支付宝';
+        document.getElementById('successTime').textContent = data.data.paid_at || '';
+        document.getElementById('viewReceiptBtn').href = '/pay/' + token + '/receipt?trade_no=' + encodeURIComponent(tradeNo);
+      }
+    } catch (e) { /* 忽略轮询错误 */ }
+  }, 2000);
+}
+
+document.getElementById('alipayCancelBtn').addEventListener('click', () => {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  document.getElementById('alipayQrWrap').style.display = 'none';
+  document.getElementById('payFormWrap').style.display = 'block';
 });
 </script>
 {% endblock %}
