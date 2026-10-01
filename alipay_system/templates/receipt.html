@@ -72,13 +72,19 @@
           {% if payment.paid_at %}
           <div class="field-line"><span class="k">支付时间</span><span class="v">{{ payment.paid_at }}</span></div>
           {% endif %}
-          {% if payment.status == 'refunded' %}
+          {% if payment.refund_amount and payment.refund_amount > 0 %}
           <div class="field-line" style="color:var(--red);"><span class="k">退款金额</span><span class="v">{{ payment.refund_amount|money }}</span></div>
+          {% if payment.refund_at %}
           <div class="field-line" style="color:var(--red);"><span class="k">退款时间</span><span class="v">{{ payment.refund_at }}</span></div>
+          {% endif %}
           <div class="field-line"><span class="k">退款原因</span><span class="v">{{ payment.refund_reason or '—' }}</span></div>
+          {% if payment.status == 'paid' %}
+          <div class="field-line"><span class="k">剩余可退</span><span class="v" style="color:var(--orange);">{{ (payment.amount - payment.refund_amount)|money }}</span></div>
+          {% endif %}
           {% endif %}
           <div class="field-line"><span class="k">订单状态</span><span class="v">
-            {% if payment.status == 'paid' %}<span class="badge green">已支付</span>
+            {% if payment.status == 'paid' and payment.refund_amount and payment.refund_amount > 0 %}<span class="badge orange">部分退款</span>
+            {% elif payment.status == 'paid' %}<span class="badge green">已支付</span>
             {% elif payment.status == 'pending' %}<span class="badge orange">待支付</span>
             {% elif payment.status == 'refunded' %}<span class="badge gray">已退款</span>
             {% elif payment.status == 'closed' %}<span class="badge gray">已关闭</span>

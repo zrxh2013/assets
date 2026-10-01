@@ -59,7 +59,9 @@
               <td class="text-sub">{{ pay_methods.get(r.pay_method, '—') if r.pay_method else '—' }}</td>
               <td class="text-sub">{{ r.note or '—' }}</td>
               <td>
-                {% if r.status == 'paid' %}
+                {% if r.status == 'paid' and r.refund_amount and r.refund_amount > 0 %}
+                  <span class="badge orange">部分退款</span>
+                {% elif r.status == 'paid' %}
                   <span class="badge green">已支付</span>
                 {% elif r.status == 'pending' %}
                   <span class="badge orange">待支付</span>
@@ -75,6 +77,9 @@
                 <button class="btn btn-sm detail-btn" data-trade-no="{{ r.trade_no }}">详情</button>
                 {% if r.status == 'paid' %}
                   <button class="btn btn-sm btn-danger refund-btn" data-trade-no="{{ r.trade_no }}">退款</button>
+                  {% if r.refund_amount and r.refund_amount > 0 %}
+                    <span class="text-mute" style="font-size:11px; display:block; margin-top:2px;">已退 ¥{{ '%.2f'|format(r.refund_amount) }}</span>
+                  {% endif %}
                 {% elif r.status == 'refunded' %}
                   <span class="text-mute" style="font-size:11px;">{{ r.refund_at }}</span>
                 {% else %}
@@ -104,6 +109,31 @@
   </div>
 </div>
 
+<!-- 退款弹窗 -->
+<div class="modal-mask" id="refundModal">
+  <div class="modal" style="max-width:420px; text-align:left;">
+    <h3>发起退款</h3>
+    <div id="refundInfo" style="font-size:13px; color:var(--text-sub); margin:10px 0 14px; line-height:1.7;"></div>
+    <div class="form-group">
+      <label>退款金额（元）</label>
+      <div class="input-group">
+        <span class="addon">¥</span>
+        <input class="form-control" type="number" step="0.01" min="0.01" id="refundAmountInput" placeholder="留空则全额退款">
+      </div>
+      <div style="font-size:12px; color:var(--text-mute); margin-top:4px;" id="refundHint"></div>
+    </div>
+    <div class="form-group">
+      <label>退款原因</label>
+      <input class="form-control" type="text" id="refundReasonInput" maxlength="60" value="商户主动退款" placeholder="退款原因（可留空）">
+    </div>
+    <div id="refundError" style="color:var(--red); font-size:13px; margin-bottom:10px; display:none;"></div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn" id="refundCancelBtn" style="flex:1;">取消</button>
+      <button class="btn btn-danger" id="refundSubmitBtn" style="flex:1;">确认退款</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // 订单详情
 document.querySelectorAll('.detail-btn').forEach(btn => {
@@ -119,7 +149,7 @@ document.querySelectorAll('.detail-btn').forEach(btn => {
       if (data.ok) {
         const d = data.data;
         const statusBadge = {
-          'paid': '<span class="badge green">已支付</span>',
+          'paid': (d.refund_amount && parseFloat(d.refund_amount) > 0) ? '<span class="badge orange">部分退款</span>' : '<span class="badge green">已支付</span>',
           'pending': '<span class="badge orange">待支付</span>',
           'refunded': '<span class="badge gray">已退款</span>',
           'closed': '<span class="badge gray">已关闭</span>',
@@ -153,16 +183,16 @@ document.querySelectorAll('.detail-btn').forEach(btn => {
           <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
             <span style="color:var(--text-mute);">支付时间</span><span>${d.paid_at || '—'}</span>
           </div>
-          ${d.status === 'refunded' ? `
+          ${(d.refund_amount && parseFloat(d.refund_amount) > 0) ? `
             <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0; color:var(--red);">
               <span>退款金额</span><span>¥${parseFloat(d.refund_amount).toFixed(2)}</span>
             </div>
-            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0; color:var(--red);">
-              <span>退款时间</span><span>${d.refund_at}</span>
-            </div>
+            ${d.refund_at ? `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0; color:var(--red);"><span>退款时间</span><span>${d.refund_at}</span></div>` : ''}
             <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
               <span style="color:var(--text-mute);">退款原因</span><span>${d.refund_reason || '—'}</span>
-            </div>` : ''}
+            </div>
+            ${d.status === 'paid' ? `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;"><span style="color:var(--text-mute);">剩余可退</span><span style="color:var(--orange);">¥${(parseFloat(d.amount) - parseFloat(d.refund_amount)).toFixed(2)}</span></div>` : ''}
+          ` : ''}
           <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0;">
             <span style="color:var(--text-mute);">客户端IP</span><span style="font-family:monospace; font-size:12px;">${d.client_ip || '—'}</span>
           </div>
@@ -183,29 +213,102 @@ document.getElementById('detailModal').addEventListener('click', (e) => {
   if (e.target.id === 'detailModal') e.target.classList.remove('show');
 });
 
+// 退款弹窗逻辑
+const refundModal = document.getElementById('refundModal');
+const refundAmountInput = document.getElementById('refundAmountInput');
+const refundReasonInput = document.getElementById('refundReasonInput');
+const refundError = document.getElementById('refundError');
+const refundInfo = document.getElementById('refundInfo');
+const refundHint = document.getElementById('refundHint');
+let currentRefundTradeNo = null;
+let currentMaxRefund = 0;
+
 document.querySelectorAll('.refund-btn').forEach(btn => {
   btn.addEventListener('click', async () => {
     const tradeNo = btn.dataset.tradeNo;
-    if (!confirm('确认对该订单发起退款？\n交易单号：' + tradeNo)) return;
-    const reason = prompt('退款原因（可留空）：', '商户主动退款') || '商户主动退款';
-    btn.disabled = true; btn.textContent = '处理中...';
+    currentRefundTradeNo = tradeNo;
+    refundError.style.display = 'none';
+    refundError.textContent = '';
+    refundReasonInput.value = '商户主动退款';
+    refundAmountInput.value = '';
+    // 获取订单详情以显示可退金额
     try {
-      const fd = new FormData();
-      fd.append('reason', reason);
-      const res = await fetch('/merchant/order/' + tradeNo + '/refund', { method:'POST', body: fd });
+      const res = await fetch('/merchant/order/' + tradeNo);
       const data = await res.json();
       if (data.ok) {
-        alert('退款成功，金额 ¥' + parseFloat(data.refund_amount).toFixed(2));
-        location.reload();
+        const d = data.data;
+        const paid = parseFloat(d.amount);
+        const refunded = parseFloat(d.refund_amount) || 0;
+        currentMaxRefund = Math.round((paid - refunded) * 100) / 100;
+        refundInfo.innerHTML = `
+          <div>交易单号：<span style="font-family:monospace; font-size:12px;">${d.trade_no}</span></div>
+          <div>实付金额：<span style="color:var(--text); font-weight:600;">¥${paid.toFixed(2)}</span></div>
+          <div>已退金额：<span style="color:var(--orange);">¥${refunded.toFixed(2)}</span></div>
+          <div>最多可退：<span style="color:var(--red); font-weight:600;">¥${currentMaxRefund.toFixed(2)}</span></div>
+        `;
+        refundHint.textContent = `留空则全额退款 ¥${currentMaxRefund.toFixed(2)}`;
       } else {
-        alert(data.msg || '退款失败');
-        btn.disabled = false; btn.textContent = '退款';
+        refundInfo.textContent = '加载订单信息失败';
       }
     } catch (e) {
-      alert('网络错误');
-      btn.disabled = false; btn.textContent = '退款';
+      refundInfo.textContent = '网络错误';
     }
+    refundModal.classList.add('show');
   });
+});
+
+document.getElementById('refundCancelBtn').addEventListener('click', () => {
+  refundModal.classList.remove('show');
+});
+
+document.getElementById('refundSubmitBtn').addEventListener('click', async () => {
+  const amount = refundAmountInput.value.trim();
+  if (amount) {
+    const amt = parseFloat(amount);
+    if (isNaN(amt) || amt <= 0) {
+      refundError.textContent = '退款金额不合法';
+      refundError.style.display = 'block';
+      return;
+    }
+    if (amt > currentMaxRefund + 0.001) {
+      refundError.textContent = `退款金额不能超过可退金额 ¥${currentMaxRefund.toFixed(2)}`;
+      refundError.style.display = 'block';
+      return;
+    }
+  }
+  const reason = refundReasonInput.value.trim() || '商户主动退款';
+  const btn = document.getElementById('refundSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = '处理中...';
+  refundError.style.display = 'none';
+  try {
+    const fd = new FormData();
+    if (amount) fd.append('refund_amount', amount);
+    fd.append('reason', reason);
+    const res = await fetch('/merchant/order/' + currentRefundTradeNo + '/refund', { method:'POST', body: fd });
+    const data = await res.json();
+    if (data.ok) {
+      let msg = '退款成功，本次退款 ¥' + parseFloat(data.refund_amount).toFixed(2);
+      if (data.status === 'paid') {
+        msg += '\n（部分退款，剩余可退 ¥' + parseFloat(data.remaining).toFixed(2) + '）';
+      }
+      refundModal.classList.remove('show');
+      alert(msg);
+      location.reload();
+    } else {
+      refundError.textContent = data.msg || '退款失败';
+      refundError.style.display = 'block';
+    }
+  } catch (e) {
+    refundError.textContent = '网络错误';
+    refundError.style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.textContent = '确认退款';
+});
+
+refundModal.addEventListener('click', (e) => {
+  if (e.target.id === 'refundModal') e.target.classList.remove('show');
 });
 </script>
 {% endblock %}

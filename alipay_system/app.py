@@ -14,6 +14,7 @@ import base64
 import hashlib
 import secrets
 import sqlite3
+import time
 from datetime import datetime
 from functools import wraps
 
@@ -283,6 +284,14 @@ ORDER_STATUS = {
 
 # 订单超时时间（秒）：pending 订单超过该时间未支付则自动关闭
 ORDER_TIMEOUT_SECONDS = 15 * 60  # 15 分钟
+
+# 支付密码（演示环境固定密码，生产环境应由用户设置并加密存储）
+PAY_PASSWORD = "123456"
+MAX_PWD_RETRY = 5           # 最大密码错误次数
+PWD_LOCK_SECONDS = 60       # 超过错误次数后锁定时长（秒）
+
+# 密码重试状态：{ trade_no: {"fails": int, "lock_until": float} }
+_pwd_retry = {}
 
 
 def now() -> str:
@@ -723,6 +732,43 @@ def pay_query(token):
     return jsonify({"ok": True, "data": dict(p)})
 
 
+@app.route("/pay/<token>/verify_pwd", methods=["POST"])
+def pay_verify_pwd(token):
+    """支付密码服务端校验，带重试次数限制与临时锁定。"""
+    close_expired_orders(get_db())
+    trade_no = (request.form.get("trade_no") or "").strip()
+    pwd = request.form.get("password") or ""
+    if not trade_no:
+        return jsonify({"ok": False, "msg": "缺少订单号"}), 400
+
+    state = _pwd_retry.get(trade_no, {"fails": 0, "lock_until": 0})
+    now_ts = time.time()
+    # 若处于锁定中
+    if state["lock_until"] and now_ts < state["lock_until"]:
+        remain = int(state["lock_until"] - now_ts)
+        return jsonify({"ok": False, "msg": f"密码错误次数过多，请 {remain} 秒后再试",
+                        "locked": True, "retry_after": remain}), 429
+
+    if pwd == PAY_PASSWORD:
+        # 校验通过，清除该订单的失败记录
+        _pwd_retry.pop(trade_no, None)
+        return jsonify({"ok": True})
+
+    # 密码错误，累计失败次数
+    state["fails"] = state.get("fails", 0) + 1
+    remaining = MAX_PWD_RETRY - state["fails"]
+    if state["fails"] >= MAX_PWD_RETRY:
+        state["lock_until"] = now_ts + PWD_LOCK_SECONDS
+        _pwd_retry[trade_no] = state
+        return jsonify({"ok": False,
+                        "msg": f"密码错误次数过多，请 {PWD_LOCK_SECONDS} 秒后再试",
+                        "locked": True, "retry_after": PWD_LOCK_SECONDS,
+                        "remaining": 0}), 429
+    _pwd_retry[trade_no] = state
+    return jsonify({"ok": False, "msg": f"支付密码错误，还可尝试 {remaining} 次",
+                    "remaining": remaining}), 400
+
+
 @app.route("/pay/<token>/receipt")
 def pay_receipt(token):
     """买家电子凭证页：展示订单完整信息（支付后可查看）。"""
@@ -813,7 +859,7 @@ def order_detail(trade_no):
 @app.route("/merchant/order/<trade_no>/refund", methods=["POST"])
 @login_required
 def order_refund(trade_no):
-    """商户发起退款。"""
+    """商户发起退款（支持部分退款，累计退款金额不得超过实付金额）。"""
     m = current_merchant()
     db = get_db()
     p = db.execute(
@@ -822,16 +868,41 @@ def order_refund(trade_no):
     ).fetchone()
     if not p:
         return jsonify({"ok": False, "msg": "订单不存在"}), 404
-    if p["status"] != "paid":
+    if p["status"] not in ("paid", "refunded"):
         return jsonify({"ok": False, "msg": f"订单状态为 {ORDER_STATUS[p['status']]}，不可退款"}), 400
+    # 已全额退款则不可再退
+    if p["status"] == "refunded" and p["refund_amount"] >= p["amount"]:
+        return jsonify({"ok": False, "msg": "该订单已全额退款"}), 400
+
+    # 退款金额：默认全额，可指定部分退款
+    refund_raw = (request.form.get("refund_amount") or "").strip()
+    if refund_raw:
+        try:
+            refund_amount = round(float(refund_raw), 2)
+            if refund_amount <= 0:
+                raise ValueError
+        except (TypeError, ValueError):
+            return jsonify({"ok": False, "msg": "退款金额不合法"}), 400
+    else:
+        refund_amount = round(float(p["amount"]) - float(p["refund_amount"] or 0), 2)
+
+    # 累计退款不得超过实付金额
+    total_refund = round(float(p["refund_amount"] or 0) + refund_amount, 2)
+    if total_refund > p["amount"] + 0.001:
+        return jsonify({"ok": False, "msg": f"退款金额超过实付金额，最多可退 ¥{p['amount'] - (p['refund_amount'] or 0):.2f}"}), 400
+
     reason = (request.form.get("reason") or "商户主动退款").strip()
+    new_status = "refunded" if total_refund >= p["amount"] - 0.001 else "paid"
     db.execute(
-        "UPDATE payments SET status='refunded', refund_amount=?, refund_at=?, refund_reason=? "
+        "UPDATE payments SET status=?, refund_amount=?, refund_at=?, refund_reason=? "
         "WHERE trade_no=?",
-        (p["amount"], now(), reason, trade_no),
+        (new_status, total_refund, now(), reason, trade_no),
     )
     db.commit()
-    return jsonify({"ok": True, "refund_amount": p["amount"]})
+    return jsonify({"ok": True, "refund_amount": refund_amount,
+                    "total_refund": total_refund,
+                    "remaining": round(p["amount"] - total_refund, 2),
+                    "status": new_status})
 
 
 @app.route("/records/export.csv")

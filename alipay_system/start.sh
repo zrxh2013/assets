@@ -6,33 +6,40 @@ set -e
 cd "$(dirname "$0")"
 
 # ---------- Python 路径自动检测 ----------
-# 优先使用 python3，若不可用则尝试常见 pyenv 路径
-if command -v python3 >/dev/null 2>&1; then
-  PYTHON=python3
-elif [ -x "/root/.pyenv/shims/python3" ]; then
-  PYTHON="/root/.pyenv/shims/python3"
-elif [ -x "/usr/bin/python3" ]; then
-  PYTHON="/usr/bin/python3"
-else
-  # 兜底：查找 pyenv 下最新版本的 python3
-  LATEST=$(ls -d /root/.pyenv/versions/3.*/bin/python3 2>/dev/null | sort -V | tail -1)
-  if [ -n "$LATEST" ]; then
-    PYTHON="$LATEST"
-  else
-    echo "❌ 未找到可用的 python3，请先安装 Python 3"
-    exit 1
+# 收集所有候选 python3，优先 pyenv，然后系统
+CANDIDATES=()
+if command -v python3 >/dev/null 2>&1; then CANDIDATES+=("python3"); fi
+[ -x "/root/.pyenv/shims/python3" ] && CANDIDATES+=("/root/.pyenv/shims/python3")
+for p in /root/.pyenv/versions/3.*/bin/python3; do [ -x "$p" ] && CANDIDATES+=("$p"); done
+[ -x "/usr/bin/python3" ] && CANDIDATES+=("/usr/bin/python3")
+[ -x "/usr/local/bin/python3" ] && CANDIDATES+=("/usr/local/bin/python3")
+
+PYTHON=""
+for cand in "${CANDIDATES[@]}"; do
+  # 已有依赖直接用
+  if $cand -c "import flask, qrcode, PIL" 2>/dev/null; then
+    PYTHON="$cand"
+    break
   fi
+  # 无依赖则尝试安装（仅当该 python 有 pip）
+  if $cand -m pip --version >/dev/null 2>&1; then
+    $cand -m pip install -r requirements.txt --quiet 2>/dev/null
+    if $cand -c "import flask, qrcode, PIL" 2>/dev/null; then
+      PYTHON="$cand"
+      break
+    fi
+  fi
+done
+
+if [ -z "$PYTHON" ]; then
+  echo "❌ 未找到可用的 python3（含 flask/qrcode/pillow），请先安装 Python 3 和依赖"
+  exit 1
 fi
 PIP="$PYTHON -m pip"
 echo "使用 Python: $($PYTHON --version 2>&1) ($PYTHON)"
 
-# 1. 检查并安装依赖
-if ! $PYTHON -c "import flask, qrcode, PIL" 2>/dev/null; then
-  echo "[1/3] 安装依赖中..."
-  $PIP install -r requirements.txt --quiet 2>&1 | tail -2
-else
-  echo "[1/3] 依赖已就绪"
-fi
+# 1. 依赖已在上面的检测中就绪
+echo "[1/3] 依赖已就绪"
 
 # 2. 杀掉占用 8000 端口的旧进程
 OLD_PID=$(lsof -ti:8000 2>/dev/null || true)

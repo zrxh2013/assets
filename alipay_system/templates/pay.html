@@ -110,6 +110,26 @@
         <button class="alipay-btn alipay-btn-ghost" id="backToFormBtn" style="margin-top:8px;">返回修改</button>
       </div>
 
+      <!-- 支付密码弹窗 -->
+      <div id="pwdModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:14px; padding:24px; width:320px; text-align:center;">
+          <div style="font-size:16px; font-weight:600; margin-bottom:6px;">请输入支付密码</div>
+          <div style="font-size:12px; color:var(--text-mute); margin-bottom:18px;">向 {{ merchant.merchant_name }} 付款 <span id="pwdAmt" style="color:var(--red); font-weight:600;">¥0.00</span></div>
+          <div style="display:flex; gap:8px; justify-content:center; margin-bottom:16px;">
+            <input class="pwd-dot" type="password" maxlength="1" inputmode="numeric" style="width:36px; height:40px; text-align:center; border:1px solid #d9d9d9; border-radius:8px; font-size:20px;">
+            <input class="pwd-dot" type="password" maxlength="1" inputmode="numeric" style="width:36px; height:40px; text-align:center; border:1px solid #d9d9d9; border-radius:8px; font-size:20px;">
+            <input class="pwd-dot" type="password" maxlength="1" inputmode="numeric" style="width:36px; height:40px; text-align:center; border:1px solid #d9d9d9; border-radius:8px; font-size:20px;">
+            <input class="pwd-dot" type="password" maxlength="1" inputmode="numeric" style="width:36px; height:40px; text-align:center; border:1px solid #d9d9d9; border-radius:8px; font-size:20px;">
+            <input class="pwd-dot" type="password" maxlength="1" inputmode="numeric" style="width:36px; height:40px; text-align:center; border:1px solid #d9d9d9; border-radius:8px; font-size:20px;">
+            <input class="pwd-dot" type="password" maxlength="1" inputmode="numeric" style="width:36px; height:40px; text-align:center; border:1px solid #d9d9d9; border-radius:8px; font-size:20px;">
+          </div>
+          <div id="pwdError" style="color:var(--red); font-size:12px; height:16px; margin-bottom:8px;"></div>
+          <button class="alipay-btn" id="pwdConfirmBtn" style="width:100%;">确认</button>
+          <button class="alipay-btn alipay-btn-ghost" id="pwdCancelBtn" style="width:100%; margin-top:8px;">取消</button>
+          <div style="font-size:11px; color:var(--text-mute); margin-top:10px;">演示密码：123456</div>
+        </div>
+      </div>
+
       <!-- 步骤3：支付中（模拟网关处理） -->
       <div id="payingWrap" style="display:none;">
         <div style="text-align:center; padding:30px 0;">
@@ -244,10 +264,92 @@ document.getElementById('backToFormBtn').addEventListener('click', () => {
   document.getElementById('payFormWrap').style.display = 'block';
 });
 
-// 步骤2 → 步骤3：确认支付（模拟网关扣款）
-document.getElementById('confirmPayBtn').addEventListener('click', async () => {
+// 支付密码弹窗逻辑
+const pwdInputs = document.querySelectorAll('.pwd-dot');
+const pwdModal = document.getElementById('pwdModal');
+let currentPayMethod = null;
+
+// 密码框自动跳转
+pwdInputs.forEach((input, idx) => {
+  input.addEventListener('input', () => {
+    if (input.value.length === 1 && idx < pwdInputs.length - 1) {
+      pwdInputs[idx + 1].focus();
+    }
+    document.getElementById('pwdError').textContent = '';
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !input.value && idx > 0) {
+      pwdInputs[idx - 1].focus();
+    }
+  });
+});
+
+function showPwdModal() {
+  document.getElementById('pwdAmt').textContent = '¥' + parseFloat(currentAmount).toFixed(2);
+  pwdInputs.forEach(i => { i.value = ''; });
+  document.getElementById('pwdError').textContent = '';
+  pwdModal.style.display = 'flex';
+  pwdInputs[0].focus();
+}
+
+function hidePwdModal() {
+  pwdModal.style.display = 'none';
+}
+
+// 步骤2 → 密码框
+document.getElementById('confirmPayBtn').addEventListener('click', () => {
+  currentPayMethod = document.querySelector('input[name=payMethod]:checked').value;
+  showPwdModal();
+});
+
+document.getElementById('pwdCancelBtn').addEventListener('click', hidePwdModal);
+
+// 密码确认 → 服务端校验 → 步骤3：实际支付
+document.getElementById('pwdConfirmBtn').addEventListener('click', async () => {
+  const pwd = Array.from(pwdInputs).map(i => i.value).join('');
+  if (pwd.length !== 6) {
+    document.getElementById('pwdError').textContent = '请输入6位支付密码';
+    return;
+  }
+  const confirmBtn = document.getElementById('pwdConfirmBtn');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = '校验中...';
+  try {
+    const fd = new FormData();
+    fd.append('trade_no', currentTradeNo);
+    fd.append('password', pwd);
+    const res = await fetch('/pay/' + token + '/verify_pwd', { method:'POST', body: fd });
+    const data = await res.json();
+    if (data.ok) {
+      hidePwdModal();
+      await doPay(currentPayMethod);
+    } else {
+      document.getElementById('pwdError').textContent = data.msg || '支付密码错误';
+      pwdInputs.forEach(i => { i.value = ''; });
+      pwdInputs[0].focus();
+      // 若锁定，倒计时提示
+      if (data.locked) {
+        let left = data.retry_after || 60;
+        const tick = setInterval(() => {
+          left--;
+          document.getElementById('pwdError').textContent = `密码错误次数过多，请 ${left} 秒后再试`;
+          if (left <= 0) {
+            clearInterval(tick);
+            document.getElementById('pwdError').textContent = '可重新输入支付密码';
+          }
+        }, 1000);
+      }
+    }
+  } catch (e) {
+    document.getElementById('pwdError').textContent = '网络错误，请重试';
+  }
+  confirmBtn.disabled = false;
+  confirmBtn.textContent = '确认';
+});
+
+// 实际支付（模拟网关扣款）
+async function doPay(payMethod) {
   const btn = document.getElementById('confirmPayBtn');
-  const payMethod = document.querySelector('input[name=payMethod]:checked').value;
   btn.disabled = true; btn.textContent = '处理中...';
   document.getElementById('cashierWrap').style.display = 'none';
   document.getElementById('payingWrap').style.display = 'block';
@@ -283,7 +385,7 @@ document.getElementById('confirmPayBtn').addEventListener('click', async () => {
   }
   btn.disabled = false;
   btn.textContent = '确认支付';
-});
+}
 
 // 完成按钮：回到付款页（可继续付款）
 document.getElementById('doneBtn').addEventListener('click', () => {

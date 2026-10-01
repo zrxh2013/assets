@@ -49,10 +49,17 @@
               <span>{{ payment.paid_at }}</span>
             </div>
             {% endif %}
+            {% if payment.refund_amount and payment.refund_amount > 0 %}
+            <div class="field-line" style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:13px; color:var(--red);">
+              <span>退款金额</span>
+              <span>{{ payment.refund_amount|money }}</span>
+            </div>
+            {% endif %}
             <div class="field-line" style="display:flex; justify-content:space-between; padding:8px 0; font-size:13px;">
               <span style="color:var(--text-mute);">状态</span>
               <span>
-                {% if payment.status == 'paid' %}<span class="badge green">已支付</span>
+                {% if payment.status == 'paid' and payment.refund_amount and payment.refund_amount > 0 %}<span class="badge orange">部分退款</span>
+                {% elif payment.status == 'paid' %}<span class="badge green">已支付</span>
                 {% elif payment.status == 'pending' %}<span class="badge orange">待支付</span>
                 {% elif payment.status == 'refunded' %}<span class="badge gray">已退款</span>
                 {% elif payment.status == 'closed' %}<span class="badge gray">已关闭</span>
