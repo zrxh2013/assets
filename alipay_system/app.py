@@ -259,6 +259,28 @@ def mask_id_card(id_card: str) -> str:
     return id_card[:6] + "*" * 8 + id_card[-4:]
 
 
+def mask_account(account: str) -> str:
+    """支付宝账号脱敏：保留首末各少量字符，防止明文暴露给扫码买家。
+
+    - 邮箱：首1字符 + *** + @ + 域名（如 z***@example.com）
+    - 手机号：前3 + **** + 后4（如 138****8888）
+    - 其他短账号：首1 + *** + 末1
+    """
+    if not account:
+        return ""
+    s = str(account).strip()
+    if "@" in s:
+        name, _, domain = s.partition("@")
+        if len(name) <= 1:
+            return f"{name}***@{domain}"
+        return f"{name[:1]}***@{domain}"
+    if s.isdigit() and len(s) >= 7:
+        return f"{s[:3]}****{s[-4:]}"
+    if len(s) <= 2:
+        return s[0] + "***"
+    return f"{s[:1]}***{s[-1:]}"
+
+
 def is_valid_id_card(id_card: str) -> bool:
     """简易 18 位身份证校验（含校验位验证）。"""
     if not id_card or len(id_card) != 18:
