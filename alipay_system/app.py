@@ -12,11 +12,14 @@ import os
 import io
 import base64
 import hashlib
+import hmac
 import secrets
 import sqlite3
 import time
 from datetime import datetime
 from functools import wraps
+
+from werkzeug.security import generate_password_hash, check_password_hash
 
 import qrcode
 from qrcode.image.styledpil import StyledPilImage
@@ -36,7 +39,22 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "alipay.db")
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(32)
+
+# Session 密钥：优先用环境变量，其次用持久化密钥文件，保证重启不掉线
+_SECRET_KEY_FILE = os.path.join(BASE_DIR, ".secret_key")
+_session_secret = os.getenv("FLASK_SECRET_KEY")
+if not _session_secret:
+    if os.path.exists(_SECRET_KEY_FILE):
+        with open(_SECRET_KEY_FILE, "r") as f:
+            _session_secret = f.read().strip()
+    if not _session_secret:
+        _session_secret = secrets.token_hex(32)
+        try:
+            with open(_SECRET_KEY_FILE, "w") as f:
+                f.write(_session_secret)
+        except OSError:
+            pass  # 只读环境退化为每次随机（仅开发模式）
+app.secret_key = _session_secret
 app.config["DB_PATH"] = DB_PATH
 
 
@@ -54,6 +72,12 @@ def close_db(exc):
     db = g.pop("db", None)
     if db is not None:
         db.close()
+
+
+@app.context_processor
+def inject_csrf_token():
+    """向所有模板注入 csrf_token 变量。"""
+    return {"csrf_token": get_csrf_token()}
 
 
 def init_db():
@@ -264,7 +288,28 @@ VALID_LEVELS = set(MERCHANT_LEVELS)
 
 # --------------------------------------------------------------- helpers
 def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+    """生成密码哈希：使用 pbkdf2:sha256 加盐，兼容旧版 sha256 哈希。"""
+    return generate_password_hash(password, method="pbkdf2:sha256", salt_length=16)
+
+
+def verify_password(password: str, stored_hash: str) -> bool:
+    """验证密码：支持新版 pbkdf2 哈希和旧版 sha256 哈希（自动迁移）。"""
+    if not stored_hash:
+        return False
+    # 新版哈希以 pbkdf2: 开头
+    if stored_hash.startswith("pbkdf2:"):
+        return check_password_hash(stored_hash, password)
+    # 旧版 sha256（64 位十六进制）
+    if len(stored_hash) == 64 and all(c in "0123456789abcdef" for c in stored_hash):
+        return hmac.compare_digest(
+            hashlib.sha256(password.encode("utf-8")).hexdigest(), stored_hash
+        )
+    return False
+
+
+def needs_password_rehash(stored_hash: str) -> bool:
+    """检查密码哈希是否需要升级到新版算法。"""
+    return not stored_hash.startswith("pbkdf2:")
 
 
 def gen_token() -> str:
@@ -303,12 +348,17 @@ ORDER_STATUS = {
 ORDER_TIMEOUT_SECONDS = 15 * 60  # 15 分钟
 
 # 支付密码（演示环境固定密码，生产环境应由用户设置并加密存储）
-PAY_PASSWORD = "123456"
+PAY_PASSWORD = os.getenv("PAY_PASSWORD", "123456")
 MAX_PWD_RETRY = 5           # 最大密码错误次数
 PWD_LOCK_SECONDS = 60       # 超过错误次数后锁定时长（秒）
 
 # 密码重试状态：{ trade_no: {"fails": int, "lock_until": float} }
 _pwd_retry = {}
+
+# 支付令牌：密码校验通过后下发，pay_confirm 必须验证令牌才能支付
+# 结构: { trade_no: {"token": str, "expires": float} }
+_pay_tokens = {}
+PAY_TOKEN_TTL = 120  # 支付令牌有效期 120 秒
 
 
 def now() -> str:
@@ -317,6 +367,34 @@ def now() -> str:
 
 def today() -> str:
     return datetime.now().strftime("%Y-%m-%d")
+
+
+def get_csrf_token() -> str:
+    """生成或获取当前 session 的 CSRF token。"""
+    if "_csrf_token" not in session:
+        session["_csrf_token"] = secrets.token_hex(16)
+    return session["_csrf_token"]
+
+
+def verify_csrf_token(token: str) -> bool:
+    """校验 CSRF token。"""
+    stored = session.get("_csrf_token")
+    if not stored or not token:
+        return False
+    return secrets.compare_digest(stored, token)
+
+
+def csrf_protect(f):
+    """CSRF 校验装饰器：用于商户后台 POST 表单路由。"""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if request.method == "POST":
+            token = (request.form.get("csrf_token") or
+                      request.headers.get("X-CSRF-Token") or "")
+            if not verify_csrf_token(token):
+                return jsonify({"ok": False, "msg": "CSRF 校验失败，请刷新页面重试"}), 403
+        return f(*args, **kwargs)
+    return decorated
 
 
 def close_expired_orders(db) -> int:
@@ -446,8 +524,15 @@ def login():
         m = db.execute(
             "SELECT * FROM merchants WHERE username = ?", (username,)
         ).fetchone()
-        if not m or m["password_hash"] != hash_password(password):
+        if not m or not verify_password(password, m["password_hash"]):
             return render_template("login.html", error="用户名或密码错误"), 401
+        # 旧版 sha256 哈希自动升级为 pbkdf2
+        if needs_password_rehash(m["password_hash"]):
+            db.execute(
+                "UPDATE merchants SET password_hash=? WHERE id=?",
+                (hash_password(password), m["id"]),
+            )
+            db.commit()
         session["merchant_id"] = m["id"]
         return redirect(url_for("dashboard"))
     return render_template("login.html")
@@ -536,6 +621,7 @@ def codes():
 
 @app.route("/codes/create", methods=["POST"])
 @login_required
+@csrf_protect
 def codes_create():
     m = current_merchant()
     amount_raw = (request.form.get("amount") or "").strip()
@@ -562,6 +648,7 @@ def codes_create():
 
 @app.route("/codes/<int:cid>/toggle", methods=["POST"])
 @login_required
+@csrf_protect
 def codes_toggle(cid):
     m = current_merchant()
     db = get_db()
@@ -578,6 +665,7 @@ def codes_toggle(cid):
 
 @app.route("/codes/<int:cid>/delete", methods=["POST"])
 @login_required
+@csrf_protect
 def codes_delete(cid):
     m = current_merchant()
     db = get_db()
@@ -733,6 +821,20 @@ def pay_confirm(token):
     if p["status"] in ("failed", "refunded", "closed"):
         return jsonify({"ok": False, "msg": f"订单状态为 {ORDER_STATUS[p['status']]}，无法支付"}), 400
 
+    # 模拟模式：校验支付令牌（密码校验通过后下发，防止跳过密码直接支付）
+    if not is_real_pay():
+        pay_token = (request.form.get("pay_token") or "").strip()
+        stored = _pay_tokens.get(trade_no)
+        if not stored:
+            return jsonify({"ok": False, "msg": "请先完成支付密码校验"}), 403
+        if time.time() > stored["expires"]:
+            _pay_tokens.pop(trade_no, None)
+            return jsonify({"ok": False, "msg": "支付令牌已过期，请重新校验密码"}), 403
+        if not secrets.compare_digest(pay_token, stored["token"]):
+            return jsonify({"ok": False, "msg": "支付令牌无效"}), 403
+        # 令牌使用后立即销毁（一次性）
+        _pay_tokens.pop(trade_no, None)
+
     # 模拟网关扣款（真实场景此处调用支付宝 alipay.trade.pay）
     alipay_trade_no = gen_alipay_trade_no()
     db.execute(
@@ -835,7 +937,10 @@ def pay_verify_pwd(token):
     if pwd == PAY_PASSWORD:
         # 校验通过，清除该订单的失败记录
         _pwd_retry.pop(trade_no, None)
-        return jsonify({"ok": True})
+        # 下发一次性支付令牌（有效期 120 秒），pay_confirm 必须携带此令牌
+        pay_token = secrets.token_urlsafe(24)
+        _pay_tokens[trade_no] = {"token": pay_token, "expires": now_ts + PAY_TOKEN_TTL}
+        return jsonify({"ok": True, "pay_token": pay_token})
 
     # 密码错误，累计失败次数
     state["fails"] = state.get("fails", 0) + 1
@@ -941,6 +1046,7 @@ def order_detail(trade_no):
 
 @app.route("/merchant/order/<trade_no>/refund", methods=["POST"])
 @login_required
+@csrf_protect
 def order_refund(trade_no):
     """商户发起退款（支持部分退款，累计退款金额不得超过实付金额）。"""
     m = current_merchant()
@@ -984,12 +1090,20 @@ def order_refund(trade_no):
             return jsonify({"ok": False, "msg": f"支付宝退款失败: {r['msg']}"}), 500
         refund_id = r.get("refund_id", "")
 
+    # 并发安全：用条件更新（CAS）防止并发退款导致超退
+    # WHERE refund_amount = 原值 确保在我们读取和写入之间没有其他退款修改过该字段
+    old_refund_amount = float(p["refund_amount"] or 0)
     new_status = "refunded" if total_refund >= p["amount"] - 0.001 else "paid"
-    db.execute(
+    cursor = db.execute(
         "UPDATE payments SET status=?, refund_amount=?, refund_at=?, refund_reason=? "
-        "WHERE trade_no=?",
-        (new_status, total_refund, now(), reason, trade_no),
+        "WHERE trade_no=? AND refund_amount=?",
+        (new_status, total_refund, now(), reason, trade_no, old_refund_amount),
     )
+    if cursor.rowcount == 0:
+        # 条件更新失败：说明并发请求已修改了 refund_amount，本次退款需重试
+        db.rollback()
+        return jsonify({"ok": False, "msg": "退款失败：订单退款状态已变更，请刷新后重试"}), 409
+
     # 记录退款流水到独立 refunds 表
     db.execute(
         "INSERT INTO refunds (trade_no, refund_id, refund_amount, refund_reason, refunded_at) "
@@ -1084,6 +1198,7 @@ def alipay_qr_img():
 # --------------------------------------------------------------- merchant profile
 @app.route("/profile", methods=["GET", "POST"])
 @login_required
+@csrf_protect
 def profile():
     m = current_merchant()
     db = get_db()

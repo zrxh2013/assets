@@ -110,6 +110,7 @@ const form = document.getElementById('createForm');
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const fd = new FormData(form);
+  fd.append('csrf_token', '{{ csrf_token }}');
   const res = await fetch('{{ url_for("codes_create") }}', { method:'POST', body: fd });
   const data = await res.json();
   if (!data.ok) { alert(data.msg || '生成失败'); return; }
@@ -137,8 +138,11 @@ document.querySelectorAll('.toggle-btn').forEach(btn => {
   btn.addEventListener('click', async () => {
     const tr = btn.closest('tr');
     const cid = tr.dataset.cid;
-    const res = await fetch('/codes/' + cid + '/toggle', { method:'POST' });
+    const fd = new FormData();
+    fd.append('csrf_token', '{{ csrf_token }}');
+    const res = await fetch('/codes/' + cid + '/toggle', { method:'POST', body: fd });
     const data = await res.json();
+    if (!data.ok) { alert(data.msg || '操作失败'); return; }
     if (data.ok) location.reload();
   });
 });
@@ -148,8 +152,11 @@ document.querySelectorAll('.del-btn').forEach(btn => {
     if (!confirm('确认删除该收款码？相关收款记录也会被删除。')) return;
     const tr = btn.closest('tr');
     const cid = tr.dataset.cid;
-    const res = await fetch('/codes/' + cid + '/delete', { method:'POST' });
+    const fd = new FormData();
+    fd.append('csrf_token', '{{ csrf_token }}');
+    const res = await fetch('/codes/' + cid + '/delete', { method:'POST', body: fd });
     const data = await res.json();
+    if (!data.ok) { alert(data.msg || '删除失败'); return; }
     if (data.ok) location.reload();
   });
 });

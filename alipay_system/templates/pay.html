@@ -348,7 +348,7 @@ document.getElementById('pwdConfirmBtn').addEventListener('click', async () => {
     const data = await res.json();
     if (data.ok) {
       hidePwdModal();
-      await doPay(currentPayMethod);
+      await doPay(currentPayMethod, data.pay_token);
     } else {
       document.getElementById('pwdError').textContent = data.msg || '支付密码错误';
       pwdInputs.forEach(i => { i.value = ''; });
@@ -374,7 +374,7 @@ document.getElementById('pwdConfirmBtn').addEventListener('click', async () => {
 });
 
 // 实际支付（模拟网关扣款）
-async function doPay(payMethod) {
+async function doPay(payMethod, payToken) {
   const btn = document.getElementById('confirmPayBtn');
   btn.disabled = true; btn.textContent = '处理中...';
   document.getElementById('cashierWrap').style.display = 'none';
@@ -388,6 +388,7 @@ async function doPay(payMethod) {
     const fd = new FormData();
     fd.append('trade_no', currentTradeNo);
     fd.append('pay_method', payMethod);
+    if (payToken) fd.append('pay_token', payToken);
     const res = await fetch('/pay/' + token + '/pay', { method:'POST', body: fd });
     const data = await res.json();
     if (data.ok) {

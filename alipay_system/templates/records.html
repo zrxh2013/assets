@@ -285,6 +285,7 @@ document.getElementById('refundSubmitBtn').addEventListener('click', async () =>
     const fd = new FormData();
     if (amount) fd.append('refund_amount', amount);
     fd.append('reason', reason);
+    fd.append('csrf_token', '{{ csrf_token }}');
     const res = await fetch('/merchant/order/' + currentRefundTradeNo + '/refund', { method:'POST', body: fd });
     const data = await res.json();
     if (data.ok) {
