@@ -17,6 +17,15 @@ fi
 
 JAVA="$JAVA8_HOME/bin/java"
 
+# 确保 www.baidu.com 指向 127.0.0.1，否则 getLanIP() 会卡住
+grep -q "www.baidu.com" /etc/hosts || echo "127.0.0.1 www.baidu.com" >> /etc/hosts
+
+# 确保 FullNode.jar 存在
+if [ ! -f "$JAR" ]; then
+  echo "⚠️ FullNode.jar 不存在，正在下载..."
+  wget -q "https://github.com/tronprotocol/java-tron/releases/download/GreatVoyage-v4.7.5/FullNode.jar" -O "$JAR"
+fi
+
 cd "$NODE_DIR" || exit 1
 
 case "${1:-start}" in
