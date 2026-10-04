@@ -262,5 +262,23 @@ else:
     assert_eq("app.secret_key 与文件一致", app_module.app.secret_key, sk)
 
 
+# 测试 6：支付宝账号脱敏
+banner("6. 支付宝账号脱敏 (mask_account)")
+from app import mask_account
+# 邮箱：保留首字符 + 域名
+assert_eq("普通邮箱", mask_account("zhangsan@example.com"), "z***@example.com")
+assert_eq("单字符邮箱名", mask_account("a@example.com"), "a***@example.com")
+# 手机号：前3 + **** + 后4
+assert_eq("11位手机号", mask_account("13888888888"), "138****8888")
+assert_eq("7位数字", mask_account("1234567"), "123****4567")
+# 短账号保护
+assert_eq("空字符串", mask_account(""), "")
+assert_eq("1字符", mask_account("a"), "a***")
+assert_eq("2字符", mask_account("ab"), "a***")
+# 模板过滤器已注册
+assert_true("mask_account 过滤器已注册",
+            "mask_account" in app_module.app.jinja_env.filters)
+
+
 banner("全部测试通过 ✓")
 print(f"\n测试用临时库：{TMP_DB.name}（可手动删除）")

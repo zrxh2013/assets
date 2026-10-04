@@ -1321,6 +1321,11 @@ def _mask_id(id_card):
     return mask_id_card(id_card)
 
 
+@app.template_filter("mask_account")
+def _mask_account(account):
+    return mask_account(account)
+
+
 # --------------------------------------------------------------- entrypoint
 if __name__ == "__main__":
     init_db()

@@ -15,7 +15,7 @@
         <div class="av" style="background:{{ merchant.avatar_color }}">{{ merchant.merchant_name|initial }}</div>
         <div>
           <div class="name">{{ merchant.merchant_name }}</div>
-          <div class="acc">支付宝账号：{{ merchant.alipay_account }}</div>
+          <div class="acc">支付宝账号：{{ merchant.alipay_account|mask_account }}</div>
         </div>
       </div>
 
