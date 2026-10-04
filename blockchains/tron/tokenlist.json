@@ -1,7 +1,7 @@
 {
     "name": "Trust Wallet: Tron Chain List",
     "logoURI": "https://trustwallet.com/assets/images/favicon.png",
-    "timestamp": "2023-01-23T12:30:11.183301",
+    "timestamp": "2026-10-04T05:42:12.000000",
     "tokens": [
         {
             "asset": "c195_tTMz2SWatiAtZVVcH2ebpsbVtYwUPT9EdjH",
@@ -12,10 +12,20 @@
             "decimals": 18,
             "logoURI": "https://assets-cdn.trustwallet.com/blockchains/tron/assets/TMz2SWatiAtZVVcH2ebpsbVtYwUPT9EdjH/logo.png",
             "pairs": []
+        },
+        {
+            "asset": "c195_tTR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+            "type": "TRC20",
+            "address": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+            "name": "Tether",
+            "symbol": "USDT",
+            "decimals": 6,
+            "logoURI": "https://assets-cdn.trustwallet.com/blockchains/tron/assets/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t/logo.png",
+            "pairs": []
         }
     ],
     "version": {
-        "major": 0,
+        "major": 1,
         "minor": 0,
         "patch": 0
     }
