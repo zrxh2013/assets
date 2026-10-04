@@ -3,8 +3,12 @@ pragma solidity ^0.8.4;
 
 /**
  * @title USDTPoints
- * @notice USDT 积分系统：1:1 锚定 USDT (TRC20)，可存入、赎回、转账
- * @dev 储备硬约束: totalSupply <= 合约持有的 USDT 余额，确保 1:1 可赎回
+ * @notice USDT 积分系统：支持存入 USDT 获得积分、赎回、owner 发行、转账
+ * @dev 设计说明：
+ *   - deposit: 用户存入 USDT，按 1:1 获得积分（有真实 USDT 储备）
+ *   - redeem: 用户赎回积分，按 1:1 换回 USDT（仅当合约有足够 USDT 时成功）
+ *   - ownerMint: owner 可无储备发行积分（用于奖励/空投等，无 USDT 背书，不可保证赎回）
+ *   - rescueToken 禁止提取 USDT，保护用户存入的储备
  *      USDT (Tron) decimals = 6
  */
 interface ITRC20 {
@@ -32,6 +36,7 @@ contract USDTPoints {
     event Deposit(address indexed user, uint256 usdtAmount, uint256 pointsIssued);
     event Redeem(address indexed user, uint256 pointsBurned, uint256 usdtReturned);
     event OwnerMint(address indexed to, uint256 amount);
+    event OwnerBurn(address indexed from, uint256 amount);
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -55,23 +60,9 @@ contract USDTPoints {
         owner = msg.sender;
     }
 
-    // ---------- 储备校验 ----------
-
-    /// @dev 确保积分总供应量不超过合约持有的 USDT 储备
-    function _checkBacking() internal view {
-        uint256 reserve = ITRC20(usdt).balanceOf(address(this));
-        require(totalSupply <= reserve, "USDTPoints: insufficient USDT reserve");
-    }
-
-    /// @notice 查看当前储备是否充足
-    function isFullyBacked() external view returns (bool) {
-        return totalSupply <= ITRC20(usdt).balanceOf(address(this));
-    }
-
-    /// @notice 超额储备（可用于 owner mint 的额度）
-    function excessReserve() external view returns (uint256) {
-        uint256 reserve = ITRC20(usdt).balanceOf(address(this));
-        return reserve > totalSupply ? reserve - totalSupply : 0;
+    /// @notice 查看合约当前持有的 USDT 储备
+    function usdtReserve() external view returns (uint256) {
+        return ITRC20(usdt).balanceOf(address(this));
     }
 
     // ---------- 用户：存入 USDT 获得积分 ----------
@@ -89,14 +80,13 @@ contract USDTPoints {
         bool ok = ITRC20(usdt).transferFrom(msg.sender, address(this), amount);
         require(ok, "USDTPoints: USDT transfer failed");
 
-        _checkBacking();
         emit Deposit(msg.sender, amount, amount);
         emit Transfer(address(0), msg.sender, amount);
     }
 
     // ---------- 用户：赎回积分换 USDT ----------
 
-    /// @notice 赎回积分，按 1:1 换回 USDT
+    /// @notice 赎回积分，按 1:1 换回 USDT（需合约有足够 USDT 储备）
     /// @param amount 积分数量
     function redeem(uint256 amount) external nonReentrant {
         require(amount > 0, "USDTPoints: amount must be > 0");
@@ -106,18 +96,17 @@ contract USDTPoints {
         _balances[msg.sender] -= amount;
         totalSupply -= amount;
 
-        // 再转出 USDT
+        // 再转出 USDT（储备不足时 transfer 失败回滚）
         bool ok = ITRC20(usdt).transfer(msg.sender, amount);
-        require(ok, "USDTPoints: USDT transfer failed");
+        require(ok, "USDTPoints: USDT transfer failed (insufficient reserve)");
 
         emit Redeem(msg.sender, amount, amount);
         emit Transfer(msg.sender, address(0), amount);
     }
 
-    // ---------- Owner：发行积分（需超额储备） ----------
+    // ---------- Owner：无储备发行/销毁积分 ----------
 
-    /// @notice Owner 向指定地址发行积分，前提是合约有超额 USDT 储备
-    /// @dev owner 需先向合约直接转入 USDT（不调用 deposit），形成超额储备后才能 mint
+    /// @notice Owner 向指定地址发行积分（无需 USDT 储备）
     function ownerMint(address to, uint256 amount) external onlyOwner {
         require(to != address(0), "USDTPoints: mint to zero address");
         require(amount > 0, "USDTPoints: amount must be > 0");
@@ -125,9 +114,20 @@ contract USDTPoints {
         _balances[to] += amount;
         totalSupply += amount;
 
-        _checkBacking(); // 保证不超过储备
         emit OwnerMint(to, amount);
         emit Transfer(address(0), to, amount);
+    }
+
+    /// @notice Owner 销毁指定地址的积分（减少总供应量）
+    function ownerBurn(address from, uint256 amount) external onlyOwner {
+        require(from != address(0), "USDTPoints: burn from zero address");
+        require(_balances[from] >= amount, "USDTPoints: burn amount exceeds balance");
+
+        _balances[from] -= amount;
+        totalSupply -= amount;
+
+        emit OwnerBurn(from, amount);
+        emit Transfer(from, address(0), amount);
     }
 
     // ---------- 标准 TRC20 接口 ----------
@@ -178,7 +178,7 @@ contract USDTPoints {
         emit OwnershipTransferred(oldOwner, newOwner);
     }
 
-    /// @notice 紧急撤回误转入的其他代币（不影响 USDT 储备和积分）
+    /// @notice 撤回误转入的其他代币（禁止提取 USDT，保护用户储备）
     function rescueToken(address token, uint256 amount) external onlyOwner {
         require(token != usdt, "USDTPoints: cannot rescue USDT reserve");
         ITRC20(token).transfer(owner, amount);
