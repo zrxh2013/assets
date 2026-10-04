@@ -280,5 +280,54 @@ assert_true("mask_account 过滤器已注册",
             "mask_account" in app_module.app.jinja_env.filters)
 
 
+# 测试 7：对外页面字段最小暴露
+banner("7. 对外页面 merchant 字段最小暴露 (白名单)")
+from app import public_merchant_view, PUBLIC_MERCHANT_FIELDS
+
+# 模拟一个完整 merchant 行（含所有敏感字段）
+class FakeRow:
+    def __init__(self, d):
+        self._d = d
+    def __getitem__(self, k):
+        return self._d[k]
+    def keys(self):
+        return self._d.keys()
+
+full_row = FakeRow({
+    "id": 1, "username": "sec_test", "password_hash": "pbkdf2:xxx",
+    "merchant_name": "测试商户", "alipay_account": "test@example.com",
+    "avatar_color": "#1677FF",
+    "real_name": "王小明", "id_card": "110101199001010012",
+    "contact_phone": "13888888888", "org_license": "XYZ-001",
+    "uscc": "91110000ABC", "legal_person": "李四",
+    "reg_address": "北京市朝阳区", "reg_capital": "100万",
+})
+view = public_merchant_view(full_row)
+view_keys = set(view.keys())
+# 白名单应只包含公开字段
+assert_eq("白名单字段数", len(view_keys), 3)
+for k in view_keys:
+    assert_true(f"白名单字段 {k} 合法", k in PUBLIC_MERCHANT_FIELDS, f"key={k}")
+# 敏感字段必须不在视图里
+sensitive = ["password_hash", "username", "real_name", "id_card",
+             "contact_phone", "org_license", "uscc", "legal_person",
+             "reg_address", "reg_capital"]
+for s in sensitive:
+    assert_true(f"敏感字段 {s} 未暴露", s not in view, f"view={view}")
+
+# None 输入应返回空 dict
+assert_eq("None 输入返回空 dict", public_merchant_view(None), {})
+
+# 端到端验证：访问 /pay/<token>，渲染后 HTML 不应包含敏感字段值
+# 先创建一个收款码（已有 code_token_a），访问 pay 页面
+r = c.get(f"/pay/{code_token_a}")
+assert_eq("/pay/<token> 状态码", r.status_code, 200)
+html = r.get_data(as_text=True)
+assert_true("/pay HTML 含商户名", "安全测试商户" in html)
+assert_true("/pay HTML 不含真实姓名", "王小明" not in html, "已注册商户 real_name 应不暴露")
+assert_true("/pay HTML 不含完整手机号", "13888888888" not in html)
+assert_true("/pay HTML 含脱敏账号", "***" in html)
+
+
 banner("全部测试通过 ✓")
 print(f"\n测试用临时库：{TMP_DB.name}（可手动删除）")

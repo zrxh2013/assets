@@ -281,6 +281,22 @@ def mask_account(account: str) -> str:
     return f"{s[:1]}***{s[-1:]}"
 
 
+# 商户行中允许暴露给买家（对外页面）的字段白名单
+PUBLIC_MERCHANT_FIELDS = ("merchant_name", "avatar_color", "alipay_account")
+
+
+def public_merchant_view(merchant_row) -> dict:
+    """将商户行投影为只含公开字段的 dict，防止 sensitive 字段
+    （real_name / id_card / contact_phone / org_license / uscc /
+    legal_person / reg_address / reg_capital 等）通过模板上下文泄露给买家。
+
+    用于 pay / pay_receipt 等对外页面。
+    """
+    if merchant_row is None:
+        return {}
+    return {k: merchant_row[k] for k in PUBLIC_MERCHANT_FIELDS if k in merchant_row.keys()}
+
+
 def is_valid_id_card(id_card: str) -> bool:
     """简易 18 位身份证校验（含校验位验证）。"""
     if not id_card or len(id_card) != 18:
@@ -767,8 +783,10 @@ def pay(token):
     m = db.execute(
         "SELECT * FROM merchants WHERE id = ?", (c["merchant_id"],)
     ).fetchone()
-    return render_template("pay.html", code=c, merchant=m, error=None,
-                           real_pay=is_real_pay())
+    # 对外页面只暴露白名单字段，敏感字段（real_name/id_card/contact_phone 等）不进上下文
+    return render_template("pay.html", code=c,
+                           merchant=public_merchant_view(m),
+                           error=None, real_pay=is_real_pay())
 
 
 @app.route("/pay/<token>/order", methods=["POST"])
@@ -996,8 +1014,12 @@ def pay_receipt(token):
     ).fetchone()
     if not p:
         return render_template("receipt.html", error="订单不存在",
-                               payment=None, merchant=m, code=c), 404
-    return render_template("receipt.html", payment=p, merchant=m, code=c,
+                               payment=None,
+                               merchant=public_merchant_view(m),
+                               code=c), 404
+    # 对外页面只暴露白名单字段
+    return render_template("receipt.html", payment=p,
+                           merchant=public_merchant_view(m), code=c,
                            pay_methods=PAY_METHODS, order_status=ORDER_STATUS, error=None)
 
 
@@ -1019,7 +1041,7 @@ def order_query():
             ).fetchone()
             if p:
                 merchant = db.execute(
-                    "SELECT merchant_name, alipay_account FROM merchants WHERE id = ?",
+                    "SELECT merchant_name FROM merchants WHERE id = ?",
                     (p["merchant_id"],),
                 ).fetchone()
     return render_template("order_query.html", payment=p, merchant=merchant,
