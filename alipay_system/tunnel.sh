@@ -34,6 +34,41 @@ warn(){ echo -e "${YELLOW}[warn]${NC} $*"; }
 # ---------- 工具检测 ----------
 have() { command -v "$1" >/dev/null 2>&1; }
 
+# ---------- 通用：从文本里提取 trycloudflare 公网 URL ----------
+# 排除 api.trycloudflare.com（错误日志里的 API 端点，不是真正的隧道域名）
+# 排除 developers.cloudflare.com（官方文档链接，常出现在错误提示里）
+# 隧道 ID 形如 7c3b1d2e-4f5a-6789-abcd-ef0123456789，可能含大小写字母、数字、连字符
+extract_trycloudflare_url() {
+  local text="$1"
+  # 多个候选文案，兼容不同 cloudflared 版本
+  echo "$text" \
+    | grep -oE "https://[a-zA-Z0-9-]+\.trycloudflare\.com" \
+    | grep -v "^https://api\.trycloudflare\.com$" \
+    | head -1
+}
+
+# ---------- 通用：从 JSON 文本里提取 tunnels[*].public_url ----------
+# 优先返回 https URL（ngrok 同时启动 http+https 两条隧道）
+extract_tunnel_url_from_json() {
+  local text="$1"
+  echo "$text" | python3 -c "
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    ts = d.get('tunnels') or []
+    if not ts:
+        sys.exit(0)
+    # 优先选 https URL
+    https_urls = [t['public_url'] for t in ts if str(t.get('public_url','')).startswith('https://')]
+    if https_urls:
+        print(https_urls[0])
+    else:
+        print(ts[0].get('public_url',''))
+except Exception:
+    pass
+" 2>/dev/null
+}
+
 # ---------- 策略 1：ngrok ----------
 use_ngrok() {
   if ! have ngrok; then return 1; fi
@@ -45,13 +80,27 @@ use_ngrok() {
   log "使用 ngrok 启动隧道 → 127.0.0.1:${PORT}"
   setsid ngrok http "${PORT}" --log=stdout > /tmp/tunnel_ngrok.log 2>&1 &
   echo $! > "$TUNNEL_PID_FILE"
-  sleep 4
-  # ngrok API 拉取公网地址
-  local url
-  url=$(curl -s http://127.0.0.1:4040/api/tunnels 2>/dev/null \
-        | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['tunnels'][0]['public_url'])" 2>/dev/null || true)
+  # ngrok API 重试 15 次（每次 1 秒），新版本 API 起得慢
+  local url=""
+  local api_port=4040
+  # ngrok 配置文件可能改了 API 端口，从配置读
+  local cfg_port
+  cfg_port=$(ngrok config check 2>/dev/null | grep -oE "api_port[^0-9]*[0-9]+" | grep -oE "[0-9]+$" || true)
+  [ -n "$cfg_port" ] && api_port="$cfg_port"
+  for i in $(seq 1 15); do
+    sleep 1
+    # 优先从 API 拿
+    url=$(extract_tunnel_url_from_json "$(curl -s "http://127.0.0.1:${api_port}/api/tunnels" 2>/dev/null || true)")
+    [ -n "$url" ] && break
+    # 备用：从日志 grep（ngrok 启动日志含 "Forwarding" 行）
+    url=$(grep -E "Forwarding\s+http" /tmp/tunnel_ngrok.log 2>/dev/null \
+          | grep -oE "https://[a-z0-9.-]+" | head -1)
+    [ -n "$url" ] && break
+    # 进程死掉了立即终止
+    kill -0 "$(cat "$TUNNEL_PID_FILE" 2>/dev/null)" 2>/dev/null || break
+  done
   if [ -z "$url" ]; then
-    warn "ngrok 启动了但未拿到公网 URL，查 /tmp/tunnel_ngrok.log"
+    warn "ngrok 启动了但 15 秒内未拿到公网 URL，查 /tmp/tunnel_ngrok.log"
     return 1
   fi
   echo "$url" > "$TUNNEL_URL_FILE"
@@ -70,11 +119,21 @@ use_cpolar() {
   log "使用 cpolar 启动隧道 → 127.0.0.1:${PORT}"
   setsid cpolar http "${PORT}" --log stdout > /tmp/tunnel_cpolar.log 2>&1 &
   echo $! > "$TUNNEL_PID_FILE"
-  sleep 6
-  # cpolar dashboard 在 9200
-  local url
-  url=$(curl -s http://127.0.0.1:9200/api/tunnels 2>/dev/null \
-        | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['tunnels'][0]['public_url'])" 2>/dev/null || true)
+  local url=""
+  # cpolar dashboard 默认 9200，但可能被改；多端口探测
+  local p
+  for p in 9200 9201 9202 9203 9204; do
+    for i in $(seq 1 8); do
+      sleep 1
+      url=$(extract_tunnel_url_from_json "$(curl -s "http://127.0.0.1:${p}/api/tunnels" 2>/dev/null || true)")
+      [ -n "$url" ] && break
+      # 备用：从日志抓（cpolar 日志含 "Tunnel Status   online" + URL）
+      url=$(grep -oE "https://[a-z0-9.-]+\.cpolar\.(top|cn|com)" /tmp/tunnel_cpolar.log 2>/dev/null | head -1)
+      [ -n "$url" ] && break
+      kill -0 "$(cat "$TUNNEL_PID_FILE" 2>/dev/null)" 2>/dev/null || break
+    done
+    [ -n "$url" ] && break
+  done
   if [ -z "$url" ]; then
     warn "cpolar 启动了但未拿到公网 URL，查 /tmp/tunnel_cpolar.log"
     return 1
@@ -117,29 +176,43 @@ use_cloudflared() {
     if ! download_cloudflared; then return 1; fi
   fi
   log "使用 cloudflare quick tunnel → 127.0.0.1:${PORT}"
-  # quick tunnel 模式：无需账号、无需登录，cloudflare 临时分配一个 trycloudflare.com 域名
+  # 启动 quick tunnel：metrics 端口随机分配，日志里能查到
   setsid "$CF_BIN" tunnel --url "http://127.0.0.1:${PORT}" \
       > /tmp/tunnel_cloudflared.log 2>&1 &
   echo $! > "$TUNNEL_PID_FILE"
-  # cloudflared 启动日志里有 "Your quick Tunnel has been created! Visit it at: https://xxx.trycloudflare.com"
-  # 真正的隧道域名形如 https://xxx-xxx-xxx.trycloudflare.com，不能匹配 api.trycloudflare.com（那是错误日志里的 API 端点）
   local url=""
-  for i in $(seq 1 15); do
-    sleep 2
-    # 只匹配 "Your quick Tunnel has been created! Visit it at:" 行里的 URL，避免抓到错误信息里的 api 端点
-    url=$(grep -E "Your quick Tunnel has been created" /tmp/tunnel_cloudflared.log 2>/dev/null \
-          | grep -oE "https://[a-z0-9-]+\.trycloudflare\.com" | head -1)
+  local metrics_port=""
+  for i in $(seq 1 20); do
+    sleep 1
+    # 来源 1：从日志 grep（兼容多版本文案）
+    url=$(extract_trycloudflare_url "$(cat /tmp/tunnel_cloudflared.log 2>/dev/null)")
     [ -n "$url" ] && break
-    # 检测明确的失败标志
-    if grep -q "failed to request quick Tunnel" /tmp/tunnel_cloudflared.log 2>/dev/null; then
-      warn "cloudflared 创建 quick tunnel 失败（可能是网络限制 / DNS / 出站被阻断）"
+    # 来源 2：cloudflared 启动后会暴露 metrics API，从日志查端口
+    if [ -z "$metrics_port" ]; then
+      metrics_port=$(grep -oE "metrics server on 127\.0\.0\.1:[0-9]+" /tmp/tunnel_cloudflared.log 2>/dev/null \
+                     | grep -oE "[0-9]+$" | head -1 || true)
+    fi
+    if [ -n "$metrics_port" ]; then
+      # 来源 3：metrics API 提供隧道信息（JSON）
+      url=$(curl -s "http://127.0.0.1:${metrics_port}/metrics" 2>/dev/null \
+            | grep -oE "https://[a-zA-Z0-9-]+\.trycloudflare\.com" \
+            | grep -v "^https://api\.trycloudflare\.com$" \
+            | head -1 || true)
+      [ -n "$url" ] && break
+    fi
+    # 检测明确的失败标志（context deadline exceeded / quota exceeded / network unreachable 等）
+    if grep -qE "failed to request quick Tunnel|context deadline exceeded|UserAgent.*error|register rpc error" \
+        /tmp/tunnel_cloudflared.log 2>/dev/null; then
+      warn "cloudflared 创建 quick tunnel 失败（网络限制 / DNS / 出站被阻断 / 配额耗尽）"
       warn "  查看日志: /tmp/tunnel_cloudflared.log"
       warn "  或换其他策略: bash tunnel.sh 8000 --ssh"
       return 1
     fi
+    # 进程死掉了立即终止
+    kill -0 "$(cat "$TUNNEL_PID_FILE" 2>/dev/null)" 2>/dev/null || break
   done
   if [ -z "$url" ]; then
-    warn "cloudflared 启动了但 30 秒内未拿到公网 URL"
+    warn "cloudflared 启动了但 20 秒内未拿到公网 URL"
     warn "  查看日志: /tmp/tunnel_cloudflared.log"
     return 1
   fi
