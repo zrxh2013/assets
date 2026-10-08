@@ -67,11 +67,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def proxy_balance(self, address):
         """代理查询私链账户余额（TRX + TRC20）"""
         try:
+            # TRON base58 不含 I, l, O, 0 — 用户输入常见混淆时自动修正
+            # I(大写i)→L(大写L), l(小写L)→i(小写i), O(大写O)→Q, 0(零)→1
+            fixed = address.replace('I', 'L').replace('l', 'i').replace('O', 'Q').replace('0', '1')
             # 地址转 hex：base58 解码后取前 21 字节（去掉末尾 4 字节 checksum）
             import base58check
-            addr_hex = base58check.b58decode(address)[:21].hex()
-        except Exception:
-            self.send_json({'error': '地址格式无效'}, 400)
+            addr_hex = base58check.b58decode(fixed)[:21].hex()
+            address = fixed  # 返回修正后的地址给前端
+        except Exception as e:
+            self.send_json({'error': f'地址格式无效: {address}'}, 400)
             return
 
         try:

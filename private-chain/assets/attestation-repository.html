@@ -899,7 +899,9 @@ async function syncUsdtBalance() {
       document.getElementById('usdtAmount').textContent = '0.000000';
       document.getElementById('trxAmount').textContent = '0.000000 TRX';
       document.getElementById('queryAddr').textContent = addr;
-      document.getElementById('usdtSub').textContent = '地址未激活（链上无记录）';
+      // 显示后端返回的真实错误，而非笼统的"地址未激活"
+      document.getElementById('usdtSub').textContent =
+        data.error || '地址未激活（链上无记录）';
       const now = new Date().toLocaleTimeString('zh-CN');
       document.getElementById('syncInfo').textContent = `已同步 · ${now}`;
       document.getElementById('tronscanLink').href = `https://tronscan.org/#/address/${addr}`;
