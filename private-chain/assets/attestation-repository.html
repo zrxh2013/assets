@@ -531,44 +531,60 @@
     </div>
   </div>
 
-  <!-- USDT 转账存证卡片 -->
-  <div class="usdt-attest-card">
+  <!-- USDT 转账存证卡片 —— 数据从链上动态加载 -->
+  <div class="usdt-attest-card" id="usdtAttestCard">
     <div class="usdt-attest-header">
       <div class="usdt-attest-title">
         <div class="usdt-attest-icon">₮</div>
         USDT 转账存证详情
       </div>
-      <span class="card-status"><span class="dot-green"></span>已上链</span>
+      <span class="card-status" id="usdtStatus"><span class="dot-green"></span>链上加载中…</span>
     </div>
-    <div class="usdt-row">
-      <span class="usdt-label">发送方 (From)</span>
-      <span class="usdt-value">TBhVUCRm3pZDJ144V9dLP6SNjf8ZaRZGkF</span>
-    </div>
-    <div class="usdt-row">
-      <span class="usdt-label">接收方 (To)</span>
-      <span class="usdt-value">TY2rZAHXd1zovaLAfSQSpQ57r1kLMKsADR</span>
-    </div>
-    <div class="usdt-row">
-      <span class="usdt-label">转账金额</span>
-      <span class="usdt-value amount">1,675,980 USDT</span>
-    </div>
-    <div class="usdt-row">
-      <span class="usdt-label">数据哈希 (dataHash)</span>
-      <span class="usdt-value hash">0x91c8c5e6da5fdfbfabf1a6efe058c40e26af450915496afa1aa2362913575c14</span>
-    </div>
-    <div class="usdt-row">
-      <span class="usdt-label">存证交易 txID</span>
-      <span class="usdt-value">294d7580270df4d842f038e3336a8e1153d1e82d64fd9401e6d24efaf0ee004d</span>
-    </div>
-    <div class="usdt-row">
-      <span class="usdt-label">上链网络</span>
-      <span class="usdt-value" style="color:#d4a017;">TRON 私链（测试）</span>
-    </div>
-    <div class="usdt-row">
-      <span class="usdt-label">存证时间</span>
-      <span class="usdt-value">2026-10-08</span>
+    <div id="usdtAttestBody" style="color:#999;font-size:13px;text-align:center;padding:20px 0;">
+      正在从区块链读取存证数据…
     </div>
   </div>
+
+  <script>
+  // 从链上加载 USDT 转账存证数据并渲染
+  (function loadUsdtAttestation() {
+    const TXID = '294d7580270df4d842f038e3336a8e1153d1e82d64fd9401e6d24efaf0ee004d';
+    fetch('/api/transaction?txid=' + TXID)
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) throw new Error(d.error);
+        const memo = d.memo_json || {};
+        const data = memo.data || {};
+        const ts = d.timestamp ? new Date(d.timestamp) : new Date(memo.ts * 1000);
+        const dateStr = ts.toLocaleString('zh-CN', { hour12: false });
+
+        const rows = [
+          ['发送方 (From)', data.from || '—', ''],
+          ['接收方 (To)', data.to || '—', ''],
+          ['转账金额', data.amount || '—', 'amount'],
+          ['数据哈希 (dataHash)', data.dataHash || '—', 'hash'],
+          ['存证交易 txID', d.txID || TXID, ''],
+          ['上链网络', 'TRON 私链（测试）', ''],
+          ['存证时间', dateStr, ''],
+        ];
+
+        const html = rows.map(([label, val, cls]) => `
+          <div class="usdt-row">
+            <span class="usdt-label">${label}</span>
+            <span class="usdt-value ${cls}">${val}</span>
+          </div>
+        `).join('');
+
+        document.getElementById('usdtAttestBody').innerHTML = html;
+        document.getElementById('usdtStatus').innerHTML = '<span class="dot-green"></span>已上链 · 数据来自链上';
+      })
+      .catch(e => {
+        document.getElementById('usdtAttestBody').innerHTML =
+          '<div style="color:#e74c3c;">链上数据加载失败: ' + e.message + '</div>';
+        document.getElementById('usdtStatus').innerHTML = '<span style="color:#e74c3c;">●</span> 加载失败';
+      });
+  })();
+  </script>
 
   <!-- Contract cards -->
   <div class="card-list" id="cardList"></div>
