@@ -67,9 +67,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def proxy_balance(self, address):
         """代理查询私链账户余额（TRX + TRC20）"""
         try:
-            # 地址转 hex（去掉 base58，这里简单用 tronweb 的逻辑替代）
+            # 地址转 hex：base58 解码后取前 21 字节（去掉末尾 4 字节 checksum）
             import base58check
-            addr_hex = base58check.b58decode(address).hex()
+            addr_hex = base58check.b58decode(address)[:21].hex()
         except Exception:
             self.send_json({'error': '地址格式无效'}, 400)
             return
