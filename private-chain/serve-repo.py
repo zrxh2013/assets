@@ -16,6 +16,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if self.path.startswith('/api/transaction?txid='):
             txid = self.path.split('txid=')[1]
             self.proxy_transaction(txid)
+        elif self.path.startswith('/api/balance?address='):
+            address = self.path.split('address=')[1].split('&')[0]
+            self.proxy_balance(address)
         else:
             super().do_GET()
 
@@ -58,6 +61,43 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 'memo_json': memo_obj,
             }
             self.send_json(result)
+        except Exception as e:
+            self.send_json({'error': str(e)}, 500)
+
+    def proxy_balance(self, address):
+        """代理查询私链账户余额（TRX + TRC20）"""
+        try:
+            # 地址转 hex（去掉 base58，这里简单用 tronweb 的逻辑替代）
+            import base58check
+            addr_hex = base58check.b58decode(address).hex()
+        except Exception:
+            self.send_json({'error': '地址格式无效'}, 400)
+            return
+
+        try:
+            req = urllib.request.Request(
+                f'{PRIVATE_NODE}/wallet/getaccount',
+                data=json.dumps({'address': addr_hex}).encode(),
+                headers={'Content-Type': 'application/json'},
+                method='POST'
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read())
+
+            trx_balance = (data.get('balance', 0)) / 1_000_000
+
+            # TRC20 余额: [{合约hex: 余额}, ...]
+            trc20_list = data.get('trc20', [])
+            trc20_map = {}
+            for token in trc20_list:
+                for k, v in token.items():
+                    trc20_map[k] = int(v)
+
+            self.send_json({
+                'address': address,
+                'trx': trx_balance,
+                'trc20': trc20_map,
+            })
         except Exception as e:
             self.send_json({'error': str(e)}, 500)
 

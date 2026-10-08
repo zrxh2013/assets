@@ -449,16 +449,16 @@
     <div class="balance-header">
       <div class="balance-title">
         <div class="balance-icon">₮</div>
-        <h3>USDT 资产余额 · 波场主网</h3>
+        <h3>USDT 资产余额 · TRON 私链</h3>
       </div>
-      <span class="balance-network">TRON Mainnet</span>
+      <span class="balance-network">TRON 私链</span>
     </div>
 
     <div class="balance-amount">
       <span class="num" id="usdtAmount">--</span>
       <span class="unit">USDT</span>
     </div>
-    <div class="balance-sub" id="usdtSub">正在从波场主网同步余额…</div>
+    <div class="balance-sub" id="usdtSub">正在从私链同步余额…</div>
 
     <div class="balance-rows">
       <div class="balance-row">
@@ -467,7 +467,7 @@
       </div>
       <div class="balance-row">
         <span class="balance-label">USDT 合约</span>
-        <span class="balance-val hash" id="usdtContract">TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</span>
+        <span class="balance-val hash" id="usdtContract">TQ3mFixn6sY88Dv72GifSiDNA68fYzvPap</span>
       </div>
       <div class="balance-row">
         <span class="balance-label">查询地址</span>
@@ -797,8 +797,9 @@ function copyText(text) {
 // ============================================================
 // USDT 余额同步 —— 直接调用波场主网 TronGrid 官方节点 API
 // ============================================================
-const USDT_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"; // 官方 USDT (TRC20) 合约地址
-const TRONGRID_API = "https://api.trongrid.io/v1/accounts/";
+const USDT_CONTRACT = "TQ3mFixn6sY88Dv72GifSiDNA68fYzvPap"; // 私链 USDT (TRC20) 合约地址
+const USDT_CONTRACT_HEX = "419a6e591feb47e5c48c6f50ce1c6e775a82c1fb25";
+const TRONGRID_API = "/api/balance?address=";
 
 function formatNumber(n, decimals = 6) {
   if (n === null || n === undefined || isNaN(n)) return '0.000000';
@@ -832,7 +833,7 @@ async function syncUsdtBalance() {
 
   btn.disabled = true;
   btn.textContent = '同步中…';
-  document.getElementById('usdtSub').innerHTML = '<span class="syncing">正在从波场主网同步余额…</span>';
+  document.getElementById('usdtSub').innerHTML = '<span class="syncing">正在从私链同步余额…</span>';
   document.getElementById('usdtAmount').textContent = '...';
   document.getElementById('trxAmount').textContent = '...';
 
@@ -842,21 +843,14 @@ async function syncUsdtBalance() {
     });
     const data = await resp.json();
 
-    if (data.success && data.data && data.data.length > 0) {
-      const acc = data.data[0];
+    if (!data.error) {
+      // TRX 余额
+      const trxBalance = data.trx || 0;
 
-      // TRX 余额 (sun → TRX)
-      const trxBalance = (acc.balance || 0) / 1_000_000;
-
-      // USDT 余额 (从 trc20 数组中找到官方 USDT 合约)
+      // USDT 余额 (从 trc20 map 中找到私链 USDT 合约)
       let usdtRaw = 0;
-      if (Array.isArray(acc.trc20)) {
-        for (const token of acc.trc20) {
-          if (token[USDT_CONTRACT] !== undefined) {
-            usdtRaw = Number(token[USDT_CONTRACT]);
-            break;
-          }
-        }
+      if (data.trc20 && typeof data.trc20 === 'object') {
+        usdtRaw = data.trc20[USDT_CONTRACT_HEX] || 0;
       }
       const usdtBalance = usdtRaw / 1_000_000;
 
@@ -865,16 +859,15 @@ async function syncUsdtBalance() {
       document.getElementById('trxAmount').textContent = formatNumber(trxBalance) + ' TRX';
       document.getElementById('queryAddr').textContent = addr;
       document.getElementById('usdtSub').textContent =
-        usdtBalance > 0 ? '已同步波场主网链上真实余额' : '该地址当前无 USDT 持仓';
+        usdtBalance > 0 ? '已同步私链链上真实余额' : '该地址当前无私链 USDT 持仓';
 
       const now = new Date().toLocaleTimeString('zh-CN');
       document.getElementById('syncInfo').textContent =
-        `已同步 · ${now} · TronGrid 官方主网节点`;
+        `已同步 · ${now} · TRON 私链节点`;
 
       const link = document.getElementById('tronscanLink');
       link.href = `https://tronscan.org/#/address/${addr}`;
     } else {
-      // 地址未激活或不存在
       document.getElementById('usdtAmount').textContent = '0.000000';
       document.getElementById('trxAmount').textContent = '0.000000 TRX';
       document.getElementById('queryAddr').textContent = addr;
@@ -903,7 +896,7 @@ window.addEventListener('load', () => {
 // ============================================================
 // 上链存证广播 —— 浏览器端用 TronWeb 构建并广播交易
 // ============================================================
-const USDT_CONTRACT_BROADCAST = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+const USDT_CONTRACT_BROADCAST = "TQ3mFixn6sY88Dv72GifSiDNA68fYzvPap";
 
 async function broadcastAnchor() {
   const title = document.getElementById('anchorTitle').value.trim();
