@@ -86,12 +86,34 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
             trx_balance = (data.get('balance', 0)) / 1_000_000
 
-            # TRC20 余额: [{合约hex: 余额}, ...]
-            trc20_list = data.get('trc20', [])
+            # TRC20 余额: 私链 getaccount 不返回 trc20，需通过合约 balanceOf 查询
             trc20_map = {}
-            for token in trc20_list:
-                for k, v in token.items():
-                    trc20_map[k] = int(v)
+            trc20_list = data.get('trc20', [])
+            if trc20_list:
+                # 主网/部分节点直接返回 trc20 字段
+                for token in trc20_list:
+                    for k, v in token.items():
+                        trc20_map[k] = int(v)
+            else:
+                # 私链：调用 USDT 合约 balanceOf 查询
+                USDT_CONTRACT_HEX = '41b79c4f7d2aac45e8f63cde7759c14474fed67786'
+                owner_param = addr_hex[2:].rjust(64, '0')
+                req2 = urllib.request.Request(
+                    f'{PRIVATE_NODE}/wallet/triggerconstantcontract',
+                    data=json.dumps({
+                        'owner_address': addr_hex,
+                        'contract_address': USDT_CONTRACT_HEX,
+                        'function_selector': 'balanceOf(address)',
+                        'parameter': owner_param,
+                    }).encode(),
+                    headers={'Content-Type': 'application/json'},
+                    method='POST'
+                )
+                with urllib.request.urlopen(req2, timeout=10) as resp2:
+                    result = json.loads(resp2.read())
+                constant = result.get('constant_result', [])
+                if constant:
+                    trc20_map[USDT_CONTRACT_HEX] = int(constant[0], 16)
 
             self.send_json({
                 'address': address,

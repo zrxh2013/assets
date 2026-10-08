@@ -480,7 +480,7 @@
       </div>
       <div class="balance-row">
         <span class="balance-label">USDT 合约</span>
-        <span class="balance-val hash" id="usdtContract">TQ3mFixn6sY88Dv72GifSiDNA68fYzvPap</span>
+        <span class="balance-val hash" id="usdtContract">TSi3uopuCqLXKzLhycpVpNunJZ8GnNUPTd</span>
       </div>
       <div class="balance-row">
         <span class="balance-label">查询地址</span>
@@ -825,8 +825,8 @@ function copyText(text) {
 // ============================================================
 // USDT 余额同步 —— 直接调用波场主网 TronGrid 官方节点 API
 // ============================================================
-const USDT_CONTRACT = "TQ3mFixn6sY88Dv72GifSiDNA68fYzvPap"; // 私链 USDT (TRC20) 合约地址
-const USDT_CONTRACT_HEX = "419a6e591feb47e5c48c6f50ce1c6e775a82c1fb25";
+const USDT_CONTRACT = "TSi3uopuCqLXKzLhycpVpNunJZ8GnNUPTd"; // 私链 USDT (TRC20) 合约地址
+const USDT_CONTRACT_HEX = "41b79c4f7d2aac45e8f63cde7759c14474fed67786";
 const TRONGRID_API = "/api/balance?address=";
 
 function formatNumber(n, decimals = 6) {
@@ -924,7 +924,7 @@ window.addEventListener('load', () => {
 // ============================================================
 // 上链存证广播 —— 浏览器端用 TronWeb 构建并广播交易
 // ============================================================
-const USDT_CONTRACT_BROADCAST = "TQ3mFixn6sY88Dv72GifSiDNA68fYzvPap";
+const USDT_CONTRACT_BROADCAST = "TSi3uopuCqLXKzLhycpVpNunJZ8GnNUPTd";
 
 async function broadcastAnchor() {
   const title = document.getElementById('anchorTitle').value.trim();
