@@ -72,6 +72,19 @@
   .usdt-value.amount { color: #26a17b; font-weight: 600; font-size: 16px; font-family: inherit; }
   .usdt-value.hash { color: #b8860b; }
 
+  /* 存证凭证图 */
+  .cert-card {
+    background: #fff; border: 1px solid #f0e8d0; border-radius: 16px;
+    padding: 16px; margin: 0 16px 12px;
+    box-shadow: 0 2px 8px rgba(180,140,20,0.06);
+  }
+  .cert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .cert-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: #2c2c2c; }
+  .cert-icon { width: 28px; height: 28px; background: #d4a017; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; }
+  .cert-img-wrap { border-radius: 12px; overflow: hidden; border: 1px solid #f0e8d0; }
+  .cert-img { width: 100%; display: block; }
+  .cert-download { display: inline-block; margin-top: 10px; font-size: 12px; color: #b8860b; text-decoration: none; }
+
   /* Contract cards */
   .card-list { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
   .contract-card {
@@ -585,6 +598,21 @@
       });
   })();
   </script>
+
+  <!-- 存证凭证图 -->
+  <div class="cert-card">
+    <div class="cert-header">
+      <div class="cert-title">
+        <div class="cert-icon">🖼️</div>
+        存证凭证图
+      </div>
+      <span class="card-status"><span class="dot-green"></span>链上数据可视化</span>
+    </div>
+    <div class="cert-img-wrap">
+      <img src="usdt-attestation-certificate.png" alt="USDT 存证凭证" class="cert-img" id="certImg">
+    </div>
+    <a href="usdt-attestation-certificate.png" download class="cert-download">⬇ 下载存证凭证图</a>
+  </div>
 
   <!-- Contract cards -->
   <div class="card-list" id="cardList"></div>
