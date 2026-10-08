@@ -495,8 +495,8 @@
     </div>
 
     <div class="balance-footer">
-      <span class="balance-sync-info" id="syncInfo">数据来源：TronGrid 官方主网节点</span>
-      <a href="#" id="tronscanLink" target="_blank">在 TronScan 查看 ↗</a>
+      <span class="balance-sync-info" id="syncInfo">数据来源：本地 TRON 私链节点</span>
+      <a href="#" id="tronscanLink" target="_blank">🔗 本地节点查看</a>
     </div>
   </div>
 
@@ -653,8 +653,8 @@
     </div>
 
     <div class="notary-footer">
-      <a href="https://tronscan.org/#/transaction/7506790e8dedc4052747b55241e45a9ff89415d81d3f3e1acbaa5784c888f407" target="_blank" class="btn-tronscan">
-        <span>↗</span> 在 TronScan 官方区块链浏览器查看原始交易
+      <a href="http://127.0.0.1:18090/wallet/gettransactionbyid" target="_blank" class="btn-tronscan" onclick="event.preventDefault();copyText('7506790e8dedc4052747b55241e45a9ff89415d81d3f3e1acbaa5784c888f407');this.innerHTML='<span>✓</span> txID 已复制';">
+        <span>📋</span> 复制链上交易 txID
       </a>
     </div>
   </div>
@@ -762,7 +762,7 @@ function renderCards(list) {
         <button class="copy-btn" onclick="copyText('${SIGNER}')">复制</button>
       </div>
       <div class="card-actions">
-        <a href="https://tronscan.org/#/transaction/${c.txID}" target="_blank" class="btn btn-primary">在 TronScan 查看</a>
+        <a href="#" onclick="event.preventDefault();copyText('${c.txID}');showToast('txID 已复制');" class="btn btn-primary">📋 复制链上 txID</a>
         <a href="ptahdao-trust-contracts.html#${c.id}" class="btn btn-secondary">查看合同</a>
       </div>
     </div>
