@@ -12,6 +12,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ASSETS_DIR, **kwargs)
 
+    def end_headers(self):
+        # 强制 HTML 不缓存，确保手机端总是拿到最新版本
+        if self.path.endswith('.html') or self.path == '/':
+            self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+        super().end_headers()
+
     def do_GET(self):
         if self.path.startswith('/api/transaction?txid='):
             txid = self.path.split('txid=')[1]
