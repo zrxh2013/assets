@@ -55,6 +55,23 @@
   }
   .filter-tab.active { background: #d4a017; color: #fff; border-color: #d4a017; }
 
+  /* USDT 转账存证卡片 */
+  .usdt-attest-card {
+    background: linear-gradient(135deg, #fff9ed 0%, #fff 100%);
+    border: 1px solid #f0e8d0; border-radius: 16px;
+    padding: 16px; margin: 0 16px 12px;
+    box-shadow: 0 2px 8px rgba(180,140,20,0.06);
+  }
+  .usdt-attest-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .usdt-attest-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: #2c2c2c; }
+  .usdt-attest-icon { width: 28px; height: 28px; background: #26a17b; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; }
+  .usdt-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #f0e8d0; font-size: 13px; }
+  .usdt-row:last-child { border-bottom: none; }
+  .usdt-label { color: #888; flex-shrink: 0; }
+  .usdt-value { color: #2c2c2c; word-break: break-all; text-align: right; font-family: "SF Mono", Consolas, monospace; font-size: 12px; }
+  .usdt-value.amount { color: #26a17b; font-weight: 600; font-size: 16px; font-family: inherit; }
+  .usdt-value.hash { color: #b8860b; }
+
   /* Contract cards */
   .card-list { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
   .contract-card {
@@ -511,6 +528,45 @@
       <div class="anchor-tip">
         ⚠️ 私钥仅在浏览器本地用于签名，不会上传任何服务器。数据将写入 TRON 主网交易 memo，永久可查。
       </div>
+    </div>
+  </div>
+
+  <!-- USDT 转账存证卡片 -->
+  <div class="usdt-attest-card">
+    <div class="usdt-attest-header">
+      <div class="usdt-attest-title">
+        <div class="usdt-attest-icon">₮</div>
+        USDT 转账存证详情
+      </div>
+      <span class="card-status"><span class="dot-green"></span>已上链</span>
+    </div>
+    <div class="usdt-row">
+      <span class="usdt-label">发送方 (From)</span>
+      <span class="usdt-value">TBhVUCRm3pZDJ144V9dLP6SNjf8ZaRZGkF</span>
+    </div>
+    <div class="usdt-row">
+      <span class="usdt-label">接收方 (To)</span>
+      <span class="usdt-value">TY2rZAHXd1zovaLAfSQSpQ57r1kLMKsADR</span>
+    </div>
+    <div class="usdt-row">
+      <span class="usdt-label">转账金额</span>
+      <span class="usdt-value amount">1,675,980 USDT</span>
+    </div>
+    <div class="usdt-row">
+      <span class="usdt-label">数据哈希 (dataHash)</span>
+      <span class="usdt-value hash">0x91c8c5e6da5fdfbfabf1a6efe058c40e26af450915496afa1aa2362913575c14</span>
+    </div>
+    <div class="usdt-row">
+      <span class="usdt-label">存证交易 txID</span>
+      <span class="usdt-value">294d7580270df4d842f038e3336a8e1153d1e82d64fd9401e6d24efaf0ee004d</span>
+    </div>
+    <div class="usdt-row">
+      <span class="usdt-label">上链网络</span>
+      <span class="usdt-value" style="color:#d4a017;">TRON 私链（测试）</span>
+    </div>
+    <div class="usdt-row">
+      <span class="usdt-label">存证时间</span>
+      <span class="usdt-value">2026-10-08</span>
     </div>
   </div>
 
