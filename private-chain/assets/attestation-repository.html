@@ -477,7 +477,7 @@
         <div class="balance-icon" style="background:#d4a017;">📤</div>
         <h3>上链存证 · 广播交易</h3>
       </div>
-      <span class="balance-network">波场主网</span>
+      <span class="balance-network">TRON 私链</span>
     </div>
 
     <div class="anchor-form">
@@ -863,9 +863,9 @@ async function broadcastAnchor() {
       throw new Error('TronWeb 库未加载，请检查网络连接');
     }
 
-    // 初始化 TronWeb（主网）
+    // 初始化 TronWeb（私链）
     const tronWeb = new TronWebCtor({
-      fullHost: 'https://api.trongrid.io',
+      fullHost: 'http://127.0.0.1:18090',
       privateKey: privKey,
     });
     resultDiv.innerHTML = '<span style="color:#f39c12;">步骤2: 构建交易（带 memo）…</span>';
@@ -913,7 +913,7 @@ async function broadcastAnchor() {
     resultDiv.innerHTML = '<span style="color:#f39c12;">步骤4: 签名交易…</span>' + (memoAdded ? ' (memo已添加)' : ' (无memo)');
 
     const signed = await tronWeb.trx.sign(tx);
-    resultDiv.innerHTML = '<span style="color:#f39c12;">步骤5: 广播到波场主网…</span>';
+    resultDiv.innerHTML = '<span style="color:#f39c12;">步骤5: 广播到 TRON 私链…</span>';
 
     const result = await tronWeb.trx.sendRawTransaction(signed);
 
@@ -922,7 +922,7 @@ async function broadcastAnchor() {
     if (isSuccess) {
       const txid = signed.txID || result.txid;
       resultDiv.innerHTML =
-        '<div class="ok">✅ 广播成功！交易已写入波场主网</div>' +
+        '<div class="ok">✅ 广播成功！交易已写入 TRON 私链</div>' +
         '<div>发送方: ' + from + '</div>' +
         '<div>接收方: ' + toAddr + '</div>' +
         '<div>转账金额: ' + amount + ' TRX</div>' +
