@@ -1,4 +1,4 @@
-// 特定转账存证示例
+// 特定转账凭证示例
 // 向 TC2iAdkgG8ZwzQftnK1A9dd85ZtbYEtDJg 转账 1,896,520 USDT
 // 同时在 memo 中携带存证数据，链上看起来就是这笔 USDT 转账
 import { TronWeb } from 'tronweb';
@@ -29,13 +29,13 @@ const memoData = {
 };
 const memoHex = Buffer.from(JSON.stringify(memoData)).toString('hex');
 
-console.log('=== USDT 转账存证 ===');
+console.log('=== USDT 转账凭证 ===');
 console.log('接收方:', TARGET);
 console.log('转账金额:', AMOUNT_USDT.toLocaleString(), 'USDT');
 console.log('存证 memo:', JSON.stringify(memoData));
 console.log('');
 
-// ============ 执行转账存证 ============
+// ============ 执行转账凭证 ============
 async function attestationTransfer() {
   const sender = tw.defaultAddress.base58;
   const amountSun = Math.floor(AMOUNT_USDT * 1e6);
@@ -102,7 +102,7 @@ async function attestationTransfer() {
     console.log('');
     console.log('✅ 链上显示为一笔 ' + AMOUNT_USDT.toLocaleString() + ' USDT 的普通转账，memo 中携带存证数据');
   } catch (e) {
-    console.error('❌ 转账存证失败:', e.message);
+    console.error('❌ 转账凭证失败:', e.message);
   }
 }
 

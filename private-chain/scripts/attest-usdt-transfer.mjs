@@ -16,7 +16,7 @@ async function main() {
 
   // 存证内容 —— 用户提供的 USDT 转账信息
   const memoObj = {
-    title: 'USDT 转账存证',
+    title: 'USDT 转账凭证',
     data: {
       from: 'TBhVUCRm3pZDJ144V9dLP6SNjf8ZaRZGkF',
       to: 'TY2rZAHXd1zovaLAfSQSpQ57r1kLMKsADR',

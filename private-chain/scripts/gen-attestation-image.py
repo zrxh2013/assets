@@ -8,7 +8,7 @@ LOGO_PATH = os.path.join(ASSETS, 'usdt-logo-official.jpg')
 OUTPUT_PATH = os.path.join(ASSETS, 'usdt-attestation-certificate.png')
 
 # 存证数据（从链上获取）
-TITLE = "USDT 转账存证"
+TITLE = "USDT 转账凭证"
 DATA = {
     "发送方 (From)": "TBhVUCRm3pZDJ144V9dLP6SNjf8ZaRZGkF",
     "接收方 (To)": "TY2rZAHXd1zovaLAfSQSpQ57r1kLMKsADR",

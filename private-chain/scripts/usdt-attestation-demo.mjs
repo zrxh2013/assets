@@ -1,4 +1,4 @@
-// USDT 转账存证示例
+// USDT 转账凭证示例
 // 通过调用 USDT 合约的 transfer 方法向受益人转账真实金额，
 // 同时在 memo 中携带存证数据，链上看起来就是一笔普通的 USDT 转账
 import { TronWeb } from 'tronweb';
@@ -33,7 +33,7 @@ console.log('存证 memo:', JSON.stringify(memoData));
 console.log('转账金额:', Number(beneficiary.amount).toLocaleString(), 'USDT');
 console.log('');
 
-// ============ 执行 USDT 转账存证 ============
+// ============ 执行 USDT 转账凭证 ============
 async function usdtAttestation() {
   const sender = tw.defaultAddress.base58;
   const amountUsdt = parseFloat(beneficiary.amount);

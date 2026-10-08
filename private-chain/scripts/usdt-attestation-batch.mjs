@@ -1,4 +1,4 @@
-// USDT 转账存证 - 批量版本
+// USDT 转账凭证 - 批量版本
 // 向每个受益人转账真实金额的 USDT，同时在 memo 中携带存证数据
 // 链上看起来就是普通的 USDT 转账，金额与确权金额一致
 // 支持断点续传
@@ -42,7 +42,7 @@ function saveResults(results) {
   writeFileSync(RESULTS_FILE, JSON.stringify(results, null, 2));
 }
 
-// ============ 单笔 USDT 转账存证 ============
+// ============ 单笔 USDT 转账凭证 ============
 async function attestOne(b, sender) {
   const amountUsdt = parseFloat(b.amount);
   const amountSun = Math.floor(amountUsdt * 1e6);

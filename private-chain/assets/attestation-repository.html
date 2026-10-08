@@ -55,7 +55,7 @@
   }
   .filter-tab.active { background: #d4a017; color: #fff; border-color: #d4a017; }
 
-  /* USDT 转账存证卡片 */
+  /* USDT 转账凭证卡片 */
   .usdt-attest-card {
     background: linear-gradient(135deg, #fff9ed 0%, #fff 100%);
     border: 1px solid #f0e8d0; border-radius: 16px;
@@ -544,12 +544,12 @@
     </div>
   </div>
 
-  <!-- USDT 转账存证卡片 —— 数据从链上动态加载 -->
+  <!-- USDT 转账凭证卡片 —— 数据从链上动态加载 -->
   <div class="usdt-attest-card" id="usdtAttestCard">
     <div class="usdt-attest-header">
       <div class="usdt-attest-title">
         <div class="usdt-attest-icon">₮</div>
-        USDT 转账存证详情
+        USDT 转账凭证详情
       </div>
       <span class="card-status" id="usdtStatus"><span class="dot-green"></span>链上加载中…</span>
     </div>
@@ -559,9 +559,9 @@
   </div>
 
   <script>
-  // 从链上加载 USDT 转账存证数据并渲染
+  // 从链上加载 USDT 转账凭证数据并渲染
   (function loadUsdtAttestation() {
-    const TXID = '294d7580270df4d842f038e3336a8e1153d1e82d64fd9401e6d24efaf0ee004d';
+    const TXID = '319554ff6086d00371f770318714802512c101f7fdf835367ea2c085132af7f0';
     fetch('/api/transaction?txid=' + TXID)
       .then(r => r.json())
       .then(d => {
