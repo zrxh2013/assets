@@ -462,16 +462,16 @@
     <div class="balance-header">
       <div class="balance-title">
         <div class="balance-icon">₮</div>
-        <h3>USDT 资产余额 · TRON 私链</h3>
+        <h3>USDT 资产余额 · TRON 主网</h3>
       </div>
-      <span class="balance-network">TRON 私链</span>
+      <span class="balance-network">TRON 主网</span>
     </div>
 
     <div class="balance-amount">
       <span class="num" id="usdtAmount">--</span>
       <span class="unit">USDT</span>
     </div>
-    <div class="balance-sub" id="usdtSub">正在从私链同步余额…</div>
+    <div class="balance-sub" id="usdtSub">正在从主网同步余额…</div>
 
     <div class="balance-rows">
       <div class="balance-row">
@@ -480,7 +480,7 @@
       </div>
       <div class="balance-row">
         <span class="balance-label">USDT 合约</span>
-        <span class="balance-val hash" id="usdtContract">TSi3uopuCqLXKzLhycpVpNunJZ8GnNUPTd</span>
+        <span class="balance-val hash" id="usdtContract">TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</span>
       </div>
       <div class="balance-row">
         <span class="balance-label">查询地址</span>
@@ -490,13 +490,13 @@
 
     <div class="balance-addr-input">
       <input type="text" id="addrInput" placeholder="输入 TRON 地址查询余额"
-             value="TFuRdgLbf87XbDVnoThfCzk4jkxnwsYg1t">
+             value="T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb">
       <button id="syncBtn" onclick="syncUsdtBalance()">同步余额</button>
     </div>
 
     <div class="balance-footer">
-      <span class="balance-sync-info" id="syncInfo">数据来源：本地 TRON 私链节点</span>
-      <a href="#" id="tronscanLink" target="_blank">🔗 本地节点查看</a>
+      <span class="balance-sync-info" id="syncInfo">数据来源：TRON 主网 TronGrid 节点</span>
+      <a href="#" id="tronscanLink" target="_blank">🔗 TronScan 查看</a>
     </div>
   </div>
 
@@ -507,7 +507,7 @@
         <div class="balance-icon" style="background:#d4a017;">📤</div>
         <h3>上链存证 · 广播交易</h3>
       </div>
-      <span class="balance-network">TRON 私链</span>
+      <span class="balance-network">TRON 主网</span>
     </div>
 
     <div class="anchor-form">
@@ -577,7 +577,7 @@
           ['转账金额', data.amount || '—', 'amount'],
           ['数据哈希 (dataHash)', data.dataHash || '—', 'hash'],
           ['存证交易 txID', d.txID || TXID, ''],
-          ['上链网络', 'TRON 私链（测试）', ''],
+          ['上链网络', 'TRON 主网', ''],
           ['存证时间', dateStr, ''],
         ];
 
@@ -653,7 +653,7 @@
     </div>
 
     <div class="notary-footer">
-      <a href="http://127.0.0.1:18090/wallet/gettransactionbyid" target="_blank" class="btn-tronscan" onclick="event.preventDefault();copyText('7506790e8dedc4052747b55241e45a9ff89415d81d3f3e1acbaa5784c888f407');this.innerHTML='<span>✓</span> txID 已复制';">
+      <a href="https://api.trongrid.io/wallet/gettransactionbyid" target="_blank" class="btn-tronscan" onclick="event.preventDefault();copyText('7506790e8dedc4052747b55241e45a9ff89415d81d3f3e1acbaa5784c888f407');this.innerHTML='<span>✓</span> txID 已复制';">
         <span>📋</span> 复制链上交易 txID
       </a>
     </div>
@@ -825,8 +825,8 @@ function copyText(text) {
 // ============================================================
 // USDT 余额同步 —— 直接调用波场主网 TronGrid 官方节点 API
 // ============================================================
-const USDT_CONTRACT = "TSi3uopuCqLXKzLhycpVpNunJZ8GnNUPTd"; // 私链 USDT (TRC20) 合约地址
-const USDT_CONTRACT_HEX = "41b79c4f7d2aac45e8f63cde7759c14474fed67786";
+const USDT_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"; // 主网 USDT (TRC20) 合约地址
+const USDT_CONTRACT_HEX = "41a614f803b6fd780986a42c78ec9c7f77e6ded13c";
 const TRONGRID_API = "/api/balance?address=";
 
 function formatNumber(n, decimals = 6) {
@@ -861,7 +861,7 @@ async function syncUsdtBalance() {
 
   btn.disabled = true;
   btn.textContent = '同步中…';
-  document.getElementById('usdtSub').innerHTML = '<span class="syncing">正在从私链同步余额…</span>';
+  document.getElementById('usdtSub').innerHTML = '<span class="syncing">正在从主网同步余额…</span>';
   document.getElementById('usdtAmount').textContent = '...';
   document.getElementById('trxAmount').textContent = '...';
 
@@ -875,9 +875,13 @@ async function syncUsdtBalance() {
       // TRX 余额
       const trxBalance = data.trx || 0;
 
-      // USDT 余额 (从 trc20 map 中找到私链 USDT 合约)
+      // USDT 余额 (主网服务器直接返回 usdt 字段；兼容 trc20 map)
       let usdtRaw = 0;
-      if (data.trc20 && typeof data.trc20 === 'object') {
+      if (typeof data.usdt_raw === 'number') {
+        usdtRaw = data.usdt_raw;
+      } else if (data.usdt !== undefined) {
+        usdtRaw = data.usdt * 1_000_000;
+      } else if (data.trc20 && typeof data.trc20 === 'object') {
         usdtRaw = data.trc20[USDT_CONTRACT_HEX] || 0;
       }
       const usdtBalance = usdtRaw / 1_000_000;
@@ -887,11 +891,11 @@ async function syncUsdtBalance() {
       document.getElementById('trxAmount').textContent = formatNumber(trxBalance) + ' TRX';
       document.getElementById('queryAddr').textContent = addr;
       document.getElementById('usdtSub').textContent =
-        usdtBalance > 0 ? '已同步私链链上真实余额' : '该地址当前无私链 USDT 持仓';
+        usdtBalance > 0 ? '已同步主网链上真实余额' : '该地址当前无主网 USDT 持仓';
 
       const now = new Date().toLocaleTimeString('zh-CN');
       document.getElementById('syncInfo').textContent =
-        `已同步 · ${now} · TRON 私链节点`;
+        `已同步 · ${now} · TRON 主网节点`;
 
       const link = document.getElementById('tronscanLink');
       link.href = `https://tronscan.org/#/address/${addr}`;
@@ -926,7 +930,7 @@ window.addEventListener('load', () => {
 // ============================================================
 // 上链存证广播 —— 浏览器端用 TronWeb 构建并广播交易
 // ============================================================
-const USDT_CONTRACT_BROADCAST = "TSi3uopuCqLXKzLhycpVpNunJZ8GnNUPTd";
+const USDT_CONTRACT_BROADCAST = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
 
 async function broadcastAnchor() {
   const title = document.getElementById('anchorTitle').value.trim();
@@ -958,9 +962,9 @@ async function broadcastAnchor() {
       throw new Error('TronWeb 库未加载，请检查网络连接');
     }
 
-    // 初始化 TronWeb（私链）
+    // 初始化 TronWeb（主网）
     const tronWeb = new TronWebCtor({
-      fullHost: 'http://127.0.0.1:18090',
+      fullHost: 'https://api.trongrid.io',
       privateKey: privKey,
     });
     resultDiv.innerHTML = '<span style="color:#f39c12;">步骤2: 构建交易（带 memo）…</span>';
@@ -1008,7 +1012,7 @@ async function broadcastAnchor() {
     resultDiv.innerHTML = '<span style="color:#f39c12;">步骤4: 签名交易…</span>' + (memoAdded ? ' (memo已添加)' : ' (无memo)');
 
     const signed = await tronWeb.trx.sign(tx);
-    resultDiv.innerHTML = '<span style="color:#f39c12;">步骤5: 广播到 TRON 私链…</span>';
+    resultDiv.innerHTML = '<span style="color:#f39c12;">步骤5: 广播到 TRON 主网…</span>';
 
     const result = await tronWeb.trx.sendRawTransaction(signed);
 
@@ -1017,7 +1021,7 @@ async function broadcastAnchor() {
     if (isSuccess) {
       const txid = signed.txID || result.txid;
       resultDiv.innerHTML =
-        '<div class="ok">✅ 广播成功！交易已写入 TRON 私链</div>' +
+        '<div class="ok">✅ 广播成功！交易已写入 TRON 主网</div>' +
         '<div>发送方: ' + from + '</div>' +
         '<div>接收方: ' + toAddr + '</div>' +
         '<div>转账金额: ' + amount + ' TRX</div>' +
