@@ -423,8 +423,38 @@
   }
 </style>
 
-<!-- TronWeb 浏览器端库（用于链上交易广播） -->
+<!-- TronWeb 浏览器端库（用于链上交易广播与查询） -->
 <script src="https://cdn.jsdelivr.net/npm/tronweb@6.5.1/dist/TronWeb.min.js"></script>
+<script>
+  // 全局常量与只读查询工具（纯静态，浏览器端直连主网）
+  const USDT_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"; // 主网 USDT (TRC20)
+  const USDT_CONTRACT_HEX = "41a614f803b6fd780986a42c78ec9c7f77e6ded13c";
+
+  function getQueryTronWeb() {
+    if (window._queryTronWeb) return window._queryTronWeb;
+    const tw = window.TronWeb;
+    const TronWebCtor = (tw && typeof tw.TronWeb === 'function' && tw.TronWeb) || tw || window.tronweb;
+    if (typeof TronWebCtor !== 'function') {
+      throw new Error('TronWeb 库未加载，请检查网络连接');
+    }
+    window._queryTronWeb = new TronWebCtor({ fullHost: 'https://api.trongrid.io' });
+    return window._queryTronWeb;
+  }
+
+  async function getUsdtBalance(address) {
+    const tronWeb = getQueryTronWeb();
+    const addrHex = tronWeb.address.toHex(address);
+    const result = await tronWeb.transactionBuilder.triggerConstantContract(
+      USDT_CONTRACT, 'balanceOf(address)', {},
+      [{ type: 'address', value: addrHex }],
+      addrHex
+    );
+    if (result.constant_result && result.constant_result[0]) {
+      return parseInt(result.constant_result[0], 16);
+    }
+    return 0;
+  }
+</script>
 </head>
 <body>
 
@@ -559,43 +589,55 @@
   </div>
 
   <script>
-  // 从链上加载 USDT 转账凭证数据并渲染
-  (function loadUsdtAttestation() {
-    const TXID = '319554ff6086d00371f770318714802512c101f7fdf835367ea2c085132af7f0';
-    fetch('/api/transaction?txid=' + TXID)
-      .then(r => r.json())
-      .then(d => {
-        if (d.error) throw new Error(d.error);
-        const memo = d.memo_json || {};
-        const data = memo.data || {};
-        const ts = d.timestamp ? new Date(d.timestamp) : new Date(memo.ts * 1000);
-        const dateStr = ts.toLocaleString('zh-CN', { hour12: false });
+  // 从链上加载 USDT 转账凭证数据并渲染（浏览器端直接调用主网，纯静态）
+  (async function loadUsdtAttestation() {
+    const TXID = 'f826a8be3d277f0f4859e7d21a7712e36b7f7a9047372155292bb11668d4a79d';
+    try {
+      const tronWeb = getQueryTronWeb();
+      const tx = await tronWeb.trx.getTransaction(TXID);
+      if (!tx || !tx.raw_data) throw new Error('txID 未在主网找到');
 
-        const rows = [
-          ['发送方 (From)', data.from || '—', ''],
-          ['接收方 (To)', data.to || '—', ''],
-          ['转账金额', data.amount || '—', 'amount'],
-          ['数据哈希 (dataHash)', data.dataHash || '—', 'hash'],
-          ['存证交易 txID', d.txID || TXID, ''],
-          ['上链网络', 'TRON 主网', ''],
-          ['存证时间', dateStr, ''],
-        ];
+      const raw = tx.raw_data;
+      const contract = raw.contract && raw.contract[0] ? raw.contract[0] : {};
+      const v = contract.parameter ? contract.parameter.value : {};
 
-        const html = rows.map(([label, val, cls]) => `
-          <div class="usdt-row">
-            <span class="usdt-label">${label}</span>
-            <span class="usdt-value ${cls}">${val}</span>
-          </div>
-        `).join('');
+      // 解码 memo（raw_data.data 是 hex）
+      let memoText = '';
+      let memoObj = null;
+      if (raw.data) {
+        try {
+          memoText = tronWeb.utils.bytes.bytesToString(tronWeb.utils.code.hexStr2byteArray(raw.data));
+          memoObj = JSON.parse(memoText);
+        } catch (e) { /* memo 非 JSON，忽略 */ }
+      }
+      const data = (memoObj && memoObj.data) || {};
+      const ts = raw.timestamp ? new Date(raw.timestamp) : (memoObj && memoObj.ts ? new Date(memoObj.ts * 1000) : new Date());
+      const dateStr = ts.toLocaleString('zh-CN', { hour12: false });
 
-        document.getElementById('usdtAttestBody').innerHTML = html;
-        document.getElementById('usdtStatus').innerHTML = '<span class="dot-green"></span>已上链 · 数据来自链上';
-      })
-      .catch(e => {
-        document.getElementById('usdtAttestBody').innerHTML =
-          '<div style="color:#e74c3c;">链上数据加载失败: ' + e.message + '</div>';
-        document.getElementById('usdtStatus').innerHTML = '<span style="color:#e74c3c;">●</span> 加载失败';
-      });
+      const rows = [
+        ['发送方 (From)', data.from || '—', ''],
+        ['接收方 (To)', data.to || '—', ''],
+        ['转账金额', data.amount || '—', 'amount'],
+        ['数据哈希 (dataHash)', data.dataHash || '—', 'hash'],
+        ['存证交易 txID', tx.txID || TXID, ''],
+        ['上链网络', 'TRON 主网', ''],
+        ['存证时间', dateStr, ''],
+      ];
+
+      const html = rows.map(([label, val, cls]) => `
+        <div class="usdt-row">
+          <span class="usdt-label">${label}</span>
+          <span class="usdt-value ${cls}">${val}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('usdtAttestBody').innerHTML = html;
+      document.getElementById('usdtStatus').innerHTML = '<span class="dot-green"></span>已上链 · 数据来自链上';
+    } catch (e) {
+      document.getElementById('usdtAttestBody').innerHTML =
+        '<div style="color:#e74c3c;">链上数据加载失败: ' + e.message + '</div>';
+      document.getElementById('usdtStatus').innerHTML = '<span style="color:#e74c3c;">●</span> 加载失败';
+    }
   })();
   </script>
 
@@ -823,12 +865,9 @@ function copyText(text) {
 }
 
 // ============================================================
-// USDT 余额同步 —— 直接调用波场主网 TronGrid 官方节点 API
+// USDT 余额同步 —— 浏览器端直接调用波场主网 TronGrid 官方节点（纯静态，无需后端）
+// 全局常量 USDT_CONTRACT / getQueryTronWeb / getUsdtBalance 已在 <head> 中定义
 // ============================================================
-const USDT_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"; // 主网 USDT (TRC20) 合约地址
-const USDT_CONTRACT_HEX = "41a614f803b6fd780986a42c78ec9c7f77e6ded13c";
-const TRONGRID_API = "/api/balance?address=";
-
 function formatNumber(n, decimals = 6) {
   if (n === null || n === undefined || isNaN(n)) return '0.000000';
   return Number(n).toLocaleString('en-US', {
@@ -866,50 +905,40 @@ async function syncUsdtBalance() {
   document.getElementById('trxAmount').textContent = '...';
 
   try {
-    const resp = await fetch(TRONGRID_API + encodeURIComponent(addr), {
-      headers: { 'Accept': 'application/json' }
-    });
-    const data = await resp.json();
+    const tronWeb = getQueryTronWeb();
 
-    if (!data.error) {
-      // TRX 余额
-      const trxBalance = data.trx || 0;
-
-      // USDT 余额 (主网服务器直接返回 usdt 字段；兼容 trc20 map)
-      let usdtRaw = 0;
-      if (typeof data.usdt_raw === 'number') {
-        usdtRaw = data.usdt_raw;
-      } else if (data.usdt !== undefined) {
-        usdtRaw = data.usdt * 1_000_000;
-      } else if (data.trc20 && typeof data.trc20 === 'object') {
-        usdtRaw = data.trc20[USDT_CONTRACT_HEX] || 0;
-      }
-      const usdtBalance = usdtRaw / 1_000_000;
-
-      // 更新 UI
-      document.getElementById('usdtAmount').textContent = formatNumber(usdtBalance);
-      document.getElementById('trxAmount').textContent = formatNumber(trxBalance) + ' TRX';
-      document.getElementById('queryAddr').textContent = addr;
-      document.getElementById('usdtSub').textContent =
-        usdtBalance > 0 ? '已同步主网链上真实余额' : '该地址当前无主网 USDT 持仓';
-
-      const now = new Date().toLocaleTimeString('zh-CN');
-      document.getElementById('syncInfo').textContent =
-        `已同步 · ${now} · TRON 主网节点`;
-
-      const link = document.getElementById('tronscanLink');
-      link.href = `https://tronscan.org/#/address/${addr}`;
-    } else {
-      document.getElementById('usdtAmount').textContent = '0.000000';
-      document.getElementById('trxAmount').textContent = '0.000000 TRX';
-      document.getElementById('queryAddr').textContent = addr;
-      // 显示后端返回的真实错误，而非笼统的"地址未激活"
-      document.getElementById('usdtSub').textContent =
-        data.error || '地址未激活（链上无记录）';
-      const now = new Date().toLocaleTimeString('zh-CN');
-      document.getElementById('syncInfo').textContent = `已同步 · ${now}`;
-      document.getElementById('tronscanLink').href = `https://tronscan.org/#/address/${addr}`;
+    // TRX 余额（返回 sun，1 TRX = 1e6 sun）
+    let trxBalance = 0;
+    try {
+      const trxSun = await tronWeb.trx.getBalance(addr);
+      trxBalance = trxSun / 1_000_000;
+    } catch (e) {
+      // 地址未激活时 getBalance 可能返回 0 或抛错
+      trxBalance = 0;
     }
+
+    // USDT 余额（直接调用主网合约 balanceOf）
+    let usdtRaw = 0;
+    try {
+      usdtRaw = await getUsdtBalance(addr);
+    } catch (e) {
+      usdtRaw = 0;
+    }
+    const usdtBalance = usdtRaw / 1_000_000;
+
+    // 更新 UI
+    document.getElementById('usdtAmount').textContent = formatNumber(usdtBalance);
+    document.getElementById('trxAmount').textContent = formatNumber(trxBalance) + ' TRX';
+    document.getElementById('queryAddr').textContent = addr;
+    document.getElementById('usdtSub').textContent =
+      (trxBalance > 0 || usdtBalance > 0) ? '已同步主网链上真实余额' : '该地址当前无主网资产持仓（可能未激活）';
+
+    const now = new Date().toLocaleTimeString('zh-CN');
+    document.getElementById('syncInfo').textContent =
+      `已同步 · ${now} · TRON 主网节点`;
+
+    const link = document.getElementById('tronscanLink');
+    link.href = `https://tronscan.org/#/address/${addr}`;
   } catch (e) {
     console.error('USDT 同步失败:', e);
     document.getElementById('usdtSub').textContent = '同步失败：' + e.message;
