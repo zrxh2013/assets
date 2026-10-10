@@ -54,6 +54,10 @@ func explorerURLAlternatives(chain, name string) []string {
 			altUrls = append(altUrls, fmt.Sprintf("https://etherscan.io/token/%s", nameNorm))
 		}
 
+		if strings.ToLower(chain) == coin.Coins[coin.BITCOIN].Handle {
+			altUrls = append(altUrls, fmt.Sprintf("https://unisat.io/brc20/%s", nameNorm))
+		}
+
 		altUrls = append(altUrls, fmt.Sprintf("https://explorer.%s.io", nameNorm))
 		altUrls = append(altUrls, fmt.Sprintf("https://scan.%s.io", nameNorm))
 	}
