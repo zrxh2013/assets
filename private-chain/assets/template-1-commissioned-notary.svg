@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 580" width="500" height="580">
+  <rect width="500" height="580" fill="#fff"/>
+  <!-- 模板标注 -->
+  <text x="250" y="32" text-anchor="middle" font-size="17" fill="#e74c3c" font-weight="bold">⚠ 模板示例 · 非真实印章</text>
+  <text x="250" y="50" text-anchor="middle" font-size="12" fill="#aaa">委托公证人印章 · 圆形 4.2cm · 宋体红印</text>
+
+  <!-- 双层圆框 -->
+  <circle cx="250" cy="310" r="185" fill="none" stroke="#c0392b" stroke-width="5"/>
+  <circle cx="250" cy="310" r="175" fill="none" stroke="#c0392b" stroke-width="1.5"/>
+
+  <!-- 环绕：上半弧 中国委托公证人 -->
+  <path id="arcTop" d="M 250 135 A 175 175 0 0 1 250 135" fill="none"/>
+  <!-- 分段环绕：左半 -->
+  <path id="arcL" d="M 75 310 A 175 175 0 0 1 250 135" fill="none"/>
+  <text font-size="32" fill="#c0392b" font-weight="bold" font-family="SimSun,serif">
+    <textPath href="#arcL" startOffset="100%" text-anchor="middle">委 托 公 证 人</textPath>
+  </text>
+  <!-- 右半 -->
+  <path id="arcR" d="M 250 135 A 175 175 0 0 1 425 310" fill="none"/>
+  <text font-size="32" fill="#c0392b" font-weight="bold" font-family="SimSun,serif">
+    <textPath href="#arcR" startOffset="0%" text-anchor="middle">中 国</textPath>
+  </text>
+
+  <!-- 中央五角星 -->
+  <g transform="translate(250,310)">
+    <polygon points="0,-55 17,-18 55,-18 23,7 34,46 0,23 -34,46 -23,7 -55,-18 -17,-18" fill="#c0392b"/>
+  </g>
+
+  <!-- 姓名横排 -->
+  <text x="250" y="400" text-anchor="middle" font-size="42" fill="#c0392b" font-weight="bold" font-family="SimSun,serif">示 例 公 证 人</text>
+
+  <!-- 底部律所环绕 -->
+  <path id="arcBot" d="M 88 340 A 165 165 0 0 0 412 340" fill="none"/>
+  <text font-size="18" fill="#c0392b" font-family="SimSun,serif">
+    <textPath href="#arcBot" startOffset="50%" text-anchor="middle">● XX 律 師 行 公 证 處 ●</textPath>
+  </text>
+
+  <!-- 规范对照 -->
+  <text x="250" y="540" text-anchor="middle" font-size="11" fill="#999">☑ 圆形 ☑ 中央五角星 ☑ 宋体 ☑ 名称环行 ☑ 姓名横排 ☑ 机构底部</text>
+  <text x="250" y="560" text-anchor="middle" font-size="10" fill="#bbb">真实印章由司法部统一制发并备案 · 本图仅用于教学演示</text>
+</svg>

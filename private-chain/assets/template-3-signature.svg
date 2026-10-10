@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 567 315" width="567" height="315">
+  <!-- 4.5cm x 2.5cm at 126px/cm → 567x315, 放大2倍便于看 -->
+  <rect width="567" height="315" fill="#fff"/>
+
+  <!-- 模板标注 -->
+  <text x="283" y="28" text-anchor="middle" font-size="15" fill="#e74c3c" font-weight="bold">⚠ 模板示例 · 非真实印章</text>
+  <text x="283" y="46" text-anchor="middle" font-size="12" fill="#aaa">公证员签名章 · 长方形 4.5cm × 2.5cm · 蓝色不加边框</text>
+
+  <!-- 签名章本体：长方形，无框，蓝色印泥 -->
+  <rect x="60" y="75" width="447" height="200" fill="#fff" stroke="none"/>
+
+  <!-- 手写体姓名（签名章核心内容） -->
+  <text x="283" y="180" text-anchor="middle" font-size="92" fill="#1a5276" font-weight="bold" font-family="KaiTi,楷体,STKaiti,cursive" style="letter-spacing:8px">示例公证人</text>
+
+  <!-- 拼音/英文签名（部分公证人会加） -->
+  <text x="283" y="230" text-anchor="middle" font-size="18" fill="#2874a6" font-family="serif" font-style="italic">XX Gongzhengren</text>
+
+  <!-- 蓝印泥边缘晕染效果（模拟真实盖章） -->
+  <rect x="58" y="73" width="451" height="204" fill="none" stroke="#1a5276" stroke-width="1.5" stroke-dasharray="3,4" opacity="0.5"/>
+
+  <!-- 规范对照 -->
+  <text x="283" y="298" text-anchor="middle" font-size="11" fill="#999">☑ 长方形 4.5×2.5cm ☑ 蓝色印泥 ☑ 不加边框 ☑ 手写签名 ☑ 楷体/行书</text>
+</svg>

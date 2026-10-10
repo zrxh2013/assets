@@ -1,0 +1,9 @@
+{
+  "result": true,
+  "txID": "d686061b4770075382df061d3359eb14054519ff16240450e3181e89c6239066",
+  "note": "DRY_RUN: not broadcast",
+  "tx": {
+    "txID": "d686061b4770075382df061d3359eb14054519ff16240450e3181e89c6239066",
+    "signatureCount": 1
+  }
+}

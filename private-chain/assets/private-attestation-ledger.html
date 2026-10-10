@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<title>PtahDAO 信托确权清算存证账本 — 私链 USDT</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #faf8f3;
+    color: #2c2c2c;
+    line-height: 1.6;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding-bottom: 60px; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #fff9ed 0%, #fff 100%);
+    padding: 20px;
+    border-bottom: 1px solid #e8e0cc;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header-row { display: flex; align-items: center; justify-content: space-between; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #d4a017, #b8860b);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: bold; font-size: 20px;
+  }
+  .logo-text { font-size: 20px; font-weight: bold; color: #2c2c2c; letter-spacing: 1px; }
+
+  .page-title { padding: 16px 20px 8px; }
+  .page-title h1 { font-size: 18px; color: #8B6914; margin-bottom: 4px; }
+  .page-title .sub { font-size: 12px; color: #999; }
+
+  /* Stats card */
+  .stats-card {
+    background: linear-gradient(135deg, #fff9ed 0%, #fff 100%);
+    border: 1px solid #f0e8d0; border-radius: 16px;
+    padding: 18px; margin: 8px 16px 16px;
+    box-shadow: 0 2px 8px rgba(180,140,20,0.08);
+  }
+  .stats-row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .stat-item {
+    flex: 1; min-width: 120px;
+    background: #fff; border: 1px solid #f0e8d0; border-radius: 12px;
+    padding: 12px;
+  }
+  .stat-label { font-size: 11px; color: #999; margin-bottom: 4px; }
+  .stat-value { font-size: 16px; font-weight: 600; color: #8B6914; }
+  .stat-value.usdt { color: #26a17b; }
+  .stat-value.small { font-size: 11px; font-family: "SF Mono", Consolas, monospace; color: #666; word-break: break-all; }
+
+  /* Search */
+  .search-box { padding: 8px 20px 12px; }
+  .search-box input {
+    width: 100%; padding: 12px 16px;
+    border: 1px solid #e8e0cc; border-radius: 24px;
+    background: #fff; font-size: 14px; outline: none;
+  }
+  .search-box input:focus { border-color: #d4a017; }
+
+  /* Tx card */
+  .tx-card {
+    background: #fff; border: 1px solid #f0e8d0; border-radius: 16px;
+    padding: 14px; margin: 0 16px 12px;
+    box-shadow: 0 2px 6px rgba(180,140,20,0.05);
+    transition: transform .15s;
+  }
+  .tx-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(180,140,20,0.1); }
+  .tx-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .tx-name { font-size: 15px; font-weight: 600; color: #2c2c2c; }
+  .tx-receipt {
+    font-size: 10px; color: #b8860b;
+    background: #fff9ed; padding: 2px 8px; border-radius: 10px;
+    font-family: "SF Mono", Consolas, monospace;
+  }
+  .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed #f5efde; font-size: 12px; }
+  .tx-row:last-child { border-bottom: none; }
+  .tx-label { color: #888; flex-shrink: 0; }
+  .tx-value { color: #2c2c2c; word-break: break-all; text-align: right; font-family: "SF Mono", Consolas, monospace; font-size: 11px; }
+  .tx-value.amount { color: #26a17b; font-weight: 600; font-size: 15px; font-family: inherit; }
+  .tx-value.hash { color: #b8860b; }
+  .tx-value.link { color: #1a73e8; cursor: pointer; text-decoration: underline; }
+
+  /* Footer */
+  .footer {
+    text-align: center; padding: 20px; color: #999; font-size: 11px;
+    border-top: 1px solid #f0e8d0; margin-top: 20px;
+  }
+
+  .empty { text-align: center; padding: 40px 20px; color: #999; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <div class="logo">
+        <div class="logo-icon">P</div>
+        <div class="logo-text">PtahDAO</div>
+      </div>
+      <div style="font-size:11px;color:#999;">私链 USDT 存证</div>
+    </div>
+  </div>
+
+  <!-- Title -->
+  <div class="page-title">
+    <h1>信托确权清算存证账本</h1>
+    <div class="sub">TRON 私链 · USDT 合约转账 + memo 上链 · 共 <span id="totalCount">0</span> 笔</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-card">
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-label">存证笔数</div>
+        <div class="stat-value" id="statCount">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">存证总金额 (USDT)</div>
+        <div class="stat-value usdt" id="statTotal">0.00</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">状态</div>
+        <div class="stat-value" style="color:#26a17b;">全部成功</div>
+      </div>
+    </div>
+    <div class="stats-row" style="margin-top:12px;">
+      <div class="stat-item">
+        <div class="stat-label">USDT 合约地址 (base58)</div>
+        <div class="stat-value small" id="statContract">—</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">发送方钱包</div>
+        <div class="stat-value small" id="statSender">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-box">
+    <input id="searchInput" type="text" placeholder="搜索姓名 / 回执号 / txID / 地址..." />
+  </div>
+
+  <!-- Tx list -->
+  <div id="txList"></div>
+
+  <!-- Footer -->
+  <div class="footer">
+    PtahDAO 信托确权清算存证 · TRON 私链 USDT 合约<br/>
+    每笔交易均包含 USDT 转账 + memo 上链存证（姓名/金额/回执号/地址/时间戳）<br/>
+    生成时间：<span id="genTime">—</span>
+  </div>
+</div>
+
+<script>
+// 数据由生成脚本注入
+const ATTESTATIONS = window.__ATTESTATIONS || [];
+const META = window.__META || {};
+
+document.getElementById('totalCount').textContent = ATTESTATIONS.length;
+document.getElementById('statCount').textContent = ATTESTATIONS.length;
+
+let total = 0;
+ATTESTATIONS.forEach(a => { total += parseFloat(a.amount) || 0; });
+document.getElementById('statTotal').textContent = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+document.getElementById('statContract').textContent = META.contract || '—';
+document.getElementById('statSender').textContent = META.sender || '—';
+document.getElementById('genTime').textContent = new Date().toLocaleString('zh-CN');
+
+function shortHash(h, head=10, tail=8) {
+  if (!h) return '';
+  if (h.length <= head + tail + 3) return h;
+  return h.slice(0, head) + '...' + h.slice(-tail);
+}
+
+function renderList(list) {
+  const container = document.getElementById('txList');
+  if (!list.length) {
+    container.innerHTML = '<div class="empty">无匹配记录</div>';
+    return;
+  }
+  container.innerHTML = list.map(a => {
+    const tsDate = a.ts ? new Date(a.ts).toLocaleString('zh-CN') : '—';
+    return `
+      <div class="tx-card">
+        <div class="tx-head">
+          <div class="tx-name">${escapeHtml(a.name)}</div>
+          <div class="tx-receipt">${escapeHtml(a.receipt)}</div>
+        </div>
+        <div class="tx-row">
+          <div class="tx-label">存证金额</div>
+          <div class="tx-value amount">${a.amount} USDT</div>
+        </div>
+        <div class="tx-row">
+          <div class="tx-label">受益人地址</div>
+          <div class="tx-value">${escapeHtml(a.addr)}</div>
+        </div>
+        <div class="tx-row">
+          <div class="tx-label">交易哈希 (txID)</div>
+          <div class="tx-value hash" title="${escapeHtml(a.txid)}">${shortHash(a.txid, 16, 12)}</div>
+        </div>
+        <div class="tx-row">
+          <div class="tx-label">上链时间</div>
+          <div class="tx-value">${tsDate}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) { renderList(ATTESTATIONS); return; }
+  const filtered = ATTESTATIONS.filter(a =>
+    (a.name || '').toLowerCase().includes(q) ||
+    (a.receipt || '').toLowerCase().includes(q) ||
+    (a.txid || '').toLowerCase().includes(q) ||
+    (a.addr || '').toLowerCase().includes(q)
+  );
+  renderList(filtered);
+});
+
+renderList(ATTESTATIONS);
+</script>
+</body>
+</html>

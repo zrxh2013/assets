@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 620" width="560" height="620">
+  <rect width="560" height="620" fill="#fff"/>
+  <text x="280" y="32" text-anchor="middle" font-size="17" fill="#e74c3c" font-weight="bold">⚠ 模板示例 · 非真实印章</text>
+  <text x="280" y="50" text-anchor="middle" font-size="12" fill="#aaa">中国法律服务（香港）有限公司 · 转递专用章</text>
+
+  <!-- 双层圆框 -->
+  <circle cx="280" cy="330" r="205" fill="none" stroke="#c0392b" stroke-width="5"/>
+  <circle cx="280" cy="330" r="195" fill="none" stroke="#c0392b" stroke-width="1.5"/>
+
+  <!-- 顶部环: 中华人民共和国司法部委托香港 -->
+  <path id="t1" d="M 85 330 A 195 195 0 0 1 280 135" fill="none"/>
+  <text font-size="21" fill="#c0392b" font-family="SimSun,serif">
+    <textPath href="#t1" startOffset="100%" text-anchor="middle">中华人民共和国司法部委托香港</textPath>
+  </text>
+  <path id="t2" d="M 280 135 A 195 195 0 0 1 475 330" fill="none"/>
+  <text font-size="21" fill="#c0392b" font-family="SimSun,serif">
+    <textPath href="#t2" startOffset="0%" text-anchor="middle">律师办理内地使用的公证文书</textPath>
+  </text>
+
+  <!-- 中央五角星 -->
+  <g transform="translate(280,310)">
+    <polygon points="0,-65 20,-21 65,-21 27,8 40,54 0,27 -40,54 -27,8 -65,-21 -20,-21" fill="#c0392b"/>
+  </g>
+
+  <!-- 横排文字: 转递专用章 -->
+  <text x="280" y="425" text-anchor="middle" font-size="38" fill="#c0392b" font-weight="bold" font-family="SimSun,serif">转 递 专 用 章</text>
+
+  <!-- 底部环: 中国法律服务（香港）有限公司 -->
+  <path id="b1" d="M 98 365 A 185 185 0 0 0 462 365" fill="none"/>
+  <text font-size="18" fill="#c0392b" font-family="SimSun,serif">
+    <textPath href="#b1" startOffset="50%" text-anchor="middle">中国法律服务（香港）有限公司</textPath>
+  </text>
+
+  <!-- 编号 + 日期 -->
+  <text x="280" y="505" text-anchor="middle" font-size="13" fill="#c0392b" font-family="SimSun,serif">深办第 2026-XX 号</text>
+  <text x="280" y="528" text-anchor="middle" font-size="13" fill="#c0392b" font-family="SimSun,serif">2026 年 09 月 02 日</text>
+
+  <text x="280" y="585" text-anchor="middle" font-size="11" fill="#999">☑ 圆形 ☑ 中央五角星 ☑ 司法部委托文字 ☑ 中港法服名称 ☑ 编号 ☑ 日期</text>
+  <text x="280" y="605" text-anchor="middle" font-size="10" fill="#bbb">真实转递专用章仅由中国法律服务（香港）有限公司加盖 · 本图仅用于教学</text>
+</svg>

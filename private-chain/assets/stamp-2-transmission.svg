@@ -1,0 +1,63 @@
+<svg width="400" height="440" viewBox="0 0 400 440" xmlns="http://www.w3.org/2000/svg">
+  <title>转递专用章 · 中国法律服务（香港）有限公司（教学演示模板）</title>
+  <desc>圆形 · 中央五角星 · 上弧司法部委托文字 · 下弧中港法服名称 · 编号=深办第 年度-流水号 号</desc>
+
+  <rect x="0" y="0" width="400" height="440" fill="#fff" />
+
+  <text x="200" y="20" text-anchor="middle" fill="#888" font-size="11" font-family="SimSun">
+    转递专用章（中国法律服务（香港）有限公司加盖）· 教学演示模板
+  </text>
+
+  <!-- 外圆 -->
+  <circle cx="200" cy="245" r="180" fill="none" stroke="#c0392b" stroke-width="4" />
+  <circle cx="200" cy="245" r="172" fill="none" stroke="#c0392b" stroke-width="1.2" />
+
+  <defs>
+    <path id="transTopArc2" d="M 28,245 A 172,172 0 0,1 372,245" fill="none" />
+    <path id="transBotArc2" d="M 36,249 A 164,164 0 0,0 364,249" fill="none" />
+  </defs>
+
+  <!-- 上弧文字 -->
+  <text fill="#c0392b" font-size="14" font-family="SimSun" font-weight="bold" letter-spacing="1.5">
+    <textPath href="#transTopArc2" startOffset="50%" text-anchor="middle">
+      中华人民共和国司法部委托香港律师办理内地使用的公证文书
+    </textPath>
+  </text>
+
+  <!-- 中央五角星（大） -->
+  <polygon points="200,145 215,193 265,193 225,223 240,271 200,241 160,271 175,223 135,193 185,193"
+           fill="#c0392b" />
+
+  <!-- 中间主文字 -->
+  <text x="200" y="315" text-anchor="middle" fill="#c0392b" font-size="24"
+        font-family="SimSun" font-weight="bold" letter-spacing="8">转 递 专 用 章</text>
+
+  <!-- 下弧文字：中国法律服务（香港）有限公司 -->
+  <text fill="#c0392b" font-size="12" font-family="SimSun" font-weight="bold" letter-spacing="1.5">
+    <textPath href="#transBotArc2" startOffset="50%" text-anchor="middle">
+      中国法律服务（香港）有限公司
+    </textPath>
+  </text>
+
+  <!-- 编号：中港法服内部转递档案号「深办第 年度+档案序号 号」
+       司法部 1996 标准样章：编号格式为「深办第 XXXXX 号」，需可在中国法律服务(香港)官网核验
+       对应见证人：邓达明 (484) — CAAO 协会括号编号 -->
+  <text x="200" y="390" text-anchor="middle" fill="#c0392b" font-size="14" font-family="SimSun" font-weight="bold">
+    深 办 第 <tspan font-size="16">2 0 2 6 - 0 4 8 4</tspan> 号
+  </text>
+
+  <!-- 见证公证人：邓达明 (484) → 与 CAAO 协会括号编号一致，可在 caao.org.hk 查询 -->
+  <text x="200" y="412" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
+    见证人：邓 达 明 (484) · 中国委托公证人及香港律师
+  </text>
+
+  <!-- 日期 -->
+  <text x="200" y="430" text-anchor="middle" fill="#c0392b" font-size="11" font-family="SimSun">
+    2026 年 9 月 2 日 · 发证：中国法律服务（香港）有限公司
+  </text>
+
+  <!-- 水印 -->
+  <text x="200" y="444" text-anchor="middle" fill="#ddd" font-size="9" font-family="SimSun">
+    ⚠ 教学演示模板 · 非真实印章
+  </text>
+</svg>

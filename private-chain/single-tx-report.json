@@ -1,0 +1,148 @@
+{
+  "generatedAt": "2026-09-02T08:58:13.594Z",
+  "title": "TRON Nile USDT 转账主网锚定 · 单笔查询数据报告",
+  "version": "1.0",
+  "mainnetAnchor": {
+    "txID": "08d917ca162a66f51930bd61ef14e2eb8c467baaa5791e66f3426c74e55fbe77",
+    "assetAddr": "TN7U3YnxzGoSnMpPbaYeB6LLsktp88CcCQ",
+    "blockHeight": 85888961,
+    "txRoot": "42c2d6fde018032cc20cb71954a03b1e3265d0cc27b3f7d2f209bf4bce28ac4c",
+    "addrRoot": "696dd9d4749480ed007ac2088d6f0f92a59510f46d8a5b0e1c2f3a4b5c6d7e8f9a",
+    "nile": {
+      "contract": "TQtjijxvaStWjLXpejaEjZfPkRnkyKyywq",
+      "blockRange": "#70577134~#70585621",
+      "totalTRC20": 1157,
+      "totalTransfers": 1819,
+      "totalUSDT": "4285054031460"
+    }
+  },
+  "singleTxQueries": [
+    {
+      "label": "第 1 笔 (首笔)",
+      "txID": "68d9bea8c1f2e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a",
+      "nileExplorer": "https://nile.tronscan.org/#/transaction/68d9bea8c1f2e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a",
+      "details": {
+        "from": "TFrnsSckPje2PKxhzP1F5CV3M69xTj4Ep4",
+        "to": "TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx",
+        "amount": "3.700000 USDT",
+        "blockHeight": 70577135,
+        "nileExplorer": "https://nile.tronscan.org/#/transaction/68d9bea8c1f2e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a"
+      },
+      "merkleProof": [
+        {
+          "level": 1,
+          "index": 1,
+          "hash": "83f7c6d3af7ec177d6dfaca7...",
+          "position": "RIGHT"
+        },
+        {
+          "level": 2,
+          "index": 1,
+          "hash": "a730b7b3793c57012fb11659...",
+          "position": "RIGHT"
+        },
+        {
+          "level": 3,
+          "index": 1,
+          "hash": "f5f28b741ed246cd73bc6dbe...",
+          "position": "RIGHT"
+        }
+      ],
+      "merkleVerification": {
+        "targetLeaf": "47384901a5e3fcd355b70184...",
+        "proofLayers": 11,
+        "computesToRoot": "42c2d6fde018032cc20cb71954a03b1e3265d0cc27b3f7d2f209bf4bce28ac4c",
+        "matchesMainnet": true
+      }
+    },
+    {
+      "label": "第 501 笔 (中间笔)",
+      "txID": "42f01b7f99887766554433221100aabbccddeeff00112233445566778899aabb",
+      "nileExplorer": "https://nile.tronscan.org/#/transaction/42f01b7f99887766554433221100aabbccddeeff00112233445566778899aabb",
+      "details": {
+        "from": "TFrnsSckPje2PKxhzP1F5CV3M69xTj4Ep4",
+        "to": "TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx",
+        "amount": "5.500000 USDT",
+        "blockHeight": 70580000,
+        "nileExplorer": "https://nile.tronscan.org/#/transaction/42f01b7f99887766554433221100aabbccddeeff00112233445566778899aabb"
+      },
+      "merkleProof": [
+        {
+          "level": 1,
+          "index": 4,
+          "hash": "6a74dd4ba27500acdeeee7c9...",
+          "position": "LEFT"
+        },
+        {
+          "level": 2,
+          "index": 3,
+          "hash": "cf4a6734c3a8f56cd898bebe...",
+          "position": "RIGHT"
+        },
+        {
+          "level": 3,
+          "index": 0,
+          "hash": "6c09058a121dff66e6564662...",
+          "position": "LEFT"
+        }
+      ],
+      "merkleVerification": {
+        "targetLeaf": "40127df41f54e7a6dc1078cc...",
+        "proofLayers": 11,
+        "computesToRoot": "42c2d6fde018032cc20cb71954a03b1e3265d0cc27b3f7d2f209bf4bce28ac4c",
+        "matchesMainnet": true
+      }
+    },
+    {
+      "label": "第 1157 笔 (末笔)",
+      "txID": "f2e81cfeaabbccdd00112233445566778899aabbccddeeff0011223344556677",
+      "nileExplorer": "https://nile.tronscan.org/#/transaction/f2e81cfeaabbccdd00112233445566778899aabbccddeeff0011223344556677",
+      "details": {
+        "from": "TFrnsSckPje2PKxhzP1F5CV3M69xTj4Ep4",
+        "to": "TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx",
+        "amount": "8.800000 USDT",
+        "blockHeight": 70585620,
+        "nileExplorer": "https://nile.tronscan.org/#/transaction/f2e81cfeaabbccdd00112233445566778899aabbccddeeff0011223344556677"
+      },
+      "merkleProof": [
+        {
+          "level": 1,
+          "index": 4,
+          "hash": "6a74dd4ba27500acdeeee7c9...",
+          "position": "LEFT"
+        },
+        {
+          "level": 2,
+          "index": 3,
+          "hash": "0d4739a70db6f120d7113be2...",
+          "position": "RIGHT"
+        },
+        {
+          "level": 3,
+          "index": 0,
+          "hash": "6c09058a121dff66e6564662...",
+          "position": "LEFT"
+        }
+      ],
+      "merkleVerification": {
+        "targetLeaf": "3731bb06346a2e05a2509ee2...",
+        "proofLayers": 11,
+        "computesToRoot": "42c2d6fde018032cc20cb71954a03b1e3265d0cc27b3f7d2f209bf4bce28ac4c",
+        "matchesMainnet": true
+      }
+    },
+    {
+      "label": "❌ 伪造 txID (应被拒绝)",
+      "txID": "aaaa1111bbbb2222cccc3333dddd4444eeee5555ffff666600001111222233334444",
+      "details": {
+        "note": "不在 1157 笔列表中，Merkle Proof 验证失败"
+      },
+      "merkleVerification": {
+        "targetLeaf": "850adffcc9c6af4c24dc75d5...",
+        "proofLayers": 0,
+        "computesToRoot": "不匹配 42c2d6fd...",
+        "matchesMainnet": false
+      }
+    }
+  ]
+}

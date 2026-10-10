@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" width="500" height="560">
+  <!-- 背景 -->
+  <rect width="500" height="560" fill="#fff8f8"/>
+  
+  <!-- 顶部模板标注 -->
+  <text x="250" y="35" text-anchor="middle" font-size="18" fill="#e74c3c" font-weight="bold">⚠ 教学演示模板 · 非真实印章</text>
+  <text x="250" y="58" text-anchor="middle" font-size="13" fill="#999">仅供了解正规委托公证人印章排版规范</text>
+  
+  <!-- 印章外框 (圆形) -->
+  <circle cx="250" cy="300" r="180" fill="none" stroke="#c0392b" stroke-width="5"/>
+  <circle cx="250" cy="300" r="170" fill="none" stroke="#c0392b" stroke-width="2"/>
+  
+  <!-- 顶部环绕文字: 中国委托公证人 (半圆弧上) -->
+  <!-- 左半弧 -->
+  <path id="topArcLeft" d="M 80 300 A 170 170 0 0 1 250 130" fill="none"/>
+  <text font-size="36" fill="#c0392b" font-weight="bold" font-family="SimSun, serif">
+    <textPath href="#topArcLeft" startOffset="100%" text-anchor="middle">委 托 公 证 人</textPath>
+  </text>
+  
+  <!-- 右半弧 -->
+  <path id="topArcRight" d="M 250 130 A 170 170 0 0 1 420 300" fill="none"/>
+  <text font-size="36" fill="#c0392b" font-weight="bold" font-family="SimSun, serif">
+    <textPath href="#topArcRight" startOffset="0%" text-anchor="middle">中 国</textPath>
+  </text>
+  
+  <!-- 中央五角星 -->
+  <g transform="translate(250, 300)">
+    <polygon points="0,-60 18,-19 60,-19 25,8 37,50 0,25 -37,50 -25,8 -60,-19 -18,-19" fill="#c0392b"/>
+  </g>
+  
+  <!-- 公证人姓名 (五角星下方横排) -->
+  <text x="250" y="395" text-anchor="middle" font-size="40" fill="#c0392b" font-weight="bold" font-family="SimSun, serif">邓 达 明</text>
+  
+  <!-- 律所名称 (最底部环绕) -->
+  <path id="bottomArc" d="M 90 330 A 160 160 0 0 0 410 330" fill="none"/>
+  <text font-size="20" fill="#c0392b" font-family="SimSun, serif">
+    <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">● 葉 謝 鄧 律 師 行 ●</textPath>
+  </text>
+  
+  <!-- 司法部备案标注 (底部) -->
+  <text x="250" y="510" text-anchor="middle" font-size="12" fill="#999">司法部 2026 年度注册 · 注册编号 14413202200495450</text>
+  <text x="250" y="530" text-anchor="middle" font-size="11" fill="#bbb">本图为教学演示模板，真实印章由司法部统一制发并备案</text>
+</svg>

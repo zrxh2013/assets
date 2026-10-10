@@ -1,0 +1,20 @@
+{
+  "txID": "08d917ca162a66f51930bd61ef14e2eb8c467baaa5791e66f3426c74e55fbe77",
+  "assetAddr": "TN7U3YnxzGoSnMpPbaYeB6LLsktp88CcCQ",
+  "assetPrivKey": "4A1620F8642CE420727CD9BC91156096EA175FB9A9BB5829C67295C6DE1E2309",
+  "memoSize": 558,
+  "memo": "{\"a\":\"nile-addr-balance-anchor\",\"v\":\"1.0\",\"chain\":\"TRON-MAINNET\",\"srcChain\":\"TRON-NILE\",\"src\":{\"contract\":\"TQtjijxvaStWjLXpejaEjZfPkRnkyKyywq\",\"blockRange\":\"#70577134~#70585621\",\"totalTRC20\":1157},\"merkle\":{\"txRoot\":\"42c2d6fde018032cc20cb71954a03b1e3265d0cc27b3f7d2f209bf4bce28ac4c\",\"addrRoot\":\"696dd9d4749480ed007ac2088d6fb1afa4623e715598c922ee84c2430b2436ee\"},\"stats\":{\"totalTxs\":1157,\"uniqueAddrs\":2,\"totalUSDT\":\"4285054031460\"},\"addrs\":[{\"p\":\"TYSfgUcvAT\",\"s\":\"9epx\",\"b\":4285054031460},{\"p\":\"TFrnsSckPj\",\"s\":\"4Ep4\",\"b\":-4285054031460}],\"ts\":1788338485378}",
+  "addrRoot": "696dd9d4749480ed007ac2088d6fb1afa4623e715598c922ee84c2430b2436ee",
+  "txRoot": "42c2d6fde018032cc20cb71954a03b1e3265d0cc27b3f7d2f209bf4bce28ac4c",
+  "nileTxs": 1157,
+  "addrs": [
+    {
+      "a": "TYSfgUcvATDNhqkQ2aPC5eGNo4X2c89epx",
+      "b": 4285054031460
+    },
+    {
+      "a": "TFrnsSckPje2PKxhzP1F5CV3M69xTj4Ep4",
+      "b": -4285054031460
+    }
+  ]
+}
