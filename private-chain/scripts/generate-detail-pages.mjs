@@ -649,78 +649,8 @@ function genIndexPage() {
 <script>
 window.__META = ${JSON.stringify(META)};
 window.__ATTESTATIONS = ${JSON.stringify(attestations)};
-const ATTESTATIONS = window.__ATTESTATIONS;
-const META = window.__META;
-
-// 排序后分配区块号
-const sorted = [...ATTESTATIONS].sort((a,b)=>a.ts-b.ts);
-sorted.forEach((a,i)=>{ a.block = 31 + Math.floor(i/4); });
-
-document.getElementById('totalCount').textContent = ATTESTATIONS.length;
-document.getElementById('statCount').textContent = ATTESTATIONS.length;
-document.getElementById('statSuccess').textContent = ATTESTATIONS.length;
-const uniqueAddr = new Set(ATTESTATIONS.map(a=>a.addr)).size;
-document.getElementById('statAddr').textContent = uniqueAddr;
-
-let total = 0;
-ATTESTATIONS.forEach(a => total += parseFloat(a.amount) || 0);
-document.getElementById('statTotal').textContent = total.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-
-function shortHash(h, head=12, tail=8) {
-  if (!h) return '';
-  if (h.length <= head+tail+3) return h;
-  return h.slice(0,head) + '...' + h.slice(-tail);
-}
-
-function fmtTime(ts) {
-  const d = new Date(ts);
-  return \`\${d.getFullYear()}-\${String(d.getMonth()+1).padStart(2,'0')}-\${String(d.getDate()).padStart(2,'0')} \${String(d.getHours()).padStart(2,'0')}:\${String(d.getMinutes()).padStart(2,'0')}\`;
-}
-
-function renderTable(list) {
-  const tbody = document.getElementById('txTableBody');
-  const empty = document.getElementById('emptyMsg');
-  if (!list.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
-  tbody.innerHTML = list.map(a => {
-    const m = JSON.parse(a.memo);
-    return \`<tr onclick="location.href='tx/\${a.txid}.html'">
-      <td>\${m.r}</td>
-      <td>\${m.t}</td>
-      <td class="mono">\${shortHash(a.txid, 14, 10)}</td>
-      <td class="amount">\${a.amount} USDT</td>
-      <td><span class="token-badge">USDT</span></td>
-      <td>#\${a.block||31}</td>
-      <td>\${fmtTime(a.ts)}</td>
-      <td><span class="status-badge">成功</span></td>
-    </tr>\`;
-  }).join('');
-}
-
-renderTable(sorted);
-
-const searchInput = document.getElementById('searchInput');
-searchInput.addEventListener('input', () => {
-  const q = searchInput.value.trim().toLowerCase();
-  if (!q) { renderTable(sorted); return; }
-  const filtered = sorted.filter(a => {
-    const m = JSON.parse(a.memo);
-    return (m.t||'').toLowerCase().includes(q) ||
-           (m.r||'').toLowerCase().includes(q) ||
-           (a.txid||'').toLowerCase().includes(q) ||
-           (a.addr||'').toLowerCase().includes(q);
-  });
-  renderTable(filtered);
-});
-
-// URL 参数查询
-const params = new URLSearchParams(location.search);
-const addrParam = params.get('addr');
-if (addrParam) {
-  searchInput.value = addrParam;
-  searchInput.dispatchEvent(new Event('input'));
-}
 </script>
+<script src="app.js"></script>
 </body>
 </html>`;
 }
