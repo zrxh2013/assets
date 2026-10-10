@@ -2,6 +2,7 @@ package processor
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -261,5 +262,347 @@ func TestFileExists_Behavior(t *testing.T) {
 	}
 	if file.Exists(missing) {
 		t.Error("file.Exists should return false for missing file")
+	}
+}
+
+// ===================================================================
+// ValidateAssetInfoFile 字段规则测试
+// ===================================================================
+
+const ethAssetAddr = "0x4Fabb145d64652a948d72533023f6E7A623C7C53" // BUSD (EIP-55 checksum)
+
+// makeAssetInfoJSON 构造一个合法的 ethereum ERC20 asset info JSON,
+// 通过 overrides 覆盖字段(nil 表示删除该字段)。
+func makeAssetInfoJSON(overrides map[string]interface{}) string {
+	base := map[string]interface{}{
+		"name":        "BUSD",
+		"type":        "ERC20",
+		"symbol":      "BUSD",
+		"decimals":    18,
+		"description": "Binance USD",
+		"website":     "https://busd.example.com",
+		"explorer":    "https://etherscan.io/token/" + ethAssetAddr,
+		"status":      "active",
+		"id":          ethAssetAddr,
+	}
+	for k, v := range overrides {
+		if v == nil {
+			delete(base, k)
+		} else {
+			base[k] = v
+		}
+	}
+	data, _ := json.MarshalIndent(base, "", "    ")
+	return string(data)
+}
+
+// writeAssetInfoFile 在 blockchains/<chain>/assets/<addr>/info.json 写入内容,
+// 返回对应的 *file.AssetFile。
+func writeAssetInfoFile(t *testing.T, chainHandle, addr, content string) *file.AssetFile {
+	t.Helper()
+	p := fmt.Sprintf("blockchains/%s/assets/%s/info.json", chainHandle, addr)
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		t.Fatalf("failed to mkdir: %v", err)
+	}
+	if err := os.WriteFile(p, []byte(content), 0o600); err != nil {
+		t.Fatalf("failed to write file %s: %v", p, err)
+	}
+	return file.NewAssetFile(p)
+}
+
+// TestValidateAssetInfoFile_Valid: 合法 asset info → 通过。
+func TestValidateAssetInfoFile_Valid(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr, makeAssetInfoJSON(nil))
+	if err := s.ValidateAssetInfoFile(f); err != nil {
+		t.Fatalf("expected nil for valid asset info, got: %v", err)
+	}
+}
+
+// TestValidateAssetInfoFile_MissingField: 缺少必填字段 name → 报 missing field。
+func TestValidateAssetInfoFile_MissingField(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"name": nil}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for missing name field, got nil")
+	}
+	if !strings.Contains(err.Error(), "missing") {
+		t.Errorf("expected 'missing' in error, got: %v", err)
+	}
+}
+
+// TestValidateAssetInfoFile_MissingID: 缺少 id → 报 missing field。
+func TestValidateAssetInfoFile_MissingID(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"id": nil}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for missing id field, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_InvalidType: type 不是 ERC20 → 链不匹配。
+func TestValidateAssetInfoFile_InvalidType(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"type": "BEP20"}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for invalid type, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_TypeNotUppercase: type 小写 → 报 should be ALLCAPS。
+func TestValidateAssetInfoFile_TypeNotUppercase(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"type": "erc20"}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for lowercase type, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_InvalidID: id 与目录地址不匹配 → 报错。
+func TestValidateAssetInfoFile_InvalidID(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"id": "0x0000000000000000000000000000000000000000"}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for mismatched id, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_IDCaseMismatch: id 仅大小写不同 → 报 case 错误。
+func TestValidateAssetInfoFile_IDCaseMismatch(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	// 目录用 checksum 形式,id 用全小写
+	lowerAddr := strings.ToLower(ethAssetAddr)
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"id": lowerAddr}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for id case mismatch, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_DecimalsOutOfRange: decimals > 30 → 报错。
+func TestValidateAssetInfoFile_DecimalsOutOfRange(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"decimals": 31}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for decimals > 30, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_DecimalsNegative: decimals < 0 → 报错。
+func TestValidateAssetInfoFile_DecimalsNegative(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"decimals": -1}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for decimals < 0, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_InvalidStatus: status 非法 → 报错。
+func TestValidateAssetInfoFile_InvalidStatus(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"status": "inactive"}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for invalid status, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_StatusSpam: status=spam → 通过(spam 是合法值)。
+func TestValidateAssetInfoFile_StatusSpam(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"status": "spam"}))
+	if err := s.ValidateAssetInfoFile(f); err != nil {
+		t.Fatalf("expected nil for status=spam, got: %v", err)
+	}
+}
+
+// TestValidateAssetInfoFile_DescriptionTooLong: description > 600 字符 → 报错。
+func TestValidateAssetInfoFile_DescriptionTooLong(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	longDesc := strings.Repeat("a", 601)
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"description": longDesc}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for description > 600 chars, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_DescriptionWithNewline: description 含换行 → 报错。
+func TestValidateAssetInfoFile_DescriptionWithNewline(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"description": "Binance\nUSD"}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for description with newline, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_DescriptionWithDoubleSpace: description 含双空格 → 报错。
+func TestValidateAssetInfoFile_DescriptionWithDoubleSpace(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"description": "Binance  USD"}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for description with double space, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_MissingWebsite: description != "-" 但 website 空 → 报错。
+func TestValidateAssetInfoFile_MissingWebsite(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"website": ""}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for empty website, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_WebsiteOptionalWhenDescriptionDash: description="-" 时 website 可空 → 通过。
+func TestValidateAssetInfoFile_WebsiteOptionalWhenDescriptionDash(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{
+			"description": "-",
+			"website":     "",
+		}))
+	if err := s.ValidateAssetInfoFile(f); err != nil {
+		t.Fatalf("expected nil for description='-' with empty website, got: %v", err)
+	}
+}
+
+// TestValidateAssetInfoFile_InvalidExplorer: explorer 不匹配 → 报错。
+func TestValidateAssetInfoFile_InvalidExplorer(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{"explorer": "https://wrong.io/token/xxx"}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for invalid explorer, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_InvalidLinksName: links.name 不在白名单 → 报错。
+// 注意:ValidateLinks 仅在 links 数量 >= 2 时才校验。
+func TestValidateAssetInfoFile_InvalidLinksName(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	links := []map[string]string{
+		{"name": "github", "url": "https://github.com/foo"},
+		{"name": "unknown_link", "url": "https://example.com"},
+	}
+	linksJSON, _ := json.Marshal(links)
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{
+			"links": json.RawMessage(linksJSON),
+		}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for invalid links name, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_InvalidLinksURLPrefix: links.url 前缀不匹配 → 报错。
+func TestValidateAssetInfoFile_InvalidLinksURLPrefix(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	links := []map[string]string{
+		{"name": "whitepaper", "url": "https://example.com/doc.pdf"},
+		{"name": "github", "url": "https://example.com"},
+	}
+	linksJSON, _ := json.Marshal(links)
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{
+			"links": json.RawMessage(linksJSON),
+		}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for invalid links url prefix, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_LinksNotHTTPS: links.url 不是 https:// → 报错。
+func TestValidateAssetInfoFile_LinksNotHTTPS(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	links := []map[string]string{
+		{"name": "whitepaper", "url": "https://example.com/a"},
+		{"name": "blog", "url": "http://example.com"},
+	}
+	linksJSON, _ := json.Marshal(links)
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr,
+		makeAssetInfoJSON(map[string]interface{}{
+			"links": json.RawMessage(linksJSON),
+		}))
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for non-https links url, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_ReadJSONError: 非法 JSON → 读取错误。
+func TestValidateAssetInfoFile_ReadJSONError(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	f := writeAssetInfoFile(t, "ethereum", ethAssetAddr, "{invalid json")
+	err := s.ValidateAssetInfoFile(f)
+	if err == nil {
+		t.Fatal("expected error for invalid JSON, got nil")
+	}
+}
+
+// TestValidateAssetInfoFile_CryptoorgException: cryptoorg 链跳过字段校验 → 即使字段非法也通过。
+func TestValidateAssetInfoFile_CryptoorgException(t *testing.T) {
+	chdirTempDir(t)
+	s := &Service{}
+	// cryptoorg handle
+	cryptoHandle := coin.Cryptoorg().Handle
+	// 即使 type、id、status 全是非法值,因 cryptoorg 例外也会通过
+	f := writeAssetInfoFile(t, cryptoHandle, "someaddr",
+		makeAssetInfoJSON(map[string]interface{}{
+			"type":   "INVALID",
+			"status": "wrong",
+			"id":     "wrong",
+		}))
+	// 注意:目录地址 someaddr 与 id=wrong 不一致,但 cryptoorg 跳过 ValidateAsset
+	if err := s.ValidateAssetInfoFile(f); err != nil {
+		t.Fatalf("expected nil for cryptoorg exception, got: %v", err)
 	}
 }
