@@ -1,40 +1,39 @@
 #!/usr/bin/env bash
 # 单元测试：验证 tunnel.sh 的公网 URL 抓取逻辑
+# 用法：bash test_tunnel_extract.sh
+# 特点：通过 source 复用 tunnel.sh 里的真实函数定义，避免代码不同步
 set -e
 
+# ---------- 路径解析（支持从任意目录运行） ----------
+# $BASH_SOURCE 是当前脚本路径，$0 在某些 shell 里不可靠
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TUNNEL_SH="$SCRIPT_DIR/tunnel.sh"
+
+if [ ! -f "$TUNNEL_SH" ]; then
+  echo "错误：找不到 tunnel.sh（期望路径：$TUNNEL_SH）" >&2
+  exit 1
+fi
+
+# ---------- 颜色输出 ----------
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
 pass() { echo -e "${GREEN}✓ $1${NC}"; }
-fail() { echo -e "${RED}✗ $1${NC}"; exit 1; }
+fail() { echo -e "${RED}✗ $1${NC}" >&2; exit 1; }
 
-# 直接复制 tunnel.sh 里的两个核心抓取函数
-extract_trycloudflare_url() {
-  local text="$1"
-  echo "$text" \
-    | grep -oE "https://[a-zA-Z0-9-]+\.trycloudflare\.com" \
-    | grep -v "^https://api\.trycloudflare\.com$" \
-    | head -1
-}
+# ---------- 从 tunnel.sh 加载函数定义 ----------
+# 通过 TUNNEL_LIB_ONLY=1 让 tunnel.sh 跳过主流程，只暴露函数
+TUNNEL_LIB_ONLY=1 source "$TUNNEL_SH"
 
-extract_tunnel_url_from_json() {
-  local text="$1"
-  echo "$text" | python3 -c "
-import sys, json
-try:
-    d = json.load(sys.stdin)
-    ts = d.get('tunnels') or []
-    if not ts:
-        sys.exit(0)
-    https_urls = [t['public_url'] for t in ts if str(t.get('public_url','')).startswith('https://')]
-    if https_urls:
-        print(https_urls[0])
-    else:
-        print(ts[0].get('public_url',''))
-except Exception:
-    pass
-" 2>/dev/null
-}
+# 校验关键函数已加载
+if ! declare -f extract_trycloudflare_url >/dev/null 2>&1; then
+  fail "extract_trycloudflare_url 未从 tunnel.sh 加载"
+fi
+if ! declare -f extract_tunnel_url_from_json >/dev/null 2>&1; then
+  fail "extract_tunnel_url_from_json 未从 tunnel.sh 加载"
+fi
+
+# ---------- 测试用例 ----------
 
 echo "测试 1: 标准成功日志"
 LOG='2026-10-05T20:47:39Z INF Your quick Tunnel has been created! Visit it at: https://abc123-def456-789.trycloudflare.com'
@@ -82,7 +81,7 @@ JSON='{"tunnels":[{"name":"http","public_url":"http://x.tcp.ngrok.io:80"}]}'
 URL=$(extract_tunnel_url_from_json "$JSON")
 [ "$URL" = "http://x.tcp.ngrok.io:80" ] && pass "URL=$URL" || fail "got=$URL"
 
-echo "测试 10: trycloudflare 多行文本，取第一个有效 URL"
+echo "测试 10: trycloudflare 多行日志，取第一个有效 URL"
 LOG='INF Thank you for trying Cloudflare Tunnel.
 INF Requesting new quick Tunnel on trycloudflare.com...
 INF Your quick Tunnel has been created! Visit it at: https://first-xyz.trycloudflare.com
@@ -92,3 +91,4 @@ URL=$(extract_trycloudflare_url "$LOG")
 
 echo ""
 echo "全部 10 个测试通过 ✓"
+echo "（已通过 source 复用 $TUNNEL_SH 中的函数定义）"

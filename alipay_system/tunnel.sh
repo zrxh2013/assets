@@ -261,54 +261,62 @@ stop_existing() {
 }
 
 # ---------- 主流程 ----------
-if [ "$PORT" = "stop" ]; then
+main() {
+  if [ "$PORT" = "stop" ]; then
+    stop_existing
+    ok "隧道已停止"
+    exit 0
+  fi
+
   stop_existing
-  ok "隧道已停止"
-  exit 0
-fi
 
-stop_existing
+  case "$MODE" in
+    --ssh|ssh) use_ssh ;;
+    --ngrok|ngrok) use_ngrok ;;
+    --cpolar|cpolar) use_cpolar ;;
+    --cf|cloudflared) use_cloudflared ;;
+    auto|"")
+      if use_ngrok; then
+        TUNNEL_OK=1
+      elif use_cpolar; then
+        TUNNEL_OK=1
+      elif use_cloudflared; then
+        TUNNEL_OK=1
+      elif use_ssh; then
+        TUNNEL_OK=1
+      fi
+      ;;
+    *) echo "未知模式: $MODE"; exit 2 ;;
+  esac
 
-case "$MODE" in
-  --ssh|ssh) use_ssh ;;
-  --ngrok|ngrok) use_ngrok ;;
-  --cpolar|cpolar) use_cpolar ;;
-  --cf|cloudflared) use_cloudflared ;;
-  auto|"")
-    if use_ngrok; then
-      TUNNEL_OK=1
-    elif use_cpolar; then
-      TUNNEL_OK=1
-    elif use_cloudflared; then
-      TUNNEL_OK=1
-    elif use_ssh; then
-      TUNNEL_OK=1
-    fi
-    ;;
-  *) echo "未知模式: $MODE"; exit 2 ;;
-esac
+  if [ ! -f "$TUNNEL_URL_FILE" ]; then
+    echo ""
+    warn "所有穿透策略均失败"
+    echo ""
+    echo "排查建议："
+    echo "  1. 安装 ngrok:  https://ngrok.com/download"
+    echo "  2. 安装 cpolar: https://www.cpolar.com/install"
+    echo "  3. 网络通畅时脚本会自动下载 cloudflared"
+    echo "  4. 有公网服务器用 SSH 反向隧道：bash tunnel.sh 8000 --ssh"
+    exit 1
+  fi
 
-if [ ! -f "$TUNNEL_URL_FILE" ]; then
+  URL=$(cat "$TUNNEL_URL_FILE")
   echo ""
-  warn "所有穿透策略均失败"
+  ok "隧道已就绪"
+  echo "  公网地址: ${URL}"
+  echo "  本地服务: http://127.0.0.1:${PORT}"
   echo ""
-  echo "排查建议："
-  echo "  1. 安装 ngrok:  https://ngrok.com/download"
-  echo "  2. 安装 cpolar: https://www.cpolar.com/install"
-  echo "  3. 网络通畅时脚本会自动下载 cloudflared"
-  echo "  4. 有公网服务器用 SSH 反向隧道：bash tunnel.sh 8000 --ssh"
-  exit 1
-fi
+  echo "支付宝回调配置（写入 .env）："
+  echo "  ALIPAY_NOTIFY_URL=${URL}/alipay/notify"
+  echo "  ALIPAY_RETURN_URL=${URL}/pay/return"
+  echo ""
+  echo "  URL 已保存: $(readlink -f "$TUNNEL_URL_FILE")"
+  echo "  停止隧道: bash $(readlink -f "$0") stop"
+}
 
-URL=$(cat "$TUNNEL_URL_FILE")
-echo ""
-ok "隧道已就绪"
-echo "  公网地址: ${URL}"
-echo "  本地服务: http://127.0.0.1:${PORT}"
-echo ""
-echo "支付宝回调配置（写入 .env）："
-echo "  ALIPAY_NOTIFY_URL=${URL}/alipay/notify"
-echo "  ALIPAY_RETURN_URL=${URL}/pay/return"
-echo ""
-echo "  URL 已保存: $(readlink -f "$TUNNEL_URL_FILE")"
-echo "  停止隧道: bash $(readlink -f "$0") stop"
+# 守卫：TUNNEL_LIB_ONLY=1 时只加载函数定义，不执行主流程
+# 用法：TUNNEL_LIB_ONLY=1 source tunnel.sh （供其他脚本复用函数）
+if [ "${TUNNEL_LIB_ONLY:-0}" != "1" ]; then
+  main
+fi
