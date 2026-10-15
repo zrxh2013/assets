@@ -861,19 +861,25 @@ def pay_confirm(token):
     if p["status"] in ("failed", "refunded", "closed"):
         return jsonify({"ok": False, "msg": f"订单状态为 {ORDER_STATUS[p['status']]}，无法支付"}), 400
 
+    # 真实支付宝模式：买家用支付宝 App 扫码付款，由支付宝异步通知更新订单，
+    # 不应在此处模拟扣款。前端走 showAlipayQR + 轮询 /query 拿状态。
+    if is_real_pay():
+        if p["status"] == "pending":
+            return jsonify({"ok": False, "msg": "请用支付宝 App 扫码完成支付"}), 400
+        return jsonify({"ok": False, "msg": f"订单状态为 {ORDER_STATUS[p['status']]}"}), 400
+
     # 模拟模式：校验支付令牌（密码校验通过后下发，防止跳过密码直接支付）
-    if not is_real_pay():
-        pay_token = (request.form.get("pay_token") or "").strip()
-        stored = _pay_tokens.get(trade_no)
-        if not stored:
-            return jsonify({"ok": False, "msg": "请先完成支付密码校验"}), 403
-        if time.time() > stored["expires"]:
-            _pay_tokens.pop(trade_no, None)
-            return jsonify({"ok": False, "msg": "支付令牌已过期，请重新校验密码"}), 403
-        if not secrets.compare_digest(pay_token, stored["token"]):
-            return jsonify({"ok": False, "msg": "支付令牌无效"}), 403
-        # 令牌使用后立即销毁（一次性）
+    pay_token = (request.form.get("pay_token") or "").strip()
+    stored = _pay_tokens.get(trade_no)
+    if not stored:
+        return jsonify({"ok": False, "msg": "请先完成支付密码校验"}), 403
+    if time.time() > stored["expires"]:
         _pay_tokens.pop(trade_no, None)
+        return jsonify({"ok": False, "msg": "支付令牌已过期，请重新校验密码"}), 403
+    if not secrets.compare_digest(pay_token, stored["token"]):
+        return jsonify({"ok": False, "msg": "支付令牌无效"}), 403
+    # 令牌使用后立即销毁（一次性）
+    _pay_tokens.pop(trade_no, None)
 
     # 模拟网关扣款（真实场景此处调用支付宝 alipay.trade.pay）
     alipay_trade_no = gen_alipay_trade_no()
