@@ -1,0 +1,22 @@
+{
+  "chains": {
+    "polygon": {
+      "chainId": 137,
+      "rpcUrl": "https://polygon-rpc.com",
+      "deBridgeGate": "0x43dE2d77BF8027e25dBD179B491e8d64f38398aA",
+      "callProxy": "0x8a0C79F5532f3b2a16AD1E4282A5DAF81928a824",
+      "explorer": "https://polygonscan.com"
+    },
+    "tron": {
+      "chainId": 728126428,
+      "rpcUrl": "https://api.trongrid.io",
+      "deBridgeGate": "TTGA4XQ419jodtFSMFiwYqfgG2uSLRBsnn",
+      "callProxy": "TUo8FfeP9XJdfB8zoH2nJGLi7CL2LJ1Lin",
+      "explorer": "https://tronscan.org"
+    }
+  },
+  "contracts": {
+    "sender": "",
+    "receiver": ""
+  }
+}

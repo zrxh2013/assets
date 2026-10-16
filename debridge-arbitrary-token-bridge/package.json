@@ -1,0 +1,26 @@
+{
+  "name": "debridge-arbitrary-token-bridge",
+  "version": "1.0.0",
+  "description": "使用 deBridge DMP 实现任意 ERC-20 代币从 Polygon 跨链到 Tron 的完整方案",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:sender": "ts-node scripts/deploy-sender.ts",
+    "deploy:receiver": "ts-node scripts/deploy-receiver.ts",
+    "set-trusted": "ts-node scripts/set-trusted-addresses.ts",
+    "bridge": "ts-node scripts/bridge-to-tron.ts",
+    "status": "ts-node scripts/check-status.ts"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.0",
+    "ethers": "^6.9.0",
+    "tronweb": "^5.3.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0"
+  }
+}
