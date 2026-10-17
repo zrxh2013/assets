@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.26;
 
 import "./interfaces/IDeBridgeGate.sol";
 import "./interfaces/ICallProxy.sol";

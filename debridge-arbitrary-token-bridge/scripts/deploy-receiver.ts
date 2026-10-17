@@ -32,66 +32,25 @@ async function main() {
   // 读取编译后的合约字节码
   const artifact = JSON.parse(
     fs.readFileSync(
-      path.join(__dirname, "..", "artifacts", "TokenReceiver.json"),
+      path.join(__dirname, "..", "artifacts", "contracts", "TokenReceiver.sol", "TokenReceiver.json"),
       "utf-8"
     )
   );
 
-  // 编码构造函数参数
+  // 使用 tronWeb.contract().new() 部署，自动处理 ABI 与构造函数参数
   // constructor(address deBridgeGate_, uint256 sourceChainId_)
-  const constructorParams = [
-    { type: "address", value: config.chains.tron.deBridgeGate },
-    { type: "uint256", value: config.chains.polygon.chainId },
-  ];
+  console.log("\n⏳ 正在部署 TokenReceiver...");
+  const instance = await tronWeb.contract().new({
+    abi: artifact.abi,
+    bytecode: artifact.bytecode,
+    feeLimit: 1_000_000_000, // 1000 TRX
+    callValue: 0,
+    parameters: [config.chains.tron.deBridgeGate, config.chains.polygon.chainId],
+  });
 
-  const parameter = tronWeb.utils.abi.encodeParams(
-    constructorParams.map((p) => p.type),
-    constructorParams.map((p) => p.value)
-  );
-
-  const bytecodeWithParams = artifact.bytecode + parameter.replace("0x", "");
-
-  // 部署合约
-  const transaction = await tronWeb.transactionBuilder.createSmartContract(
-    {
-      bytecode: bytecodeWithParams,
-      feeLimit: 1000_000_000, // 1000 TRX
-      callValue: 0,
-    },
-    deployer
-  );
-
-  const signedTx = await tronWeb.trx.sign(transaction, tronPrivateKey);
-  const result = await tronWeb.trx.sendRawTransaction(signedTx);
-
-  if (!result.result) {
-    throw new Error("合约部署失败: " + JSON.stringify(result));
-  }
-
-  console.log("\n✅ TokenReceiver 部署中...");
-  console.log("交易哈希:", result.txid);
-  console.log("区块浏览器:", `${config.chains.tron.explorer}/#/transaction/${result.txid}`);
-
-  // 等待合约部署确认
-  let contractAddress = "";
-  for (let i = 0; i < 30; i++) {
-    await new Promise((r) => setTimeout(r, 3000));
-    const txInfo = await tronWeb.trx.getTransactionInfo(result.txid);
-    if (txInfo.contractAddress) {
-      contractAddress = txInfo.contractAddress;
-      break;
-    }
-  }
-
-  if (!contractAddress) {
-    throw new Error("合约部署超时，请手动检查交易");
-  }
-
-  // Tron 合约地址转换为 Base58
-  const base58Address = tronWeb.address.fromHex(contractAddress);
+  const base58Address = instance.address;
 
   console.log("\n✅ TokenReceiver 部署成功！");
-  console.log("合约地址 (hex):", contractAddress);
   console.log("合约地址 (Base58):", base58Address);
   console.log("区块浏览器:", `${config.chains.tron.explorer}/#/contract/${base58Address}`);
 

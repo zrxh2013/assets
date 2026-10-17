@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -37,7 +37,7 @@ contract TokenSender {
     event CrossChainTransfer(
         address indexed sender,
         uint256 amount,
-        bytes submissionId
+        bytes32 submissionId
     );
     event TrustedReceiverUpdated(bytes oldReceiver, bytes newReceiver);
 
@@ -71,12 +71,13 @@ contract TokenSender {
     /**
      * @notice 发起跨链转账：锁定源代币，发送消息到目标链铸造代币
      * @param amount 转账数量（以最小单位计）
-     * @param receiver 目标链接收地址（Tron 地址打包为 bytes）
+     * @param receiver 目标链用户地址，20 字节 EVM 风格地址
+     *                 （Tron 地址去掉 0x41 前缀后的 20 字节账户地址）
      * @dev 用户需先 approve 本合约足够的 sourceToken 额度
      */
     function bridgeToken(uint256 amount, bytes calldata receiver) external payable {
         require(amount > 0, "Amount must be > 0");
-        require(receiver.length == 34, "Invalid Tron address length"); // Tron 地址 34 bytes (Base58)
+        require(receiver.length == 20, "Receiver must be 20-byte address");
         require(trustedReceiver.length > 0, "Receiver not set");
 
         // 1. 将用户代币转入本合约（锁定）

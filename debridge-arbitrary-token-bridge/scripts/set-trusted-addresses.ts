@@ -35,7 +35,8 @@ async function main() {
     privateKey: tronPrivateKey,
   });
 
-  const senderAddressBytes = ethers.toUtf8Bytes(config.contracts.sender);
+  // Polygon 是 EVM 链，CallProxy.submissionNativeSender() 返回 20 字节地址
+  const senderAddressBytes = ethers.getBytes(config.contracts.sender);
   console.log("Sender (Polygon):", config.contracts.sender);
   console.log("Sender bytes:", ethers.hexlify(senderAddressBytes));
 
@@ -59,7 +60,7 @@ async function main() {
 
   const senderArtifact = JSON.parse(
     fs.readFileSync(
-      path.join(__dirname, "..", "artifacts", "TokenSender.json"),
+      path.join(__dirname, "..", "artifacts", "contracts", "TokenSender.sol", "TokenSender.json"),
       "utf-8"
     )
   );
@@ -70,7 +71,11 @@ async function main() {
     wallet
   );
 
-  const receiverBytes = ethers.toUtf8Bytes(config.contracts.receiver);
+  // deBridge 的 send() 中 _receiver 需要目标链地址的原生字节表示。
+  // TronWeb 的 toHex() 返回 21 字节（0x41 前缀 + 20 字节），作为 Tron 合约地址的字节表示。
+  // 注意：此编码需与 deBridge 对 Tron 地址的期望格式一致，请在部署前对照官方文档确认。
+  const receiverHex = TronWeb.address.toHex(config.contracts.receiver);
+  const receiverBytes = ethers.getBytes(receiverHex);
   console.log("Receiver (Tron):", config.contracts.receiver);
   console.log("Receiver bytes:", ethers.hexlify(receiverBytes));
 

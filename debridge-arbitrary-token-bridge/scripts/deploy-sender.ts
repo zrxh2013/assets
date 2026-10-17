@@ -34,7 +34,7 @@ async function main() {
   // 读取合约 ABI 和 Bytecode
   const artifact = JSON.parse(
     fs.readFileSync(
-      path.join(__dirname, "..", "artifacts", "TokenSender.json"),
+      path.join(__dirname, "..", "artifacts", "contracts", "TokenSender.sol", "TokenSender.json"),
       "utf-8"
     )
   );

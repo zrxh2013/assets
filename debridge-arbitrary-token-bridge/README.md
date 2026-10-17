@@ -116,10 +116,19 @@ WATCH=true npm run status 0xYourSubmissionId
 
 ## 注意事项
 
-1. **Tron 地址格式**：Tron 地址为 34 字符 Base58 字符串，跨链消息中以 UTF-8 字节传输
-2. **精度对齐**：确保源链代币和目标链铸造代币的精度一致
-3. **回源链**：`TokenReceiver.bridgeBack()` 支持从 Tron 销毁代币并在源链解锁（需 Sender 实现 unlock 逻辑）
-4. **协议费用**：通过 `deBridgeGate.globalFixedNativeFee()` 动态获取
+1. **Tron 地址编码**：合约中用户接收地址统一使用 **20 字节 EVM 风格地址**（Tron 地址去掉 `0x41` 前缀后的账户地址）。脚本通过 `TronWeb.address.toHex()` 自动完成 Base58 → 20 字节的转换
+2. **目标链合约地址格式**：`_receiver`/`trustedReceiver` 需要使用 deBridge 对非 EVM 链地址的期望字节编码。当前脚本使用 Tron 的 21 字节（`0x41` 前缀）表示，**部署前请对照 deBridge 官方文档确认**
+3. **精度对齐**：确保源链代币和目标链铸造代币的精度一致
+4. **回源链**：`TokenReceiver.bridgeBack()` 支持从 Tron 销毁代币并在源链解锁（需 Sender 实现 unlock 逻辑）
+5. **协议费用**：通过 `deBridgeGate.globalFixedNativeFee()` 动态获取
+6. **编译器版本**：Solidity `0.8.26`（OpenZeppelin v5.6 依赖 `^0.8.24`/`^0.8.26`）
+7. **类型声明**：`tronweb` 无官方类型，已通过 [types/tronweb.d.ts](types/tronweb.d.ts) 提供最小声明
+
+## 已验证项
+
+- `npx hardhat compile` — 11 个 Solidity 文件编译通过
+- `npx tsc --noEmit` — 全部脚本类型检查通过
+- 地址转换逻辑 — Base58 ↔ 20 字节往返验证通过
 
 ## 参考资料
 

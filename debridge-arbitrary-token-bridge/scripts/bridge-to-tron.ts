@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import TronWeb from "tronweb";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -37,7 +38,7 @@ async function main() {
   // 读取合约 ABI
   const senderArtifact = JSON.parse(
     fs.readFileSync(
-      path.join(__dirname, "..", "artifacts", "TokenSender.json"),
+      path.join(__dirname, "..", "artifacts", "contracts", "TokenSender.sol", "TokenSender.json"),
       "utf-8"
     )
   );
@@ -76,10 +77,16 @@ async function main() {
     console.log("✅ Approve 成功:", approveTx.hash);
   }
 
-  // 4. 将 Tron 地址转换为 bytes（Base58 字符串的 UTF-8 编码）
-  //    Tron 地址是 34 字符的 Base58 字符串
-  const receiverBytes = ethers.toUtf8Bytes(tronReceiver);
-  console.log("Receiver bytes:", ethers.hexlify(receiverBytes));
+  // 4. 将 Tron Base58 地址转换为 20 字节 EVM 风格地址
+  //    TronWeb 的 toHex() 返回 21 字节（0x41 前缀 + 20 字节账户地址），
+  //    去掉前缀 "41" 后得到 20 字节，与合约要求的 receiver.length == 20 对齐。
+  const tronHex = TronWeb.address.toHex(tronReceiver); // 形如 "41xxxxxxxx..."
+  const receiver20 = tronHex.slice(2); // 去掉 "41" 前缀 → 40 个 hex 字符 = 20 字节
+  if (!/^[0-9a-fA-F]{40}$/.test(receiver20)) {
+    throw new Error("Tron 地址转换失败: " + tronHex);
+  }
+  const receiverBytes = ethers.getBytes("0x" + receiver20);
+  console.log("Receiver (20 bytes):", ethers.hexlify(receiverBytes));
 
   // 5. 发起跨链转账
   console.log("\n正在发起跨链转账...");
@@ -95,7 +102,7 @@ async function main() {
 
   // 6. 提取 submissionId
   const eventTopic = ethers.id("CrossChainTransfer(address,uint256,bytes32)");
-  const log = receipt?.logs.find((l) => l.topics[0] === eventTopic);
+  const log = receipt?.logs.find((l: ethers.Log) => l.topics[0] === eventTopic);
   if (log) {
     const parsed = senderContract.interface.parseLog(log);
     if (parsed) {
