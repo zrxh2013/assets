@@ -1,0 +1,32 @@
+{
+  "chains": {
+    "amoy": {
+      "chainId": 80002,
+      "rpcUrl": "https://polygon-amoy.drpc.org",
+      "explorer": "https://amoy.polygonscan.com"
+    },
+    "nile": {
+      "chainId": 3448148188,
+      "rpcUrl": "https://nile.trongrid.io",
+      "explorer": "https://nile.tronscan.org"
+    }
+  },
+  "contracts": {
+    "amoy": {
+      "token": "",
+      "gate": "",
+      "callProxy": "",
+      "sender": ""
+    },
+    "nile": {
+      "gate": "",
+      "callProxy": "",
+      "receiver": ""
+    }
+  },
+  "e2e": {
+    "submissionId": "",
+    "recipient": "",
+    "amount": ""
+  }
+}

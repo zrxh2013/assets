@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/workspace/debridge-arbitrary-token-bridge/contracts/TokenReceiver.sol": {
-      "lastModificationDate": 1793636208445,
-      "contentHash": "bffeba47b565eee9e5154b763b8109e7",
+      "lastModificationDate": 1793636926904,
+      "contentHash": "8e24b6395430667da8247eb13f5c2c55",
       "sourceName": "contracts/TokenReceiver.sol",
       "solcConfig": {
         "version": "0.8.26",
@@ -78,8 +78,8 @@
       ]
     },
     "/workspace/debridge-arbitrary-token-bridge/contracts/interfaces/ICallProxy.sol": {
-      "lastModificationDate": 1793636208445,
-      "contentHash": "990bc1f2948a1b60fce3f0d8273b465b",
+      "lastModificationDate": 1793636911504,
+      "contentHash": "c0113ef53327630bee294c1e019a287a",
       "sourceName": "contracts/interfaces/ICallProxy.sol",
       "solcConfig": {
         "version": "0.8.26",
@@ -114,8 +114,8 @@
       ]
     },
     "/workspace/debridge-arbitrary-token-bridge/contracts/interfaces/IFlags.sol": {
-      "lastModificationDate": 1793636208445,
-      "contentHash": "d3f4c446d9cc945a1cc4de01019652c3",
+      "lastModificationDate": 1793636904592,
+      "contentHash": "6bfc74e07f540218cf8c27faa68ad209",
       "sourceName": "contracts/interfaces/IFlags.sol",
       "solcConfig": {
         "version": "0.8.26",
@@ -150,8 +150,8 @@
       ]
     },
     "/workspace/debridge-arbitrary-token-bridge/contracts/TokenSender.sol": {
-      "lastModificationDate": 1793636208445,
-      "contentHash": "7ce1653ddf469a8bcd70a0cdb4afae05",
+      "lastModificationDate": 1793636919944,
+      "contentHash": "bb59d113fa439a1fe0f9ba8dd1c9fc06",
       "sourceName": "contracts/TokenSender.sol",
       "solcConfig": {
         "version": "0.8.26",
@@ -410,6 +410,276 @@
       ],
       "artifacts": [
         "IERC165"
+      ]
+    },
+    "/workspace/debridge-arbitrary-token-bridge/contracts/mocks/MockDeBridgeGate.sol": {
+      "lastModificationDate": 1793636981184,
+      "contentHash": "f7034ad33f56a4e1811e14043c1b5f16",
+      "sourceName": "contracts/mocks/MockDeBridgeGate.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IDeBridgeGate.sol",
+        "../interfaces/IFlags.sol",
+        "./MockCallProxy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "MockDeBridgeGate"
+      ]
+    },
+    "/workspace/debridge-arbitrary-token-bridge/contracts/mocks/MockCallProxy.sol": {
+      "lastModificationDate": 1793636949540,
+      "contentHash": "ffff71a9f474c1fa10b260850f8a27c7",
+      "sourceName": "contracts/mocks/MockCallProxy.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/ICallProxy.sol",
+        "../interfaces/IFlags.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "MockCallProxy"
+      ]
+    },
+    "/workspace/debridge-arbitrary-token-bridge/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
+      "lastModificationDate": 1793636211261,
+      "contentHash": "513778b30d2750f5d2b9b19bbcf748a5",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IERC20.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.2"
+      ],
+      "artifacts": [
+        "IERC20Metadata"
+      ]
+    },
+    "/workspace/debridge-arbitrary-token-bridge/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol": {
+      "lastModificationDate": 1793636211257,
+      "contentHash": "d15c4d05583536e080f1960ab282772d",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol",
+        "./extensions/IERC20Metadata.sol",
+        "../../utils/Context.sol",
+        "../../interfaces/draft-IERC6093.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/workspace/debridge-arbitrary-token-bridge/node_modules/@openzeppelin/contracts/utils/Context.sol": {
+      "lastModificationDate": 1793636211269,
+      "contentHash": "67bfbc07588eb8683b3fd8f6f909563e",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/workspace/debridge-arbitrary-token-bridge/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol": {
+      "lastModificationDate": 1793636211249,
+      "contentHash": "bcc76f4747d56c28c40ae272ef3470a6",
+      "sourceName": "@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.8.4"
+      ],
+      "artifacts": [
+        "IERC1155Errors",
+        "IERC20Errors",
+        "IERC721Errors"
+      ]
+    },
+    "/workspace/debridge-arbitrary-token-bridge/contracts/mocks/MockERC20.sol": {
+      "lastModificationDate": 1793636942304,
+      "contentHash": "88be4618828c517aff4fdd7b40f381de",
+      "sourceName": "contracts/mocks/MockERC20.sol",
+      "solcConfig": {
+        "version": "0.8.26",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.26"
+      ],
+      "artifacts": [
+        "MockERC20"
       ]
     }
   }

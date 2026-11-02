@@ -2,5 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as interfaces from "./interfaces";
+export * as mocks from "./mocks";
 export { TokenReceiver__factory } from "./TokenReceiver__factory";
 export { TokenSender__factory } from "./TokenSender__factory";

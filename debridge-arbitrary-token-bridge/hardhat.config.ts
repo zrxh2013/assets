@@ -19,6 +19,14 @@ const config: HardhatUserConfig = {
       url: process.env.POLYGON_RPC || "https://polygon-rpc.com",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
+    amoy: {
+      url: process.env.AMOY_RPC || "https://polygon-amoy.drpc.org",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 80002,
+    },
+    hardhat: {
+      chainId: 31337,
+    },
   },
   paths: {
     sources: "./contracts",

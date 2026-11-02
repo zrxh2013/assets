@@ -4,26 +4,15 @@ pragma solidity ^0.8.26;
 /**
  * @title ICallProxy
  * @notice deBridge CallProxy 合约接口
- * @dev CallProxy 负责在目标链执行跨链消息的外部调用
+ * @dev 对齐 deBridge v1 真实 CallProxy：只暴露两个公开状态变量
+ *      submissionChainIdFrom / submissionNativeSender，以及 call/callERC20。
+ *      注意：CallProxy 并没有 submissionAutoParamsTo() / submissionId() 这类 getter，
+ *      目标合约所需的业务数据必须由 autoParams.data 作为 calldata 直接传入。
  */
 interface ICallProxy {
-    /**
-     * @notice 获取当前提交来源的链 ID
-     */
+    /// @notice 当前提交的来源链 ID（仅在外部调用执行期间有值）
     function submissionChainIdFrom() external view returns (uint256);
 
-    /**
-     * @notice 获取当前提交的原生发送者地址
-     */
+    /// @notice 当前提交的原生发送者地址（仅在外部调用执行期间有值）
     function submissionNativeSender() external view returns (bytes memory);
-
-    /**
-     * @notice 获取当前提交的自动参数
-     */
-    function submissionAutoParamsTo() external view returns (bytes memory);
-
-    /**
-     * @notice 获取当前提交的 ID
-     */
-    function submissionId() external view returns (bytes32);
 }

@@ -21,23 +21,11 @@ import type {
 
 export interface ICallProxyInterface extends Interface {
   getFunction(
-    nameOrSignature:
-      | "submissionAutoParamsTo"
-      | "submissionChainIdFrom"
-      | "submissionId"
-      | "submissionNativeSender"
+    nameOrSignature: "submissionChainIdFrom" | "submissionNativeSender"
   ): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: "submissionAutoParamsTo",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "submissionChainIdFrom",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "submissionId",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -46,15 +34,7 @@ export interface ICallProxyInterface extends Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "submissionAutoParamsTo",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "submissionChainIdFrom",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "submissionId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -106,11 +86,7 @@ export interface ICallProxy extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  submissionAutoParamsTo: TypedContractMethod<[], [string], "view">;
-
   submissionChainIdFrom: TypedContractMethod<[], [bigint], "view">;
-
-  submissionId: TypedContractMethod<[], [string], "view">;
 
   submissionNativeSender: TypedContractMethod<[], [string], "view">;
 
@@ -119,14 +95,8 @@ export interface ICallProxy extends BaseContract {
   ): T;
 
   getFunction(
-    nameOrSignature: "submissionAutoParamsTo"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
     nameOrSignature: "submissionChainIdFrom"
   ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "submissionId"
-  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "submissionNativeSender"
   ): TypedContractMethod<[], [string], "view">;

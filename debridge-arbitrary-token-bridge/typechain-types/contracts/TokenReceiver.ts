@@ -59,7 +59,7 @@ export interface TokenReceiverInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "receiveCrossChainMessage",
-    values?: undefined
+    values: [BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setTrustedSender",
@@ -215,7 +215,11 @@ export interface TokenReceiver extends BaseContract {
 
   deBridgeGate: TypedContractMethod<[], [string], "view">;
 
-  receiveCrossChainMessage: TypedContractMethod<[], [void], "nonpayable">;
+  receiveCrossChainMessage: TypedContractMethod<
+    [receiver_: BytesLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   setTrustedSender: TypedContractMethod<
     [sender_: BytesLike],
@@ -251,7 +255,11 @@ export interface TokenReceiver extends BaseContract {
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "receiveCrossChainMessage"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+  ): TypedContractMethod<
+    [receiver_: BytesLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "setTrustedSender"
   ): TypedContractMethod<[sender_: BytesLike], [void], "nonpayable">;

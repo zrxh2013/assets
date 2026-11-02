@@ -8,7 +8,12 @@
     "deploy:receiver": "ts-node scripts/deploy-receiver.ts",
     "set-trusted": "ts-node scripts/set-trusted-addresses.ts",
     "bridge": "ts-node scripts/bridge-to-tron.ts",
-    "status": "ts-node scripts/check-status.ts"
+    "status": "ts-node scripts/check-status.ts",
+    "testnet:deploy:amoy": "ts-node scripts/testnet/deploy-amoy.ts",
+    "testnet:deploy:nile": "ts-node scripts/testnet/deploy-nile.ts",
+    "testnet:set-trusted": "ts-node scripts/testnet/set-trusted.ts",
+    "testnet:e2e": "ts-node scripts/testnet/e2e.ts",
+    "testnet:local": "hardhat run scripts/testnet/local-e2e.ts"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.0",

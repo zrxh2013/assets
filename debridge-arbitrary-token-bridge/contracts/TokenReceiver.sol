@@ -91,28 +91,22 @@ contract TokenReceiver {
 
     /**
      * @notice 接收跨链消息并铸造代币（仅 CallProxy 可调用）
-     * @dev 由 deBridge 的 CallProxy 在目标链执行
-     *      message = abi.encode(receiverAddress, amount)
+     * @dev 由 deBridge 的 CallProxy 在目标链执行：
+     *      autoParams.data = abi.encodeWithSelector(this.receiveCrossChainMessage.selector, receiver, amount)
+     *      因此本函数直接从 calldata 取参数，而不是去 CallProxy 上读（CallProxy 没有该 getter）。
+     * @param receiver_ 目标链接收者的 20 字节地址表示
+     * @param amount 铸造数量
      */
-    function receiveCrossChainMessage() external onlyCrossChainSender {
-        // 从 CallProxy 获取原始消息
-        bytes memory message = ICallProxy(
-            IDeBridgeGate(deBridgeGate).callProxy()
-        ).submissionAutoParamsTo();
-
-        // 解码消息
-        (bytes memory receiverBytes, uint256 amount) = abi.decode(
-            message,
-            (bytes, uint256)
-        );
-
-        // 将 Tron 地址 bytes 转换为 address
-        address receiver = bytesToAddress(receiverBytes);
+    function receiveCrossChainMessage(
+        bytes calldata receiver_,
+        uint256 amount
+    ) external onlyCrossChainSender {
+        address receiver = bytesToAddress(receiver_);
 
         // 铸造代币
         _mint(receiver, amount);
 
-        emit CrossChainMint(receiverBytes, amount, bytes32(0));
+        emit CrossChainMint(receiver_, amount, bytes32(0));
     }
 
     /**

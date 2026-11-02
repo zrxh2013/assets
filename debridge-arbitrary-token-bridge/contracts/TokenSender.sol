@@ -15,6 +15,11 @@ import "./interfaces/IFlags.sol";
 contract TokenSender {
     using SafeERC20 for IERC20;
 
+    /// @notice 目标链 TokenReceiver 的入口函数 selector
+    /// @dev 与 TokenReceiver.receiveCrossChainMessage(bytes,uint256) 必须严格一致
+    bytes4 private constant RECEIVE_CROSS_CHAIN_MESSAGE_SELECTOR =
+        bytes4(keccak256("receiveCrossChainMessage(bytes,uint256)"));
+
     // ============ 状态变量 ============
 
     /// @notice deBridgeGate 合约地址（Polygon 主网）
@@ -87,8 +92,14 @@ contract TokenSender {
         uint256 protocolFee = IDeBridgeGate(deBridgeGate).globalFixedNativeFee();
         require(msg.value >= protocolFee, "Insufficient protocol fee");
 
-        // 3. 编码跨链消息：(receiver, amount)
-        bytes memory message = abi.encode(receiver, amount);
+        // 3. 编码目标链外部调用的完整 calldata
+        //    deBridge 会把 autoParams.data 原样作为 calldata 调用 _receiver，
+        //    因此这里必须是「selector + 参数」，不能只编码参数。
+        bytes memory message = abi.encodeWithSelector(
+            RECEIVE_CROSS_CHAIN_MESSAGE_SELECTOR,
+            receiver,
+            amount
+        );
 
         // 4. 构建 autoParams
         IDeBridgeGate.SubmissionAutoParamsTo memory autoParams;
