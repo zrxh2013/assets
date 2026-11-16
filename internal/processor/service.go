@@ -1,6 +1,8 @@
 package processor
 
 import (
+	"sync"
+
 	assetsmanager "github.com/trustwallet/assets-go-libs/client/assets-manager"
 	"github.com/trustwallet/assets-go-libs/file"
 	"github.com/trustwallet/assets/internal/config"
@@ -9,6 +11,8 @@ import (
 type Service struct {
 	fileService   *file.Service
 	assetsManager assetsmanager.Client
+	tagsOnce      sync.Once
+	allowedTags   []string
 }
 
 func NewService(fileProvider *file.Service) *Service {

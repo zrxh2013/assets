@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/sirupsen/logrus"
 	"github.com/trustwallet/assets-go-libs/file"
 	"github.com/trustwallet/assets-go-libs/path"
 	"github.com/trustwallet/assets-go-libs/validation"
@@ -176,28 +177,37 @@ func (s *Service) ValidateDappsFolder(f *file.AssetFile) error {
 	return nil
 }
 
+func (s *Service) getAllowedTags() ([]string, bool) {
+	s.tagsOnce.Do(func() {
+		receivedTags, err := s.assetsManager.GetTagValues()
+		if err != nil {
+			logrus.WithError(err).Warn("Failed to get tag values; skipping tag allowlist validation")
+			return
+		}
+
+		s.allowedTags = make([]string, len(receivedTags.Tags))
+		for i, t := range receivedTags.Tags {
+			s.allowedTags[i] = t.ID
+		}
+	})
+
+	return s.allowedTags, s.allowedTags != nil
+}
+
 func (s *Service) ValidateChainInfoFile(f *file.AssetFile) error {
 	var coinInfo info.CoinModel
 	if err := file.ReadJSONFile(f.Path(), &coinInfo); err != nil {
 		return err
 	}
 
-	receivedTags, err := s.assetsManager.GetTagValues()
-	if err != nil {
-		return fmt.Errorf("failed to get tag values: %w", err)
+	allowedTags := coinInfo.Tags
+	if len(coinInfo.Tags) > 0 {
+		if remoteTags, ok := s.getAllowedTags(); ok {
+			allowedTags = remoteTags
+		}
 	}
 
-	tags := make([]string, len(receivedTags.Tags))
-	for i, t := range receivedTags.Tags {
-		tags[i] = t.ID
-	}
-
-	err = info.ValidateCoin(coinInfo, tags)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return info.ValidateCoin(coinInfo, allowedTags)
 }
 
 func (s *Service) ValidateAssetInfoFile(f *file.AssetFile) error {
